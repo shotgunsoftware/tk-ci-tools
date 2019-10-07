@@ -19,6 +19,10 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
-  - bash: python -m pip install black
+  - bash: python -m pip install black flake8
+    displayName: Install validators
   - bash: black --check .
-
+    displayName: black
+  # We'll check
+  - bash: flake8 --extend-ignore=E501,E203 --exclude="*/ui/*.py"
+    displayName: flake8
