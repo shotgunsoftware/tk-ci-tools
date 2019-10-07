@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 # This is a very simple build pipeline for now. It simply validates that the code
-# adheres to the Black code style.
+# adheres to the Black code style and passes flake8.
 jobs:
 - job: code_style_validation
   displayName: Code Style Validation
@@ -19,10 +19,16 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
+  # Install all the Python code validation packages.
   - bash: python -m pip install black flake8
     displayName: Install validators
-  - bash: black --check .
+  # Ensure the code that was pushed has the proper formatting, except in the
+  # ui folder.
+  - bash: black --check . --exclude="i\/.*py$"
     displayName: black
-  # We'll check
-  - bash: flake8 --extend-ignore=E501,E203 --exclude="*/ui/*.py"
+  # We'll check also that the code is flake8 compliant.
+  # We're excluding E203 as black has a different mind about white spaces when using
+  # slices than PEP8. black also uses 88 as the max line length, so use that so
+  # code comments are properly formatted.
+  - bash: flake8 --extend-ignore=E203 --exclude="*/ui/*.py" --max-line-length=88
     displayName: flake8
