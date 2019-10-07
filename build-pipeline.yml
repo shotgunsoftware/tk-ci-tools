@@ -11,7 +11,8 @@
 # This is a very simple build pipeline for now. It simply validates that the code
 # adheres to the Black code style.
 jobs:
-- job: Black Code Style Validation
+- job: code_style_validation
+  displayName: Code Style Validation
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
