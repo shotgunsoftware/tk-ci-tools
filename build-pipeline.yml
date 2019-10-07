@@ -32,3 +32,16 @@ jobs:
   # code comments are properly formatted.
   - bash: flake8 --extend-ignore=E203 --exclude="*/ui/*.py" --max-line-length=88
     displayName: flake8
+
+# Runs all tests using pytest
+- job: run_tests
+  displayName: Tests
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+  - bash: python -m pip install pytest
+  # Runs tests only if there is a test folder, otherwise displays "No test to run."
+  - bash: (test -r tests && pytest) || echo "No test to run"
