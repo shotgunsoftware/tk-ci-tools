@@ -33,5 +33,4 @@ jobs:
 - template: build-pipeline.yml@templates
 ```
 
-Someting
-    If you need to use an in-development version of these tools from a branch, you can update the `ref` in `repositories` section to point to a different branch.
+If you need to use an in-development version of these tools from a branch, you can update the `ref` in `repositories` section to point to a different branch.
