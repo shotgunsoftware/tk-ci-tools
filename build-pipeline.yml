@@ -34,15 +34,16 @@ jobs:
   - bash: black --check . --exclude="i\/.*py$"
     displayName: black
 
-  - bash: echo ${{ variables['System.PullRequest.TargetBranch'] }}
-    condition: always()
-
-  # We do a diff against the branch. We do not tolerate any flake8 errors on new code, so validate it.
+  # We do not tolerate any flake8 errors on new code, so this step will
+  # run on any PR build and only of the diff between the destination branch
+  # and the PR branch.
+  # The git clone of the repo was shallow, so we'll have to pull in the branch we're merging
+  # into. This was be done via a fetch and the diff on the origin's branch.
   - bash: |
       git fetch origin $SYSTEM_PULLREQUEST_TARGETBRANCH &&
       git diff origin/$SYSTEM_PULLREQUEST_TARGETBRANCH -- . |
       flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
-    displayName: flake8 of diff
+    displayName: flake8
     # We only run flake8 on a pull request, since only then do we know which lines are
     # modified and should be flake8ed.
     condition: eq(variables['Build.Reason'], 'PullRequest')

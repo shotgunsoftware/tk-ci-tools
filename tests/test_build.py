@@ -10,6 +10,6 @@
 
 
 def test_something():
-    pass_test =   False
+    pass_test = False
     assert pass_test
     a = b
