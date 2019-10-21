@@ -25,7 +25,7 @@ jobs:
         image_name: 'vs2017-win2016'
         platform_name: Windows
   steps:
-    - bash: pip install
+    - bash: pip install --upgrade pip
     - bash: pip install PySide2 pytest pytest-azurepipelines pytest-coverage
     - bash: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain
     - bash: pytests tests
