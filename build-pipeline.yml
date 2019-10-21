@@ -39,7 +39,8 @@ jobs:
 
   # We do a diff against the branch. We do not tolerate any flake8 errors on new code, so validate it.
   - bash: |
-      git diff $SYSTEM_PULLREQUEST_TARGETBRANCH |
+      git fetch origin $SYSTEM_PULLREQUEST_TARGETBRANCH &&
+      git diff origin/$SYSTEM_PULLREQUEST_TARGETBRANCH -- . |
       flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
     displayName: flake8 of diff
     # We only run flake8 on a pull request, since only then do we know which lines are
