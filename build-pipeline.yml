@@ -44,4 +44,4 @@ jobs:
     displayName: flake8 of diff
     # We only run flake8 on a pull request, since only then do we know which lines are
     # modified and should be flake8ed.
-    condition: ne($(System.PullRequest.TargetBranch), '')
+    condition: eq(variables['Build.Reason'], 'PullRequest')
