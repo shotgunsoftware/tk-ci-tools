@@ -12,4 +12,4 @@
 def test_something():
     pass_test =     False
     assert pass_test
-    a = b
+    a =  b
