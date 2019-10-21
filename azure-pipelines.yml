@@ -13,3 +13,5 @@ variables:
 
 jobs:
 - template: build-pipeline.yml
+  parameters:
+    flake8_exclude: "tests/*.py"
