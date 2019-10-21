@@ -1,0 +1,15 @@
+# Configures CI to be triggered by changes to any branches and on tag creation.
+trigger:
+  branches:
+    include:
+    - '*'
+  tags:
+    include:
+    - v*
+
+# This pulls in a variable group from Azure. Variables can be encrypted or not.
+variables:
+- group: deploy-secrets
+
+jobs:
+- template: build-pipeline.yml

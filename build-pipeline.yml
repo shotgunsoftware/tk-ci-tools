@@ -8,16 +8,42 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+parameters:
+  flake8_exclude: ""
+
 # This is a very simple build pipeline for now. It simply validates that the code
-# adheres to the Black code style.
+# adheres to the Black code style and passes flake8.
 jobs:
-- job: Black Code Style Validation
+- job: code_style_validation
+  displayName: Code Style Validation
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
+
+  # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
-  - bash: python -m pip install black
-  - bash: black --check .
 
+  # Install all the Python code validation packages.
+  - bash: python -m pip install black flake8
+    displayName: Install validators
+
+  # Ensure the code that was pushed has the proper formatting, except in the
+  # ui folder, which is auto-generated.
+  - bash: black --check . --exclude="i\/.*py$"
+    displayName: black
+
+  # We do not tolerate any flake8 errors on new code, so this step will
+  # run on any PR build and only of the diff between the destination branch
+  # and the PR branch.
+  # The git clone of the repo was shallow, so we'll have to pull in the branch we're merging
+  # into. This was be done via a fetch and the diff on the origin's branch.
+  - bash: |
+      git fetch origin $SYSTEM_PULLREQUEST_TARGETBRANCH &&
+      git diff origin/$SYSTEM_PULLREQUEST_TARGETBRANCH -- . |
+      flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
+    displayName: flake8
+    # We only run flake8 on a pull request, since only then do we know which lines are
+    # modified and should be flake8ed.
+    condition: eq(variables['Build.Reason'], 'PullRequest')
