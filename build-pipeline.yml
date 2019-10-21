@@ -39,4 +39,5 @@ jobs:
       git diff $(System.PullRequest.TargetBranch) |
       flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
     displayName: flake8 of diff
-    condition: eq('${{ parameters.flake8 }}', 'true')
+    # We always want the flake8 report as well as the black report.
+    condition: always()
