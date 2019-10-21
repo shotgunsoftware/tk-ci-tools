@@ -8,6 +8,9 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+parameters:
+  flake8_exclude: ""
+
 # This is a very simple build pipeline for now. It simply validates that the code
 # adheres to the Black code style and passes flake8.
 jobs:
@@ -16,32 +19,24 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
+
+  # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
+
   # Install all the Python code validation packages.
   - bash: python -m pip install black flake8
     displayName: Install validators
+
   # Ensure the code that was pushed has the proper formatting, except in the
-  # ui folder.
+  # ui folder, which is auto-generated.
   - bash: black --check . --exclude="i\/.*py$"
     displayName: black
-  # We'll check also that the code is flake8 compliant.
-  # We're excluding E203 as black has a different mind about white spaces when using
-  # slices than PEP8. black also uses 88 as the max line length, so use that so
-  # code comments are properly formatted.
-  - bash: flake8 --extend-ignore=E203 --exclude="*/ui/*.py" --max-line-length=88
-    displayName: flake8
 
-# Runs all tests using pytest
-- job: run_tests
-  displayName: Tests
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.x'
-  - bash: python -m pip install pytest
-  # Runs tests only if there is a test folder, otherwise displays "No test to run."
-  - bash: (test -r tests && pytest) || echo "No test to run"
+  # We do a diff against the branch. We do not tolerate any flake8 errors on new code, so validate it.
+  - bash: |
+      git diff $(System.PullRequest.TargetBranch) |
+      flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
+    displayName: flake8 of diff
+    condition: eq('${{ parameters.flake8 }}', 'true')
