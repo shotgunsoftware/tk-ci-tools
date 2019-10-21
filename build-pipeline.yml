@@ -14,6 +14,6 @@ parameters:
 # This is a very simple build pipeline for now. It simply validates that the code
 # adheres to the Black code style and passes flake8.
 jobs:
-- template: templates/code_style_validation.yml
+- template: "templates/code_style_validation.yml"
   parameters:
     flake8_exclude: $(flake8_exclude)
