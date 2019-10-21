@@ -34,9 +34,12 @@ jobs:
   - bash: black --check . --exclude="i\/.*py$"
     displayName: black
 
+# We only run flake8 on a pull request, since only then do we know which lines are
+# modified and should be flake8ed.
+- ${{ if ne(variables.System.PullRequest.TargetBranch, '') }}:
   # We do a diff against the branch. We do not tolerate any flake8 errors on new code, so validate it.
   - bash: |
-      git diff $(System.PullRequest.TargetBranch) |
+      git diff $() |
       flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
     displayName: flake8 of diff
     # We always want the flake8 report as well as the black report.
