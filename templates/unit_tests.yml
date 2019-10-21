@@ -1,0 +1,29 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  flake8_exclude: ""
+
+jobs:
+- job: unit_tests  # name of the job, A-Z, a-z, 0-9, and underscore
+  strategy:
+    matrix:
+      linux:
+        image_name: 'ubuntu-16.04'
+        platform_name: Linux
+      mac:
+        image_name: 'macos-10.13'
+        platform_name: macOS
+      windows:
+        image_name: 'vs2017-win2016'
+        platform_name: Windows
+  steps:
+    - bash: pip install PySide2 pytest pytest-azurepipelines pytest-coverage
+    - bash: pip install https://github.com/shotgunsoftware/tk-toolchain@master#egg=tk-toolchain
