@@ -45,3 +45,5 @@ jobs:
     # We only run flake8 on a pull request, since only then do we know which lines are
     # modified and should be flake8ed.
     condition: eq(variables['Build.Reason'], 'PullRequest')
+    env:
+      FLAKE8_EXCLUDE: ${{ parameters.flake8_exclude }}

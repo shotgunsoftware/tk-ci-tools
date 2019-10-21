@@ -16,4 +16,4 @@ parameters:
 jobs:
 - template: "templates/code_style_validation.yml"
   parameters:
-    flake8_exclude: $(flake8_exclude)
+    flake8_exclude: ${{ parameters.flake8_exclude }}
