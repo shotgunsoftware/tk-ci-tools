@@ -26,6 +26,8 @@ jobs:
         platform_name: Windows
   steps:
     - bash: python -m pip install --upgrade pip
-    - bash: python -m pip install PySide2 pytest pytest-azurepipelines pytest-coverage
-    - bash: python -m pip install git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain
+    # PySide2 has permissions errors when you're installing it at the global site-packages,
+    # so we'll install everything from now on local to the user.
+    - bash: python -m pip install --user PySide2 pytest pytest-azurepipelines pytest-coverage
+    - bash: python -m pip install --user git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain
     - bash: python -m pytest tests
