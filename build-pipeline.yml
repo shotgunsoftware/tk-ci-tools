@@ -35,6 +35,7 @@ jobs:
     displayName: black
 
   - bash: echo $(variables.System.PullRequest.TargetBranch)
+    condition: always()
 
 # We only run flake8 on a pull request, since only then do we know which lines are
 # modified and should be flake8ed.
