@@ -9,11 +9,11 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  flake8_exclude: ""
   extra_pip_dependencies: ""
 
 jobs:
-- template: unit_tests_with.yml
+# Linux Python 3.7 build
+- template: unit-tests-with.yml
   parameters:
     image_name: 'ubuntu-18.04'
     qt_wrapper: PySide2
@@ -22,7 +22,8 @@ jobs:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "Linux Python 3.7"
 
-- template: unit_tests_with.yml
+# macOS Python 2.7 build
+- template: unit-tests-with.yml
   parameters:
     image_name: 'macos-10.13'
     qt_wrapper: PySide2
@@ -33,7 +34,8 @@ jobs:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "macOS Python 2.7"
 
-- template: unit_tests_with.yml
+# macOS Python 3.7 build
+- template: unit-tests-with.yml
   parameters:
     image_name: 'macos-10.13'
     qt_wrapper: PySide2
@@ -42,7 +44,8 @@ jobs:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "macOS Python 3.7"
 
-- template: unit_tests_with.yml
+# Windows Python 2.7 build
+- template: unit-tests-with.yml
   parameters:
     image_name: 'vs2017-win2016'
     qt_wrapper: PySide
@@ -51,7 +54,8 @@ jobs:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "Windows Python 2.7"
 
-- template: unit_tests_with.yml
+# Windows Python 3.7 build
+- template: unit-tests-with.yml
   parameters:
     image_name: 'vs2017-win2016'
     qt_wrapper: PySide2

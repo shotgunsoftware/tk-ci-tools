@@ -9,15 +9,17 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
+  # comma separated list of globs that exclude files from flake8 validation
   flake8_exclude: ""
+  # space separated list of Python packages that need to be pip installed.
   extra_pip_dependencies: ""
 
-# This is a very simple build pipeline for now. It simply validates that the code
-# adheres to the Black code style and passes flake8.
+# This build pipeline will validate the code style and our test suite on
+# multiple platforms.
 jobs:
-- template: "templates/code_style_validation.yml"
+- template: "templates/code-style-validation.yml"
   parameters:
     flake8_exclude: ${{ parameters.flake8_exclude }}
-- template: "templates/unit_tests.yml"
+- template: "templates/unit-tests.yml"
   parameters:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}

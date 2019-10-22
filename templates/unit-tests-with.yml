@@ -9,11 +9,17 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
+  # Name of the virtual machine image to load.
   image_name: ""
+  # Name of the Qt wrapper to pip install. Should be PySide or PySide2
   qt_wrapper: PySide2
+  # Python version to use. Should be 2.7 or 3.7
   python_version: 3.7
+  # Any extra dependencies that should be pip installed.
   extra_pip_dependencies: ""
+  # If true, the coverage report will be uploaded to Coveralls.io
   upload_coverage: false
+  # Pretty name for the job.
   job_name: ""
 
 jobs:
@@ -22,16 +28,15 @@ jobs:
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
+
   # Switch to the right Python Version.
   - task: UsePythonVersion@0
     inputs:
       versionSpec: ${{ parameters.python_version }}
     displayName: Use Python ${{ parameters.python_version }}
 
-  - bash: echo Job will upload coverage = ${{ parameters.upload_coverage }}
-
   # Install all Toolkit dependencies for this repo.
-  # TODO: Look inside info.yml to find which frameworks need to be cloned?
+  # TODO: Maybe look inside info.yml to find which frameworks need to be cloned?
   - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat-gitattributes ../tk-core
     displayName: Installing Toolkit Dependencies
 
@@ -49,7 +54,7 @@ jobs:
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
   # Run the tests. The task will create a simple coverage file if one is missing.
-  # It will include all code except for the tests.
+  # It will include all code except for the "tests" folder.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
       python -m pytest tests --cov --verbose
@@ -60,9 +65,11 @@ jobs:
       DISPLAY: ':99.0'
     displayName: Running tests
 
+  # If this build was selected for uploading coverage, upload it.
   - ${{ if eq(parameters.upload_coverage, true) }}:
     - bash: |
         pip install coveralls==1.1 &&
         COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+      displayName: Uploading Code Coverage
       env:
         REPO_TOKEN: $(Coveralls.Repo.Token)
