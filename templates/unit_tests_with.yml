@@ -23,7 +23,7 @@ steps:
 
 # Install all Toolkit dependencies for this repo.
 # TODO: Look inside info.yml to find which frameworks need to be cloned?
-- bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
+- bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat-gitattributes ../tk-core
   displayName: Installing Toolkit Dependencies
 
 # Install pip installable modules
