@@ -8,9 +8,14 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+import sys
+from Qt import QtWidgets
 
-def test_something():
-    try:
-        from PySide import QtCore
-    except:
-        from PySide2 import QtCore
+
+def test_qt():
+    app = QtWidgets.QApplication(sys.argv)
+    button = QtWidgets.QPushButton("Hello World")
+    button.show()
+    app.processEvents()
+    button.close()
+    app.processEvents()
