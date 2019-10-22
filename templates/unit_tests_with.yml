@@ -21,7 +21,8 @@ steps:
   displayName: Use Python ${{ parameters.python_version }}
 - bash: ${{ parameters.pyside_install_script }}
 - bash: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
-- bash: pip install pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
+ # ${{ parameters.extra_pip_dependencies }}
+- bash: pip install pytest-azurepipelines Qt.py
   displayName: Installing Python modules
 - bash: python -m pytest tests
   displayName: Running tests
