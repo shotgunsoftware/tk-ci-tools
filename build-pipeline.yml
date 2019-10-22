@@ -10,6 +10,7 @@
 
 parameters:
   flake8_exclude: ""
+  extra_pip_dependencies: ""
 
 # This is a very simple build pipeline for now. It simply validates that the code
 # adheres to the Black code style and passes flake8.
@@ -18,3 +19,5 @@ jobs:
   parameters:
     flake8_exclude: ${{ parameters.flake8_exclude }}
 - template: "templates/unit_tests.yml"
+  parameters:
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
