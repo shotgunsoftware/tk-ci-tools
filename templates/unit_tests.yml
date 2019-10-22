@@ -42,4 +42,4 @@ jobs:
       parameters:
         pyside_install_script: $(pyside_install_script)
         python_version: $(python_version)
-        extra_pip_dependencies: $(extra_pip_dependencies)
+        extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
