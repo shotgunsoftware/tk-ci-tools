@@ -15,23 +15,23 @@ jobs:
 - job: unit_tests  # name of the job, A-Z, a-z, 0-9, and underscore
   strategy:
     matrix:
-      linux:
+      Linux:
         image_name: 'ubuntu-16.04'
         platform_name: Linux
-  #     mac:
-  #       image_name: 'macos-10.13'
-  #       platform_name: macOS
-  #     windows:
-  #       image_name: 'vs2017-win2016'
-  #       platform_name: Windows
+      macOS:
+         image_name: 'macos-10.13'
+         platform_name: macOS
+      Windows:
+         image_name: 'vs2017-win2016'
+         platform_name: Windows
+  pool:
+    vmImage: $(image_name)
   steps:
     - task: UsePythonVersion@0
       inputs:
         versionSpec: 2.7
       displayName: Use Python 2.7
-    - script: python -c "import sys; print(sys.version)"
-    - script: pip install https://download.qt.io/official_releases/QtForPython/pyside2/shiboken2-5.13.1-5.13.1-cp27-cp27mu-manylinux1_x86_64.whl
-    - script: pip install https://download.qt.io/official_releases/QtForPython/pyside2/PySide2-5.13.1-5.13.1-cp27-cp27mu-manylinux1_x86_64.whl
+    - script: pip install PySide2
     - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
     - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
       displayName: Installing Python modules
