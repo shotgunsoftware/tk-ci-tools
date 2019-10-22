@@ -9,17 +9,15 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  qt_libs: PySide2
-  python_version: 3.7.4
+  pyside_install_script: pip install PySide2
+  python_version: 3.7
 
 steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: ${{ parameters.python_version }}
-  displayName: Use Python $(python_version)
-- bash: pip install $QT_LIBS
-  env:
-    QT_LIBS: ${{ parameters.qt_libs }}
+  displayName: Use Python ${{ parameters.python_version }}
+- bash: ${{ parameters.pyside_install_script }}
 - bash: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
 - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
   displayName: Installing Python modules

@@ -17,24 +17,27 @@ jobs:
     matrix:
       Linux:
         image_name: 'ubuntu-16.04'
-        qt_libs_2_7: PySide
-        qt_libs_3: PySide2
+        pyside_install_script_27: |
+          sudo apt-get install libqt4-dev &&
+          pip install PySide==1.2.2 --no-index --find-links https://parkin.github.io/python-wheelhouse/ &&
+          python ~/virtualenv/python${TRAVIS_PYTHON_VERSION}/bin/pyside_postinstall.py -install
+        pyside_install_script_37: pip install PySide2
       macOS:
         image_name: 'macos-10.13'
-        qt_libs_2_7: PySide2
-        qt_libs_3: PySide2
+        pyside_install_script_27: pip install PySide2
+        pyside_install_script_37: pip install PySide2
       Windows:
         image_name: 'vs2017-win2016'
-        qt_libs_2_7: PySide
-        qt_libs_3: PySide2
+        pyside_install_script_27: pip install PySide
+        pyside_install_script_37: pip install PySide2
   pool:
     vmImage: $(image_name)
   steps:
     - template: unit_tests_with.yml
       parameters:
-        qt_libs: $(qt_libs_2_7)
+        pyside_install_script: $(pyside_install_script_27)
         python_version: 2.7
     - template: unit_tests_with.yml
       parameters:
-        qt_libs: $(qt_libs_3)
+        pyside_install_script: $(pyside_install_script_37)
         python_version: 3.7
