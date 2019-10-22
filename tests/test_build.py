@@ -10,6 +10,7 @@
 
 
 def test_something():
-    pass_test =     False
-    assert pass_test
-    a =  b
+    try:
+        from PySide import QtCore
+    except:
+        from PySide2 import QtCore
