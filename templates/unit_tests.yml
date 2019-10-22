@@ -18,12 +18,12 @@ jobs:
       linux:
         image_name: 'ubuntu-16.04'
         platform_name: Linux
-      mac:
-        image_name: 'macos-10.13'
-        platform_name: macOS
-      windows:
-        image_name: 'vs2017-win2016'
-        platform_name: Windows
+  #     mac:
+  #       image_name: 'macos-10.13'
+  #       platform_name: macOS
+  #     windows:
+  #       image_name: 'vs2017-win2016'
+  #       platform_name: Windows
   steps:
     - script: pip install PySide2
     - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
