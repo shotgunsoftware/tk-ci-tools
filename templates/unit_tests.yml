@@ -16,24 +16,33 @@ jobs:
 - job: Tests
   strategy:
     matrix:
-      # Linux:
-      #   image_name: 'ubuntu-18.04'
-      #   pyside_install_script: pip install PySide2
-      #   pyside_install_script: pip install PySide2
-      # macOS:
-      #   image_name: 'macos-10.13'
-      #   pyside_install_script_27: pip install PySide2
-      #   pyside_install_script_37: pip install PySide2
+      "Linux Python 2.7":
+        image_name: 'ubuntu-18.04'
+        pyside_install_script: pip install PySide2
+        python_version: 2.7
+
+      "Linux Python 3.7":
+        image_name: 'ubuntu-18.04'
+        pyside_install_script: pip install PySide2
+        python_version: 3.7
+
+      "macOS Python 2.7":
+        image_name: 'macos-10.13'
+        pyside_install_script: pip install PySide2
+        python_version: 2.7
+      "macOS Python 3.7":
+        image_name: 'macos-10.13'
+        pyside_install_script: pip install PySide2
+        python_version: 3.7
+
       "Windows Python 2.7":
         image_name: 'vs2017-win2016'
         pyside_install_script: pip install PySide
         python_version: 2.7
-        platform_name: Windows
       "Windows Python 3.7":
         image_name: 'vs2017-win2016'
         pyside_install_script: pip install PySide2
         python_version: 3.7
-        platform_name: Windows
   pool:
     vmImage: $(image_name)
   steps:
