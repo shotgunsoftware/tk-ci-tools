@@ -30,10 +30,9 @@ jobs:
         versionSpec: 3.7
       displayName: Use Python 3.7
     - script: pip install PySide2
-    - script: pip install pytest
-    - script: pip install pytest-azurepipelines pytest-coverage
     - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
-    - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ..
+    - script: pip install pytest-azurepipelines
+    - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
       displayName: Installing Python modules
     - script: python -m pytest tests
       displayName: Running tests
