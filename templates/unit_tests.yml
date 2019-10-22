@@ -26,8 +26,7 @@ jobs:
         platform_name: Windows
   steps:
     - script: pip install PySide2
-    - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
-    - script: pip install pytest-azurepipelines
+    - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
     - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
       displayName: Installing Python modules
     - script: python -m pytest tests
