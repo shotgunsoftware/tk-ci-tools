@@ -36,7 +36,7 @@ steps:
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
 - bash: python -m pytest tests
-  environment:
+  env:
     QT_QPA_PLATFORM: offscreen
     DISPLAY: ':99.0'
   displayName: Running tests
