@@ -14,9 +14,11 @@ parameters:
   python_version: 3.7
   extra_pip_dependencies: ""
   upload_coverage: false
+  job_name: ""
 
 jobs:
-- job: Tests
+- job:
+  displayName: ${{ parameters.job_name }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:

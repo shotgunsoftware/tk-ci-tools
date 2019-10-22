@@ -19,6 +19,8 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    job_name: "Linux Python 3.7"
 
 - template: unit_tests_with.yml
   parameters:
@@ -29,6 +31,7 @@ jobs:
     # for uploading code coverage
     upload_coverage: true
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    job_name: "macOS Python 2.7"
 
 - template: unit_tests_with.yml
   parameters:
@@ -37,6 +40,7 @@ jobs:
     python_version: 3.7
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    job_name: "macOS Python 3.7"
 
 - template: unit_tests_with.yml
   parameters:
@@ -45,6 +49,7 @@ jobs:
     python_version: 2.7
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    job_name: "Windows Python 2.7"
 
 - template: unit_tests_with.yml
   parameters:
@@ -53,3 +58,4 @@ jobs:
     python_version: 3.7
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    job_name: "Windows Python 3.7"
