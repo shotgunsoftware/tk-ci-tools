@@ -25,10 +25,6 @@ jobs:
         image_name: 'vs2017-win2016'
         platform_name: Windows
   steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: 2.x
-      displayName: Use Python 2.7
     - bash: python --version
     # PySide2 has permissions errors when you're installing it at the global site-packages,
     # so we'll install everything from now on local to the user.
