@@ -10,7 +10,4 @@
 
 
 def test_something():
-    try:
-        from PySide import QtCore
-    except:
-        from PySide2 import QtCore
+    from PySide import QtCore

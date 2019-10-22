@@ -33,6 +33,7 @@ jobs:
   pool:
     vmImage: $(image_name)
   steps:
+    - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
     - template: unit_tests_with.yml
       parameters:
         pyside_install_script: $(pyside_install_script_27)
