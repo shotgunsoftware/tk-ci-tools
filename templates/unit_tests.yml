@@ -45,7 +45,7 @@ jobs:
         python_version: 2.7
         # We're picking this build as the one responsible
         # for uploading code coverage
-        upload_coverage: 'true'
+        upload_coverage: true
 
       "macOS Python 3.7":
         image_name: 'macos-10.13'
@@ -68,3 +68,4 @@ jobs:
         qt_wrapper: $(qt_wrapper)
         python_version: $(python_version)
         extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+        upload_coverage: $(upload_coverage)
