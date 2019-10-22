@@ -73,9 +73,4 @@ jobs:
         qt_wrapper: $(qt_wrapper)
         python_version: $(python_version)
         extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
-    - bash: |
-        pip install coveralls==1.1 &&
-        COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
-      condition: and(succeeded(), variables['upload_coverage'])
-      env:
-        REPO_TOKEN: $(Coveralls.Repo.Token)
+        upload_coverage: $(upload_coverage)
