@@ -56,7 +56,7 @@ steps:
 
 - bash: |
     pip install coveralls==1.1 &&
-    COVERALLS_REPO_TOKEN=$env:REPO_TOKEN coveralls
-  condition: and(succeeded(), ${{ parameters.upload_coverage }})
+    COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+  condition: and( succeeded(), eq(${{ parameters.upload_coverage }}, true) )
   env:
     REPO_TOKEN: $(Coveralls.Repo.Token)
