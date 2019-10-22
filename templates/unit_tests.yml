@@ -16,39 +16,52 @@ jobs:
 - job: Tests
   strategy:
     matrix:
-      "Linux Python 2.7":
-        image_name: 'ubuntu-18.04'
-        pyside_install_script: pip install PySide2
-        python_version: 2.7
+      # TODO: It seems like we can't use PySide 1/2 with Python 2.7 on Linux.
+      #
+      # For PySide, we need to install lib-qt4, but then installing PySide
+      # requires a compile which is unacceptable. We can't reuse the Python wheels
+      # we had on Travis either because they are for a Python with UCS2 and
+      # Azure's Python is UCS4.
+      #
+      # As for using PySide2, pip simply reports that there is no compatible build.
+      #
+      # Potential solutions are:
+      # - Recompile Python
+      # - Host a recompiled version of PySide2 compatible with Azure.
+      #
+      # "Linux Python 2.7":
+      #   image_name: 'ubuntu-18.04'
+      #   qt_wrapper: PySide2
+      #   python_version: 2.7
 
       "Linux Python 3.7":
         image_name: 'ubuntu-18.04'
-        pyside_install_script: pip install PySide2
+        qt_wrapper: PySide2
         python_version: 3.7
 
-      "macOS Python 2.7":
-        image_name: 'macos-10.13'
-        pyside_install_script: pip install PySide2
-        python_version: 2.7
-      "macOS Python 3.7":
-        image_name: 'macos-10.13'
-        pyside_install_script: pip install PySide2
-        python_version: 3.7
+      # "macOS Python 2.7":
+      #   image_name: 'macos-10.13'
+      #   qt_wrapper: PySide2
+      #   python_version: 2.7
+      # "macOS Python 3.7":
+      #   image_name: 'macos-10.13'
+      #   qt_wrapper: PySide2
+      #   python_version: 3.7
 
-      "Windows Python 2.7":
-        image_name: 'vs2017-win2016'
-        pyside_install_script: pip install PySide
-        python_version: 2.7
-      "Windows Python 3.7":
-        image_name: 'vs2017-win2016'
-        pyside_install_script: pip install PySide2
-        python_version: 3.7
+      # "Windows Python 2.7":
+      #   image_name: 'vs2017-win2016'
+      #   qt_wrapper: PySide
+      #   python_version: 2.7
+      # "Windows Python 3.7":
+      #   image_name: 'vs2017-win2016'
+      #   qt_wrapper: PySide2
+      #   python_version: 3.7
   pool:
     vmImage: $(image_name)
   steps:
     - bash: python -c "import os; print(os.listdir(os.getcwd()))"
     - template: unit_tests_with.yml
       parameters:
-        pyside_install_script: $(pyside_install_script)
+        qt_wrapper: $(qt_wrapper)
         python_version: $(python_version)
         extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}

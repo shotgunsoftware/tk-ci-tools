@@ -9,19 +9,34 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  pyside_install_script: pip install PySide2
+  qt_wrapper: PySide2
   python_version: 3.7
   extra_pip_dependencies: ""
 
 steps:
+
 - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
+  displayName: Installing Toolkit Dependencies
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: ${{ parameters.python_version }}
   displayName: Use Python ${{ parameters.python_version }}
-- bash: ${{ parameters.pyside_install_script }}
-- bash: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
-- bash: pip install pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
+
+- bash: |
+    pip install ${{ parameters.qt_wrapper }} &&
+    pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain &&
+    pip install pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
   displayName: Installing Python modules
+
+- bash: |
+    /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    echo ">>> Started xvfb"
+  displayName: Start xvfb on Linux
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
 - bash: python -m pytest tests
+  environment:
+    QT_QPA_PLATFORM: offscreen
+    DISPLAY: ':99.0'
   displayName: Running tests
