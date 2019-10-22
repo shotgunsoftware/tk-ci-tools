@@ -15,11 +15,11 @@ parameters:
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: $(python_version)
+    versionSpec: ${{ python_version }}
   displayName: Use Python $(python_version)
 - script: pip install $QT_LIBS
   env:
-    QT_LIBS: $(qt_libs)
+    QT_LIBS: ${{ qt_libs }}
 - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
 - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
   displayName: Installing Python modules
