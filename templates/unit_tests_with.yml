@@ -22,7 +22,7 @@ steps:
     versionSpec: ${{ parameters.python_version }}
   displayName: Use Python ${{ parameters.python_version }}
 
-- bash: Job will upload coverage = ${{ parameters.upload_coverage }}
+- bash: echo Job will upload coverage = ${{ parameters.upload_coverage }}
 
 # Install all Toolkit dependencies for this repo.
 # TODO: Look inside info.yml to find which frameworks need to be cloned?
