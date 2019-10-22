@@ -27,9 +27,9 @@ jobs:
   steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: 2.x
-      displayName: Use Python 2.7
-    - script: pip install PySide2-5.13.1-5.13.1-cp27-cp27m-macosx_10_12_intel.whl
+        versionSpec: 3.7
+      displayName: Use Python 3.7
+    - script: pip install PySide2
     - script: pip install pytest
     - script: pip install pytest-azurepipelines pytest-coverage
     - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
