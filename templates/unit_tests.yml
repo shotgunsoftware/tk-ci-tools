@@ -25,16 +25,17 @@ jobs:
         image_name: 'vs2017-win2016'
         platform_name: Windows
   steps:
-    # - task: UsePythonVersion@0
-    #   inputs:
-    #     versionSpec: 2.7
-    #   displayName: Use Python 2.7
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: 2.x
+      displayName: Use Python 2.7
     - bash: python --version
     # PySide2 has permissions errors when you're installing it at the global site-packages,
     # so we'll install everything from now on local to the user.
     - bash: |
         python -m pip install PySide2 &&
-        python -m pip install pytest pytest-azurepipelines pytest-coverage &&
+        python -m pip install pytest &&
+        python -m pip install pytest-azurepipelines pytest-coverage &&
         python -m pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain &&
         git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ..
       displayName: Installing Python modules
