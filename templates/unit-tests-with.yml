@@ -66,10 +66,14 @@ jobs:
     displayName: Running tests
 
   # If this build was selected for uploading coverage, upload it.
-  - ${{ if eq(parameters.upload_coverage, true) }}:
-    - bash: |
-        pip install coveralls==1.1 &&
-        COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+  # - ${{ if eq(parameters.upload_coverage, true) }}:
+  #   - bash: |
+  #       pip install coveralls==1.1 &&
+  #       COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+  #     displayName: Uploading Code Coverage
+  #     env:
+  #       REPO_TOKEN: $(Coveralls.Repo.Token)
+
+- ${{ if eq(parameters.upload_coverage, true) }}:
+    - bash: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
       displayName: Uploading Code Coverage
-      env:
-        REPO_TOKEN: $(Coveralls.Repo.Token)
