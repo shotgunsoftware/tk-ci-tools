@@ -30,11 +30,11 @@ jobs:
   pool:
     vmImage: $(image_name)
   steps:
-    - template: templates/unit_tests_with.yml
+    - template: unit_tests_with.yml
       parameters:
         qt_libs: qt_libs_2_7
         python_version: 2.7
-    - template: templates/unit_tests_with.yml
+    - template: unit_tests_with.yml
       parameters:
         qt_libs: qt_libs_3
         python_version: 3.7
