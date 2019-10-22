@@ -20,7 +20,7 @@ jobs:
         pyside_install_script_27: |
           sudo apt-get install libqt4-dev &&
           pip install PySide==1.2.2 --no-index --find-links https://parkin.github.io/python-wheelhouse/ &&
-          python pyside_postinstall.py -install
+          pyside_postinstall.py -install
         pyside_install_script_37: pip install PySide2
       macOS:
         image_name: 'macos-10.13'
