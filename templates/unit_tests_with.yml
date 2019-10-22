@@ -58,9 +58,9 @@ jobs:
       DISPLAY: ':99.0'
     displayName: Running tests
 
-  - ${{ eq(parameters.upload_coverage, 'true') }}:
-    - bash: |
-        pip install coveralls==1.1 &&
-        COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
-      env:
-        REPO_TOKEN: $(Coveralls.Repo.Token)
+- ${{ if eq(parameters.upload_coverage, true) }}:
+  - bash: |
+      pip install coveralls==1.1 &&
+      COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+    env:
+      REPO_TOKEN: $(Coveralls.Repo.Token)
