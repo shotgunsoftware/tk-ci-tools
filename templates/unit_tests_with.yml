@@ -43,7 +43,7 @@ steps:
 # It will include all code except for the tests.
 - bash: |
     (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-    python -m pytest tests --cov --cov-report html
+    python -m pytest tests --cov --cov-report html --verbose
   # These environment variables need to be set so Linux runs can connect
   # to xvfb
   env:
