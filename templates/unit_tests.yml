@@ -38,6 +38,7 @@ jobs:
         image_name: 'ubuntu-18.04'
         qt_wrapper: PySide2
         python_version: 3.7
+        upload_coverage: false
 
       "macOS Python 2.7":
         image_name: 'macos-10.13'
@@ -51,15 +52,19 @@ jobs:
         image_name: 'macos-10.13'
         qt_wrapper: PySide2
         python_version: 3.7
+        upload_coverage: false
 
       "Windows Python 2.7":
         image_name: 'vs2017-win2016'
         qt_wrapper: PySide
         python_version: 2.7
+        upload_coverage: false
+
       "Windows Python 3.7":
         image_name: 'vs2017-win2016'
         qt_wrapper: PySide2
         python_version: 3.7
+        upload_coverage: false
   pool:
     vmImage: $(image_name)
   steps:
