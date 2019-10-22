@@ -32,7 +32,7 @@ jobs:
     # PySide2 has permissions errors when you're installing it at the global site-packages,
     # so we'll install everything from now on local to the user.
     - bash: |
-        python -m pip install PySide &&
+        python -m pip install PySide2 &&
         python -m pip install pytest pytest-azurepipelines pytest-coverage &&
         python -m pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain &&
         git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ..
