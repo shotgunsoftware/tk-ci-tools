@@ -9,54 +9,58 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
+  image_name: ""
   qt_wrapper: PySide2
   python_version: 3.7
   extra_pip_dependencies: ""
   upload_coverage: false
 
-steps:
+jobs:
+- job: Tests
+  pool:
+    vmImage: ${{ parameter.image_name }}
+  steps:
+  # Switch to the right Python Version.
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: ${{ parameters.python_version }}
+    displayName: Use Python ${{ parameters.python_version }}
 
-# Switch to the right Python Version.
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: ${{ parameters.python_version }}
-  displayName: Use Python ${{ parameters.python_version }}
+  - bash: echo Job will upload coverage = ${{ parameters.upload_coverage }}
 
-- bash: echo Job will upload coverage = ${{ parameters.upload_coverage }}
+  # Install all Toolkit dependencies for this repo.
+  # TODO: Look inside info.yml to find which frameworks need to be cloned?
+  - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat-gitattributes ../tk-core
+    displayName: Installing Toolkit Dependencies
 
-# Install all Toolkit dependencies for this repo.
-# TODO: Look inside info.yml to find which frameworks need to be cloned?
-- bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat-gitattributes ../tk-core
-  displayName: Installing Toolkit Dependencies
+  # Install pip installable modules
+  - bash: |
+      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain &&
+      pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
+    displayName: Installing Python modules
 
-# Install pip installable modules
-- bash: |
-    pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain &&
-    pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
-  displayName: Installing Python modules
+  # Start xvfb on Linux so we can test with a GUI.
+  - bash: |
+      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      echo ">>> Started xvfb"
+    displayName: Start xvfb on Linux
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-# Start xvfb on Linux so we can test with a GUI.
-- bash: |
-    /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    echo ">>> Started xvfb"
-  displayName: Start xvfb on Linux
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+  # Run the tests. The task will create a simple coverage file if one is missing.
+  # It will include all code except for the tests.
+  - bash: |
+      (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
+      python -m pytest tests --cov --verbose
+    # These environment variables need to be set so Linux runs can connect
+    # to xvfb
+    env:
+      QT_QPA_PLATFORM: offscreen
+      DISPLAY: ':99.0'
+    displayName: Running tests
 
-# Run the tests. The task will create a simple coverage file if one is missing.
-# It will include all code except for the tests.
-- bash: |
-    (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-    python -m pytest tests --cov --verbose
-  # These environment variables need to be set so Linux runs can connect
-  # to xvfb
-  env:
-    QT_QPA_PLATFORM: offscreen
-    DISPLAY: ':99.0'
-  displayName: Running tests
-
-- bash: |
-    pip install coveralls==1.1 &&
-    COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
-  condition: and(succeeded(), eq('${{ parameters.upload_coverage }}', 'true') )
-  env:
-    REPO_TOKEN: $(Coveralls.Repo.Token)
+  - ${{ eq(parameters.upload_coverage, 'true') }}:
+    - bash: |
+        pip install coveralls==1.1 &&
+        COVERALLS_REPO_TOKEN=$REPO_TOKEN coveralls
+      env:
+        REPO_TOKEN: $(Coveralls.Repo.Token)

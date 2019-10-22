@@ -13,64 +13,43 @@ parameters:
   extra_pip_dependencies: ""
 
 jobs:
-- job: Tests
-  strategy:
-    matrix:
-      # TODO: It seems like we can't use PySide 1/2 with Python 2.7 on Linux.
-      #
-      # For PySide, we need to install lib-qt4, but then installing PySide
-      # requires a compile which is unacceptable. We can't reuse the Python wheels
-      # we had on Travis either because they are for a Python with UCS2 and
-      # Azure's Python is UCS4.
-      #
-      # As for using PySide2, pip simply reports that there is no compatible build.
-      #
-      # Potential solutions are:
-      # - Recompile Python
-      # - Host a recompiled version of PySide2 compatible with Azure.
-      #
-      # "Linux Python 2.7":
-      #   image_name: 'ubuntu-18.04'
-      #   qt_wrapper: PySide2
-      #   python_version: 2.7
+- template: unit_tests_with.yml
+  parameters:
+    image_name: 'ubuntu-18.04'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    upload_coverage: false
 
-      "Linux Python 3.7":
-        image_name: 'ubuntu-18.04'
-        qt_wrapper: PySide2
-        python_version: 3.7
-        upload_coverage: false
+- template: unit_tests_with.yml
+  parameters:
+    image_name: 'macos-10.13'
+    qt_wrapper: PySide2
+    python_version: 2.7
+    # We're picking this build as the one responsible
+    # for uploading code coverage
+    upload_coverage: true
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
-      "macOS Python 2.7":
-        image_name: 'macos-10.13'
-        qt_wrapper: PySide2
-        python_version: 2.7
-        # We're picking this build as the one responsible
-        # for uploading code coverage
-        upload_coverage: true
+- template: unit_tests_with.yml
+  parameters:
+    image_name: 'macos-10.13'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    upload_coverage: false
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
-      "macOS Python 3.7":
-        image_name: 'macos-10.13'
-        qt_wrapper: PySide2
-        python_version: 3.7
-        upload_coverage: false
+- template: unit_tests_with.yml
+  parameters:
+    image_name: 'vs2017-win2016'
+    qt_wrapper: PySide
+    python_version: 2.7
+    upload_coverage: false
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
-      "Windows Python 2.7":
-        image_name: 'vs2017-win2016'
-        qt_wrapper: PySide
-        python_version: 2.7
-        upload_coverage: false
-
-      "Windows Python 3.7":
-        image_name: 'vs2017-win2016'
-        qt_wrapper: PySide2
-        python_version: 3.7
-        upload_coverage: false
-  pool:
-    vmImage: $(image_name)
-  steps:
-    - template: unit_tests_with.yml
-      parameters:
-        qt_wrapper: $(qt_wrapper)
-        python_version: $(python_version)
-        extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
-        upload_coverage: $(upload_coverage)
+- template: unit_tests_with.yml
+  parameters:
+    image_name: 'vs2017-win2016'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    upload_coverage: false
+    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
