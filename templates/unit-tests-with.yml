@@ -74,6 +74,6 @@ jobs:
   #     env:
   #       REPO_TOKEN: $(Coveralls.Repo.Token)
 
-- ${{ if eq(parameters.upload_coverage, true) }}:
+  - ${{ if eq(parameters.upload_coverage, true) }}:
     - bash: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
       displayName: Uploading Code Coverage
