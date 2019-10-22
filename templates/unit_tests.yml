@@ -27,8 +27,8 @@ jobs:
   steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: 3.7
-      displayName: Use Python 3.7
+        versionSpec: 2.7
+      displayName: Use Python 2.7
     - script: pip install PySide2
     - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain
     - script: pip install pytest-azurepipelines
