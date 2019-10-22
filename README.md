@@ -2,9 +2,9 @@
 
 Tools for Azure Pipelines. These tools allow a Toolkit developer to validate their code using Azure Pipelines, ensuring the code is formatted properly, does not contain ambiguous statements and passes all the tests on every single commit.
 
-# How to use these tools
+# How to use the build system.
 
-Create a file named  `azure-pipeline.yml` file at the root of your repo and put the following:
+Create a file named `azure-pipelines.yml` file at the root of your repo and put the following in it:
 
 ```
 # Imports the shared Azure CI tools from the master branch of shotgunsoftware/tk-ci-tools
