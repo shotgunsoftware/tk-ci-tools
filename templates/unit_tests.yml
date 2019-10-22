@@ -32,9 +32,9 @@ jobs:
   steps:
     - template: unit_tests_with.yml
       parameters:
-        qt_libs: qt_libs_2_7
+        qt_libs: $(qt_libs_2_7)
         python_version: 2.7
     - template: unit_tests_with.yml
       parameters:
-        qt_libs: qt_libs_3
+        qt_libs: $(qt_libs_3)
         python_version: 3.7
