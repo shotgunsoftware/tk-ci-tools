@@ -39,23 +39,23 @@ jobs:
         qt_wrapper: PySide2
         python_version: 3.7
 
-      # "macOS Python 2.7":
-      #   image_name: 'macos-10.13'
-      #   qt_wrapper: PySide2
-      #   python_version: 2.7
-      # "macOS Python 3.7":
-      #   image_name: 'macos-10.13'
-      #   qt_wrapper: PySide2
-      #   python_version: 3.7
+      "macOS Python 2.7":
+        image_name: 'macos-10.13'
+        qt_wrapper: PySide2
+        python_version: 2.7
+      "macOS Python 3.7":
+        image_name: 'macos-10.13'
+        qt_wrapper: PySide2
+        python_version: 3.7
 
-      # "Windows Python 2.7":
-      #   image_name: 'vs2017-win2016'
-      #   qt_wrapper: PySide
-      #   python_version: 2.7
-      # "Windows Python 3.7":
-      #   image_name: 'vs2017-win2016'
-      #   qt_wrapper: PySide2
-      #   python_version: 3.7
+      "Windows Python 2.7":
+        image_name: 'vs2017-win2016'
+        qt_wrapper: PySide
+        python_version: 2.7
+      "Windows Python 3.7":
+        image_name: 'vs2017-win2016'
+        qt_wrapper: PySide2
+        python_version: 3.7
   pool:
     vmImage: $(image_name)
   steps:
