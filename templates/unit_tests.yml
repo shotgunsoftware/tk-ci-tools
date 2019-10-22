@@ -17,23 +17,24 @@ jobs:
     matrix:
       Linux:
         image_name: 'ubuntu-16.04'
-        platform_name: Linux
+        qt_libs_2_7: PySide
+        qt_libs_3: PySide2
       macOS:
-         image_name: 'macos-10.13'
-         platform_name: macOS
+        image_name: 'macos-10.13'
+        qt_libs_2_7: PySide2
+        qt_libs_3: PySide2
       Windows:
-         image_name: 'vs2017-win2016'
-         platform_name: Windows
+        image_name: 'vs2017-win2016'
+        qt_libs_2_7: PySide
+        qt_libs_3: PySide2
   pool:
     vmImage: $(image_name)
   steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: 2.7
-      displayName: Use Python 2.7
-    - script: pip install PySide2
-    - script: pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@remote_pip_install#egg=tk-toolchain pytest-azurepipelines
-    - script: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
-      displayName: Installing Python modules
-    - script: python -m pytest tests
-      displayName: Running tests
+    - template: templates/unit_tests_with.yml
+      parameters:
+        qt_libs: qt_libs_2_7
+        python_version: 2.7
+    - template: templates/unit_tests_with.yml
+      parameters:
+        qt_libs: qt_libs_3
+        python_version: 3.7
