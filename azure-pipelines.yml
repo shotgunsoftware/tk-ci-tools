@@ -13,3 +13,5 @@ variables:
 
 jobs:
 - template: build-pipeline.yml
+  parameters:
+    extra_pip_dependencies: Qt.py

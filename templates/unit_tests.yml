@@ -24,19 +24,18 @@ jobs:
       #   image_name: 'macos-10.13'
       #   pyside_install_script_27: pip install PySide2
       #   pyside_install_script_37: pip install PySide2
-      "Windows (Python 2.7)":
+      "Windows Python 2.7":
         image_name: 'vs2017-win2016'
         pyside_install_script: pip install PySide
         python_version: 2.7
         platform_name: Windows
-      "Windows (Python 3.7)":
+      "Windows Python 3.7":
         image_name: 'vs2017-win2016'
         pyside_install_script: pip install PySide2
         python_version: 3.7
         platform_name: Windows
   pool:
     vmImage: $(image_name)
-  displayName: Tests $(platform_name) Python $(python_version)
   steps:
     - bash: python -c "import os; print(os.listdir(os.getcwd()))"
     - template: unit_tests_with.yml
