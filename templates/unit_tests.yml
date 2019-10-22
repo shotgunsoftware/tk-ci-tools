@@ -59,7 +59,6 @@ jobs:
   pool:
     vmImage: $(image_name)
   steps:
-    - bash: python -c "import os; print(os.listdir(os.getcwd()))"
     - template: unit_tests_with.yml
       parameters:
         qt_wrapper: $(qt_wrapper)
