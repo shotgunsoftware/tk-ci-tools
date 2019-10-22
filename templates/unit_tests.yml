@@ -43,6 +43,10 @@ jobs:
         image_name: 'macos-10.13'
         qt_wrapper: PySide2
         python_version: 2.7
+        # We're picking this build as the one responsible
+        # for uploading code coverage
+        upload_coverage: true
+
       "macOS Python 3.7":
         image_name: 'macos-10.13'
         qt_wrapper: PySide2

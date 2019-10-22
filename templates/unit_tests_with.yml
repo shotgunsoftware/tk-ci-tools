@@ -12,6 +12,7 @@ parameters:
   qt_wrapper: PySide2
   python_version: 3.7
   extra_pip_dependencies: ""
+  upload_coverage: false
 
 steps:
 
@@ -43,10 +44,17 @@ steps:
 # It will include all code except for the tests.
 - bash: |
     (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-    python -m pytest tests --cov --cov-report html --verbose
+    python -m pytest tests --cov --verbose
   # These environment variables need to be set so Linux runs can connect
   # to xvfb
   env:
     QT_QPA_PLATFORM: offscreen
     DISPLAY: ':99.0'
   displayName: Running tests
+
+- ${{ if eq(parameters.upload_coverage, true) }}
+  - bash: |
+      pip install coveralls==1.1 &&
+      coveralls
+    env:
+      COREVALLS_REPO_TOKEN: $(Coveralls.Repo.Token)
