@@ -15,27 +15,26 @@ jobs:
 - job: Tests
   strategy:
     matrix:
-      Linux:
-        image_name: 'ubuntu-18.04'
-        pyside_install_script_27: pip install PySide2
-        pyside_install_script_37: pip install PySide2
-      macOS:
-        image_name: 'macos-10.13'
-        pyside_install_script_27: pip install PySide2
-        pyside_install_script_37: pip install PySide2
-      Windows:
+      # Linux:
+      #   image_name: 'ubuntu-18.04'
+      #   pyside_install_script: pip install PySide2
+      #   pyside_install_script: pip install PySide2
+      # macOS:
+      #   image_name: 'macos-10.13'
+      #   pyside_install_script_27: pip install PySide2
+      #   pyside_install_script_37: pip install PySide2
+      "Windows (Python 2.7)":
         image_name: 'vs2017-win2016'
-        pyside_install_script_27: pip install PySide
-        pyside_install_script_37: pip install PySide2
+        pyside_install_script: pip install PySide
+        python_version: 2.7
+      "Windows (Python 3.7)":
+        image_name: 'vs2017-win2016'
+        pyside_install_script: pip install PySide2
+        python_version: 3.7
   pool:
     vmImage: $(image_name)
   steps:
-    - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
     - template: unit_tests_with.yml
       parameters:
-        pyside_install_script: $(pyside_install_script_27)
-        python_version: 2.7
-    - template: unit_tests_with.yml
-      parameters:
-        pyside_install_script: $(pyside_install_script_37)
-        python_version: 3.7
+        pyside_install_script: $(pyside_install_script)
+        python_version: $(python_version)

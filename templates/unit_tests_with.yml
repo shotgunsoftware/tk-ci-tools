@@ -13,6 +13,7 @@ parameters:
   python_version: 3.7
 
 steps:
+- bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
 - task: UsePythonVersion@0
   inputs:
     versionSpec: ${{ parameters.python_version }}
