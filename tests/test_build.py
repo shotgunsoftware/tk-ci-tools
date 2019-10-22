@@ -13,6 +13,9 @@ from Qt import QtWidgets
 
 
 def test_qt():
+    """
+    Ensure we can show a Qt dialog on Azure-Pipelines and interact with it.
+    """
     app = QtWidgets.QApplication(sys.argv)
     button = QtWidgets.QPushButton("Hello World")
     button.show()
