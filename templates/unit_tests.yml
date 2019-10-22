@@ -16,11 +16,8 @@ jobs:
   strategy:
     matrix:
       Linux:
-        image_name: 'ubuntu-16.04'
-        pyside_install_script_27: |
-          sudo apt-get install libqt4-dev &&
-          pip install PySide==1.2.2 --no-index --find-links https://parkin.github.io/python-wheelhouse/ &&
-          pyside_postinstall.py -install
+        image_name: 'ubuntu-18.04'
+        pyside_install_script_27: pip install PySide2
         pyside_install_script_37: pip install PySide2
       macOS:
         image_name: 'macos-10.13'
