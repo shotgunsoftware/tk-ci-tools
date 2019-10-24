@@ -37,7 +37,7 @@ jobs:
 
   # Install all Toolkit dependencies for this repo.
   # TODO: Maybe look inside info.yml to find which frameworks need to be cloned?
-  - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat-gitattributes ../tk-core
+  - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
     displayName: Installing Toolkit Dependencies
 
   # Install pip installable modules
@@ -59,10 +59,12 @@ jobs:
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
       python -m pytest tests --cov --verbose
     # These environment variables need to be set so Linux runs can connect
-    # to xvfb
+    # to xvfb and to have complete logging. Each test logging output will
+    # be captured by pytest and displayed on failure.
     env:
       QT_QPA_PLATFORM: offscreen
       DISPLAY: ':99.0'
+      TK_DEBUG: 1
     displayName: Running tests
 
   - ${{ if eq(parameters.upload_coverage, true) }}:
