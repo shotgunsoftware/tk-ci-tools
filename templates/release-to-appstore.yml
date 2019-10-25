@@ -60,7 +60,7 @@ jobs:
       # It assumes apps contains -multi-, frameworks contains -framework- and configs
       # contain -config-. Anything else is an engine
       export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if os.path.exists("app.py") else "framework" if os.path.exists("framework.py") else "engine" if os.path.exists("engine.py") else "config")'`
-      python ../app_store/bundle_to_app_store.py --repository $(Build.Repository.Name) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
+      python ../app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
       # Just like the DownloadSecureFile, the environment variables here can only
       # be used from builds on shotgunsoftware, not from forks.
