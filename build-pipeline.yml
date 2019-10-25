@@ -17,9 +17,10 @@ parameters:
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
 jobs:
-- template: "templates/code-style-validation.yml"
-  parameters:
-    flake8_exclude: ${{ parameters.flake8_exclude }}
-- template: "templates/unit-tests.yml"
-  parameters:
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+# - template: "templates/code-style-validation.yml"
+#   parameters:
+#     flake8_exclude: ${{ parameters.flake8_exclude }}
+# - template: "templates/unit-tests.yml"
+#   parameters:
+#     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+- template: "templates/release-to-app-store.yml"
