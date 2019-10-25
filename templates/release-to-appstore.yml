@@ -8,9 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-
-
 jobs:
+  # Launch a Linux VM
 - job: release_to_appstore
   displayName: Release to AppStore
   pool:
@@ -23,12 +22,12 @@ jobs:
       versionSpec: 2.7
     displayName: Use Python 2.7
 
-  # This task can be executed only from the shotgunsoftware
-  # organization repositories. It will fail on forks on our
+  # This task can be executed only from the "shotgunsoftware"
+  # organization repositories. It will fail on forks of our
   # repos from other users.
   #
-  # Therefore, the azure_internal_deploy_key is safely
-  # stored in Azure Pipelines.
+  # Therefore, the appstore release scripts in app_store.zip
+  # are safe from the outside world.
   #
   # Excerpt from https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#validate-contributions-from-forks
   #
@@ -43,16 +42,15 @@ jobs:
   #   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
   #   - Build variables marked secret
   - task: DownloadSecureFile@1
-    name: app_store_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
+    name: app_store_zip
     inputs:
       secureFile: app_store.zip
     displayName: Download release scripts
 
-  - bash: unzip $(app_store_zip.secureFilePath) -d ..
-    displayName: Unzip release scripts
-
-  - bash: pip install -r ../app_store/requirements.txt
-    displayName: Installing dependencies
+  - bash: |
+      unzip $(app_store_zip.secureFilePath) -d .. &&
+      pip install -r ../app_store/requirements.txt
+    displayName: Prepare release scripts
 
   # This will detect the bundle type.
   - bash: |
@@ -67,4 +65,4 @@ jobs:
       sgtk_app_store_api_server: $(sgtk_app_store_api_server)
       sgtk_app_store_api_user: $(sgtk_app_store_api_user)
       sgtk_app_store_api_key: $(sgtk_app_store_api_key)
-    displayName: Deploying to AppStore
+    displayName: Deploy Toolkit bundle to AppStore

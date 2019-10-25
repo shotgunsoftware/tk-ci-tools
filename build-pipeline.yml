@@ -16,22 +16,20 @@ parameters:
   # If true, the unit tests will be skipped
   skip_tests: false
 
-
-# This build pipeline will validate the code style and our test suite on
-# multiple platforms.
 jobs:
-
+# Makes sure the code adheres to our quality standards.
 - template: "templates/code-style-validation.yml"
   parameters:
     flake8_exclude: ${{ parameters.flake8_exclude }}
 
-# Do not include tests if user requested to skip them
+# Runs tests on the repository.
 - ${{ if ne( parameters.skip_tests, true ) }}:
   - template: "templates/unit-tests.yml"
     parameters:
       extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
+# If the build was launched because a tag was created, we'll want to deploy
+# this to the AppStore.
 # FIXME: We should find a way to avoid including this step on forked repos.
-# Only launch a build on a tag.
 - ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
   - template: "templates/release-to-appstore.yml"
