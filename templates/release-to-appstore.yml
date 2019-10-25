@@ -50,7 +50,7 @@ jobs:
     inputs:
       secureFile: app_store.zip
     # Run this task only if a repo was tagged
-    condition: startsWith($(Build.SourceBranch), 'refs/tags')
+    condition: startsWith( variables.Build.SourceBranch, 'refs/tags')
 
   - bash: unzip $(app_store_zip.secureFilePath) -d ..
 
