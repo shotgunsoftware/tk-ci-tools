@@ -54,9 +54,7 @@ jobs:
 
   # This will detect the bundle type.
   - bash: |
-      # Detects the bundle type.
-      # It assumes apps contains -multi-, frameworks contains -framework- and configs
-      # contain -config-. Anything else is an engine
+      # Detects the bundle type by looking at the python file at the root of the repo.
       export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if os.path.exists("app.py") else "framework" if os.path.exists("framework.py") else "engine" if os.path.exists("engine.py") else "config")'`
       python ../app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
