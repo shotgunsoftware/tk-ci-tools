@@ -43,12 +43,14 @@ jobs:
   #   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
   #   - Build variables marked secret
   - task: DownloadSecureFile@1
-    name: app_store_release_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
+    name: app_store_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
     inputs:
-      secureFile: app_store_release.zip
+      secureFile: app_store.zip
 
-  - bash: unzip $(app_store_release_zip.secureFilePath) -d ..
+  - bash: unzip $(app_store_zip.secureFilePath) -d ..
 
   - bash: pip install -r ../app_store/requirements.txt
 
-  - bash: python ../app_store/bundle_to_app_store.py --bundle tk-multi-testing --bundle-type app --no-ftp --use-https --tag v0.0.1
+  # This will detect the bundle type.
+  # `python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if "-multi-" in "repo" else "framework" if "-framework-" in repo else "config" if "-config-" in repo else "engine")'`
+  - bash: python ../app_store/bundle_to_app_store.py --bundle tk-multi-testing --bundle-type app --no-ftp --use-https --tag v0.0.1 --dry-run
