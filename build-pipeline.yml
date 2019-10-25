@@ -14,7 +14,7 @@ parameters:
   # space separated list of Python packages that need to be pip installed.
   extra_pip_dependencies: ""
   # If true, the unit tests will be skipped
-  skip_tests: true
+  skip_tests: false
 
 
 # This build pipeline will validate the code style and our test suite on
@@ -26,7 +26,7 @@ jobs:
     flake8_exclude: ${{ parameters.flake8_exclude }}
 
 # Do not include tests if user requested to skip them
-- ${{ if eq( parameters.skip_tests, true ) }}:
+- ${{ if ne( parameters.skip_tests, true ) }}:
   - template: "templates/unit-tests.yml"
     parameters:
       extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
