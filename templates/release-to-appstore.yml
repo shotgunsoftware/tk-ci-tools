@@ -51,4 +51,4 @@ jobs:
 
   - bash: pip install -r ../app_store/requirements.txt
 
-  - bash: python ../app_store/bundle_to_app_store.py
+  - bash: python ../app_store/bundle_to_app_store.py --bundle tk-multi-testing --bundle-type app --no-ftp --use-https --tag v0.0.1
