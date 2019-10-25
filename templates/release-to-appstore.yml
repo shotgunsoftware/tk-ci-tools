@@ -49,8 +49,6 @@ jobs:
     name: app_store_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
     inputs:
       secureFile: app_store.zip
-    # Run this task only if a repo was tagged
-    condition: startsWith( variables['Build.SourceBranch'], 'refs/tags')
 
   - bash: unzip $(app_store_zip.secureFilePath) -d ..
 
