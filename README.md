@@ -29,6 +29,7 @@ trigger:
 variables:
 - group: deploy-secrets
 
+# Launch into the build pipeline.
 jobs:
 - template: build-pipeline.yml@templates
 ```

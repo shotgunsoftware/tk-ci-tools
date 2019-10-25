@@ -21,6 +21,8 @@ trigger:
 variables:
 - group: deploy-secrets
 
+# Invoke the build pipeline template with Qt.py has an extra dependency so
+# the tests can run properly.
 jobs:
 - template: build-pipeline.yml
   parameters:
