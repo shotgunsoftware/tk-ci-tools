@@ -42,14 +42,11 @@ jobs:
   #   - Service connection credentials
   #   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
   #   - Build variables marked secret
-  - task: InstallSSHKey@0
+  - task: DownloadSecureFile@1
+    name: app_store_release_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
     inputs:
-      knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
-      # This is the public key
-      sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2Lqh+PhBOBwpKTAsUpbKmcG2SlXXWilBu0BP8XZ8yHKsYrh6DLU2COrh3ydSgeiUu/CGdpE701bVgym/pU8q12Ak387rgM50B3jEa+tpurQgf3Bx46W2T7BKcFH0bBkEworrd3RsVDKwVVXVjnsgIR4iViq5kJXlglakc8TtzBhRLfhtcqWSr8pyNFWP4bT0zW+uK3VpTsA2IdrI56iDe/aIe/IIFfITYfdbPa/+jzahWaPykoShvZB4YR+2W0em7JirZlemWWFKHqVRarcfHnmxGoJUKZ6y2L5I1FVkSt9gcXREIabPi8YmGGP6daw8KALSWzc6EoiQPz/ph78hH boismej@C02XKB07JG5J
-      #sshPassphrase: # Optional
-      sshKeySecureFile: azure_internal_deploy_key
+      secureFile: app_store_release.zip
 
-  - bash: git clone --depth 1 git@github.com:$DEPLOY_REPO ../deploy_scripts
-    env:
-      DEPLOY_REPO: $(Deploy.Repo)
+  - bash: unzip $(app_store_release_zip.secureFilePath) -d ..
+
+  - bash: python ../app_store/bundle_to_app_store.py
