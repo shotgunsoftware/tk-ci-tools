@@ -50,6 +50,6 @@ jobs:
       #sshPassphrase: # Optional
       sshKeySecureFile: azure_internal_deploy_key
 
-  - bash: git clone --depth 1 https://github.com/$DEPLOY_REPO ../deploy_scripts
+  - bash: git clone --depth 1 git@github.com:$DEPLOY_REPO ../deploy_scripts
     env:
       DEPLOY_REPO: $(Deploy.Repo)
