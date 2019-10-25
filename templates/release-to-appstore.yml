@@ -23,9 +23,6 @@ jobs:
       versionSpec: 2.7
     displayName: Use Python 2.7
 
-  - bash: echo $(Build.SourceBranch)
-  - bash: echo $(Build.SourceBranchName)
-
   # This task can be executed only from the shotgunsoftware
   # organization repositories. It will fail on forks on our
   # repos from other users.
@@ -60,7 +57,7 @@ jobs:
       # It assumes apps contains -multi-, frameworks contains -framework- and configs
       # contain -config-. Anything else is an engine
       export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if "-multi-" in "repo" else "framework" if "-framework-" in repo else "config" if "-config-" in repo else "engine")'`
-      python ../app_store/bundle_to_app_store.py --repository tk-multi-testing --bundle-type app --no-ftp --use-https --tag $(Build.SourceBranchName)
+      python ../app_store/bundle_to_app_store.py --repository $(Build.Repository.Name) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
       # Just like the DownloadSecureFile, the environment variables here can only
       # be used from builds on shotgunsoftware, not from forks.
