@@ -15,6 +15,8 @@ jobs:
   displayName: Release to AppStore
   pool:
     vmImage: 'ubuntu-16.04'
+  # Run this task only if a repo was tagged
+  condition: startsWith($(Build.SourceBranch), 'refs/tags')
   steps:
 
   # Switch to the right Python Version.
@@ -57,8 +59,10 @@ jobs:
       # It assumes apps contains -multi-, frameworks contains -framework- and configs
       # contain -config-. Anything else is an engine
       export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if "-multi-" in "repo" else "framework" if "-framework-" in repo else "config" if "-config-" in repo else "engine")'`
-      python ../app_store/bundle_to_app_store.py --repository tk-multi-testing --bundle-type app --no-ftp --use-https --tag v0.0.1
+      python ../app_store/bundle_to_app_store.py --repository tk-multi-testing --bundle-type app --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
+      # Just like the DownloadSecureFile, the environment variables here can only
+      # be used from builds on shotgunsoftware, not from forks.
       sgtk_app_store_api_server: $(sgtk_app_store_api_server)
       sgtk_app_store_api_user: $(sgtk_app_store_api_user)
       sgtk_app_store_api_key: $(sgtk_app_store_api_key)

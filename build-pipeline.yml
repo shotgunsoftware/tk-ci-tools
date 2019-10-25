@@ -23,4 +23,6 @@ jobs:
 # - template: "templates/unit-tests.yml"
 #   parameters:
 #     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+- bash: echo $(Build.SourceBranch)
+- bash: echo $(Build.SourceBranchName)
 - template: "templates/release-to-appstore.yml"
