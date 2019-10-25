@@ -15,8 +15,6 @@ jobs:
   displayName: Release to AppStore
   pool:
     vmImage: 'ubuntu-16.04'
-  # Run this task only if a repo was tagged
-  condition: startsWith($(Build.SourceBranch), 'refs/tags')
   steps:
 
   # Switch to the right Python Version.
@@ -24,6 +22,9 @@ jobs:
     inputs:
       versionSpec: 2.7
     displayName: Use Python 2.7
+
+  - bash: echo $(Build.SourceBranch)
+  - bash: echo $(Build.SourceBranchName)
 
   # This task can be executed only from the shotgunsoftware
   # organization repositories. It will fail on forks on our
@@ -48,6 +49,8 @@ jobs:
     name: app_store_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
     inputs:
       secureFile: app_store.zip
+    # Run this task only if a repo was tagged
+    condition: startsWith($(Build.SourceBranch), 'refs/tags')
 
   - bash: unzip $(app_store_zip.secureFilePath) -d ..
 
