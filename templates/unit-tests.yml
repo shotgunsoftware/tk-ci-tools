@@ -12,6 +12,13 @@ parameters:
   extra_pip_dependencies: ""
 
 jobs:
+
+# TODO: We're missing the Python 2.7 build here. This is because the Python 2.7
+# That Azure Pipelines ships with uses USC4 encoding for strings but PySide1
+# and PySide2 on pip using USC2, which breaks. We should look into building
+# our own copy or creating our own docker container that has Python compiled
+# the right way.
+
 # Linux Python 3.7 build
 - template: unit-tests-with.yml
   parameters:
