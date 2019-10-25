@@ -49,4 +49,6 @@ jobs:
 
   - bash: unzip $(app_store_release_zip.secureFilePath) -d ..
 
+  - bash: pip install -r ../app_store/requirements.txt
+
   - bash: python ../app_store/bundle_to_app_store.py
