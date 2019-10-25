@@ -52,14 +52,16 @@ jobs:
       pip install -r ../app_store/requirements.txt
     displayName: Prepare release scripts
 
-  # This will detect the bundle type.
+  # Deploy the bundle to the Toolkit AppStore.
   - bash: |
       # Detects the bundle type by looking at the python file at the root of the repo.
       export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if os.path.exists("app.py") else "framework" if os.path.exists("framework.py") else "engine" if os.path.exists("engine.py") else "config")'`
       python ../app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
       # Just like the DownloadSecureFile, the environment variables here can only
-      # be used from builds on shotgunsoftware, not from forks.
+      # be used from builds on shotgunsoftware, not from forks, so we do not have
+      # to worry about our credentials leaking to clients, nor do we have to
+      # worry about clients pushing code to our appstore from their pull requests.
       sgtk_app_store_api_server: $(sgtk_app_store_api_server)
       sgtk_app_store_api_user: $(sgtk_app_store_api_user)
       sgtk_app_store_api_key: $(sgtk_app_store_api_key)
