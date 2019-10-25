@@ -26,5 +26,5 @@ jobs:
 
 # FIXME: We should find a way to avoid including this step on forked repos.
 # Only launch a build on a tag.
-- ${{ if startsWith($(Build.SourceBranch), 'refs/tags') }}:
+- ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
   - template: "templates/release-to-appstore.yml"
