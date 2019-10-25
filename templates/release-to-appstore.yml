@@ -46,10 +46,13 @@ jobs:
     name: app_store_zip # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
     inputs:
       secureFile: app_store.zip
+    displayName: Download release scripts
 
   - bash: unzip $(app_store_zip.secureFilePath) -d ..
+    displayName: Unzip release scripts
 
   - bash: pip install -r ../app_store/requirements.txt
+    displayName: Installing dependencies
 
   # This will detect the bundle type.
   - bash: |
@@ -64,3 +67,4 @@ jobs:
       sgtk_app_store_api_server: $(sgtk_app_store_api_server)
       sgtk_app_store_api_user: $(sgtk_app_store_api_user)
       sgtk_app_store_api_key: $(sgtk_app_store_api_key)
+    displayName: Deploying to AppStore
