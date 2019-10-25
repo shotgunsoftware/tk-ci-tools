@@ -26,7 +26,7 @@ jobs:
     flake8_exclude: ${{ parameters.flake8_exclude }}
 
 # Do not include tests if user requested to skip them
-- if ${{ eq( parameters.skip_tests, true ) }}:
+- ${{ if eq( parameters.skip_tests, true ) }}:
   - template: "templates/unit-tests.yml"
     parameters:
       extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
