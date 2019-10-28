@@ -27,5 +27,5 @@ jobs:
       pre-commit run --all
     displayName: Validate code
 
-  - bash: tk-docs-preview
+  - bash: (test -e docs && tk-docs-preview --build-only) || echo No "docs" folder detected.
     displayName: Validate documentation
