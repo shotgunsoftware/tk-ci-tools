@@ -23,9 +23,11 @@ jobs:
 
   # Install all the Python code validation packages.
   - bash: |
-      python -m pip install pre-commit
+      python -m pip install pre-commit &&
       pre-commit run --all
     displayName: Validate code
 
-  - bash: (test -e docs && tk-docs-preview --build-only) || echo No "docs" folder detected.
+  - bash:
+      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain &&
+      ((test -e docs && tk-docs-preview --build-only) || echo No "docs" folder detected.)
     displayName: Validate documentation
