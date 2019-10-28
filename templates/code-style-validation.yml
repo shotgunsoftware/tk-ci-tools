@@ -8,9 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-parameters:
-  flake8_exclude: ""
-
 jobs:
 # Spin up a Linux VM for validating code.
 - job: code_style_validation
@@ -25,27 +22,7 @@ jobs:
       versionSpec: '3.x'
 
   # Install all the Python code validation packages.
-  - bash: python -m pip install pre-commit flake8
-    displayName: Install validators
-
-  # Ensure the code that was pushed has the proper formatting, except in the
-  # ui folder, which is auto-generated.
-  - bash: pre-commit run --all
-    displayName: Validate pre-commit was used
-
-  # We do not tolerate any flake8 errors on new code, so this step will
-  # run on any PR build and only of the diff between the destination branch
-  # and the PR branch.
-  # The git clone of the repo was shallow, so we'll have to fetch the branch
-  # we're merging into so we can then feed the diff into flake8.
-  # Contrary to HoundCI, this will force us to actually fix our flake8 errors.
   - bash: |
-      git fetch origin $SYSTEM_PULLREQUEST_TARGETBRANCH &&
-      git diff origin/$SYSTEM_PULLREQUEST_TARGETBRANCH -- . |
-      flake8 --diff --extend-ignore=E203 --exclude="*/ui/*.py,$FLAKE8_EXCLUDE" --max-line-length=88
-    displayName: flake8
-    # We only run flake8 on a pull request, since only then do we know which lines are
-    # modified and should be flake8ed.
-    condition: eq(variables['Build.Reason'], 'PullRequest')
-    env:
-      FLAKE8_EXCLUDE: ${{ parameters.flake8_exclude }}
+      python -m pip install pre-commit
+      pre-commit run --all
+    displayName: Validate code

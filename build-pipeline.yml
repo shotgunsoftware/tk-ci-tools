@@ -9,8 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # comma separated list of globs that exclude files from flake8 validation
-  flake8_exclude: ""
   # space separated list of Python packages that need to be pip installed.
   extra_pip_dependencies: ""
 
@@ -18,8 +16,6 @@ parameters:
 # multiple platforms.
 jobs:
 - template: "templates/code-style-validation.yml"
-  parameters:
-    flake8_exclude: ${{ parameters.flake8_exclude }}
 - template: "templates/unit-tests.yml"
   parameters:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
