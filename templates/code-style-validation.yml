@@ -25,13 +25,13 @@ jobs:
       versionSpec: '3.x'
 
   # Install all the Python code validation packages.
-  - bash: python -m pip install black flake8
+  - bash: python -m pip install pre-commit flake8
     displayName: Install validators
 
   # Ensure the code that was pushed has the proper formatting, except in the
   # ui folder, which is auto-generated.
-  - bash: black --check . --exclude="ui\/.*py$"
-    displayName: black
+  - bash: pre-commit run --all
+    displayName: Validate pre-commit was used
 
   # We do not tolerate any flake8 errors on new code, so this step will
   # run on any PR build and only of the diff between the destination branch
