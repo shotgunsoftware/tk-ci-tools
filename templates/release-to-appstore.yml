@@ -54,8 +54,19 @@ jobs:
 
   # Deploy the bundle to the Toolkit AppStore.
   - bash: |
+      export BUNDLE_TYPE=`python -c '
+      import os
       # Detects the bundle type by looking at the python file at the root of the repo.
-      export BUNDLE_TYPE=`python -c 'import os; repo = os.path.basename(os.getcwd()); print("app" if os.path.exists("app.py") else "framework" if os.path.exists("framework.py") else "engine" if os.path.exists("engine.py") else "config")'`
+      repo = os.path.basename(os.getcwd())
+      if os.path.exists("app.py"):
+          print("app")
+      elif os.path.exists("framework.py"):
+          print("framework")
+      elif os.path.exists("engine.py"):
+          print("engine")
+      else:
+          print("config")
+      '`
       python ../app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
       # Just like the DownloadSecureFile, the environment variables here can only
