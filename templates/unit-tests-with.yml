@@ -42,7 +42,7 @@ jobs:
 
   # Install pip installable modules
   - bash: |
-      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain &&
+      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@docs_validation#egg=tk-toolchain &&
       pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
     displayName: Installing Python modules
 
