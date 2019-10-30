@@ -10,7 +10,7 @@
 
 parameters:
   # space separated list of Python packages that need to be pip installed.
-  extra_pip_dependencies: ""
+  extra_test_dependencies: ""
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
 
@@ -29,7 +29,7 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Linux Python 3.7"
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
@@ -42,7 +42,7 @@ jobs:
     # We're picking this build as the one responsible
     # for uploading code coverage
     upload_coverage: true
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "macOS Python 2.7"
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
@@ -53,7 +53,7 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "macOS Python 3.7"
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
@@ -64,7 +64,7 @@ jobs:
     qt_wrapper: PySide
     python_version: 2.7
     upload_coverage: false
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Windows Python 2.7"
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
@@ -75,6 +75,6 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Windows Python 3.7"
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}

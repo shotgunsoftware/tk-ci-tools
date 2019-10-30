@@ -10,7 +10,7 @@
 
 parameters:
   # space separated list of Python packages that need to be pip installed.
-  extra_pip_dependencies: ""
+  extra_test_dependencies: ""
   # Version of tk-toolchain to use.
   tk_toolchain_ref: master
 
@@ -22,5 +22,5 @@ jobs:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 - template: "templates/unit-tests.yml"
   parameters:
-    extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}

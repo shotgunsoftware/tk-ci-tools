@@ -16,7 +16,7 @@ Code style validation is enforced by running the `pre-commit` hook on all the fi
 
 Your respository needs to have a pre-commit hook for the code style validation to pass. All Toolkit repositories are expected to have them.
 
-You save the following as a starting point at the root of your respository in a file called `.pre-commit-config.yaml`:
+You save the following as a starting point at the root of your respository in a file called `.pre-commit-config.yaml`. The `exclude` setting is a regular expression matching file paths that should not be validated.
 
 ```yaml
 # Copyright (c) 2019 Shotgun Software Inc.
@@ -106,3 +106,8 @@ jobs:
 ```
 
 If you need to use an in-development version of these tools from a branch, you can update the `ref` in `repositories` section to point to a different branch.
+
+The `build-pipeline.yml` template has a few parameters. They are:
+
+- `extra_test_dependencies`: Space separated list of Python packages that need to be pip installed to run the tests. Defaults to `""`.
+- `tk_toolchain_ref`: Ref of tk-toolchain to use. Defaults to `master`.
