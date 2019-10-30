@@ -35,3 +35,4 @@ jobs:
   parameters:
     # There's a test inside this repo that requires Qt.py
     extra_pip_dependencies: Qt.py
+    tk_toolchain_ref: docs_validation
