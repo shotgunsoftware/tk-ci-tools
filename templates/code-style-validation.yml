@@ -30,6 +30,6 @@ jobs:
   - bash:
       # PySide 2 and tk-toolchain are required to build the documentation.
       pip install PySide2 git+https://github.com/shotgunsoftware/tk-toolchain.git#egg=tk-toolchain &&
-      git clone --branch master --depth 1 https://github.com/shotgunsoftware/tk-core ../tk-core &&
-      tk-docs-preview --build-only
+      git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
+      tk-docs-preview --build-only --verbose
     displayName: Validate documentation
