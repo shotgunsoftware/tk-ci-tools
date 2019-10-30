@@ -9,7 +9,10 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
+  # space separated list of Python packages that need to be pip installed.
   extra_pip_dependencies: ""
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref: master
 
 jobs:
 
@@ -28,6 +31,7 @@ jobs:
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "Linux Python 3.7"
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
 # macOS Python 2.7 build
 - template: unit-tests-with.yml
@@ -40,6 +44,7 @@ jobs:
     upload_coverage: true
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "macOS Python 2.7"
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
 # macOS Python 3.7 build
 - template: unit-tests-with.yml
@@ -50,6 +55,7 @@ jobs:
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "macOS Python 3.7"
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
 # Windows Python 2.7 build
 - template: unit-tests-with.yml
@@ -60,6 +66,7 @@ jobs:
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "Windows Python 2.7"
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 
 # Windows Python 3.7 build
 - template: unit-tests-with.yml
@@ -70,3 +77,4 @@ jobs:
     upload_coverage: false
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
     job_name: "Windows Python 3.7"
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}

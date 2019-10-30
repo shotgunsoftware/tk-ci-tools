@@ -21,6 +21,8 @@ parameters:
   upload_coverage: false
   # Pretty name for the job.
   job_name: ""
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref: master
 
 jobs:
 - job:
@@ -42,7 +44,7 @@ jobs:
 
   # Install pip installable modules
   - bash: |
-      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@docs_validation#egg=tk-toolchain &&
+      pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain &&
       pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ parameters.extra_pip_dependencies }}
     displayName: Installing Python modules
 

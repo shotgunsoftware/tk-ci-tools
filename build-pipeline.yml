@@ -11,11 +11,16 @@
 parameters:
   # space separated list of Python packages that need to be pip installed.
   extra_pip_dependencies: ""
+  # Version of tk-toolchain to use.
+  tk_toolchain_ref: master
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
 jobs:
 - template: "templates/code-style-validation.yml"
+  parameters:
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
 - template: "templates/unit-tests.yml"
   parameters:
     extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
