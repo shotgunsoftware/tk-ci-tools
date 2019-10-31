@@ -30,7 +30,7 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  external_repositories: []
+  additional_repositories: []
   # Git ref of tk-core to use.
   tk_core_ref: master
 
@@ -49,10 +49,10 @@ jobs:
 
   - template: clone-repositories.yml
     parameters:
-      external_repositories:
+      additional_repositories:
       - name: tk-core
         ref: ${{ tk_core_ref }}
-      - ${{ external_repositories }}
+      - ${{ additional_repositories }}
 
   # Install pip installable modules
   - bash: |

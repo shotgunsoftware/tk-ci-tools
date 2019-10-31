@@ -20,7 +20,7 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  external_repositories: []
+  additional_repositories: []
   # Git ref of tk-core to use.
   tk_core_ref: master
 
