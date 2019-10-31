@@ -36,7 +36,7 @@ jobs:
     parameters:
       repositories:
       - name: tk-core
-        ref: ${{ tk_core_ref }}
+        ref: ${{ parameters.tk_core_ref }}
 
   - bash: pre-commit run --all
     displayName: Validate code
