@@ -1,24 +1,16 @@
 CI tools tests
 ==============
 
-These tests are designed to fail. It allows us to make sure that these errors will be properly caught by the build pipeline.
+In order to test the pipeline and make sure it works, you need to make it fail. Here are the things to try.
 
-Here are the expected output of commands
+Fail black
+----------
+Modify a test so that reformatting needs to be done. You can push such a change by passing in `--no-verify` to git commit to bypass the black pre-commit hook.
 
-Black
------
-```
-would reformat tests/test_build.py
-All done! 💥 💔 💥
-1 file would be reformatted.
-```
+Fail flake8
+-----------
+Trigger a missing variable error, such as adding `a == b` to the test file.
 
-Flake8
-------
-```
-tests/test_build.py:13:16: E222 multiple spaces after operator
-tests/test_build.py:15:5: F841 local variable 'a' is assigned to but never used
-tests/test_build.py:15:9: F821 undefined name 'b'
-```
-
-> Note: The Flake8 errors will only appear on a pull request build, not on a commit build. This is because during a build we can't do a diff with the destination branch, as there is no notion of where we're merging code.
+Fail tests
+----------
+Put an `assert False` in a test.

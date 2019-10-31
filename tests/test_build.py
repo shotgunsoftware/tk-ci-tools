@@ -8,8 +8,17 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+import sys
+from Qt import QtWidgets
 
-def test_something():
-    pass_test =     False
-    assert pass_test
-    a = b
+
+def test_qt():
+    """
+    Ensure we can show a Qt dialog on Azure-Pipelines and interact with it.
+    """
+    app = QtWidgets.QApplication(sys.argv)
+    button = QtWidgets.QPushButton("Hello World")
+    button.show()
+    app.processEvents()
+    button.close()
+    app.processEvents()
