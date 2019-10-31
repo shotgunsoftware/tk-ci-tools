@@ -49,7 +49,7 @@ jobs:
 
   - template: clone-repositories.yml
     parameters:
-      additional_repositories:
+      repositories:
       - name: tk-core
         ref: ${{ parameters.tk_core_ref }}
       - ${{ additional_repositories }}
