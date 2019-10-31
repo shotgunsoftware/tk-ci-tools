@@ -57,7 +57,7 @@ jobs:
   # Install pip installable modules
   - bash: |
       pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain &&
-      pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ join(" ", parameters.extra_test_dependencies) }}
+      pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ join(' ', parameters.extra_test_dependencies) }}
     displayName: Installing Python modules
 
   # Start xvfb on Linux so we can test with a GUI.
