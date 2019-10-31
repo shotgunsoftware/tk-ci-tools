@@ -11,6 +11,8 @@
 parameters:
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
+  # Git ref of tk-core to use.
+  tk_core_ref: master
 
 jobs:
 # Spin up a Linux VM for validating code.
@@ -25,15 +27,19 @@ jobs:
     inputs:
       versionSpec: '3.x'
 
-  # Install all the Python code validation packages.
-  - bash: |
-      python -m pip install pre-commit &&
-      pre-commit run --all
+  # We need pre-commit to ensure the pre-commit hooks were run.
+  # We need PySide2 and tk-toolchain to build the doc.
+  - bash: python -m pip install pre-commit PySide2 git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+    displayName: Installing PySide2, pre-commit and tk-toolchain
+
+  - template: clone-repositories.yml
+    parameters:
+      repositories:
+      - name: tk-core
+        ref: ${{ tk_core_ref }}
+
+  - bash: pre-commit run --all
     displayName: Validate code
 
-  - bash:
-      # PySide 2 and tk-toolchain are required to build the documentation.
-      pip install PySide2 git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain &&
-      git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core &&
-      tk-docs-preview --build-only --verbose
+  - bash: tk-docs-preview --build-only --verbose
     displayName: Validate documentation

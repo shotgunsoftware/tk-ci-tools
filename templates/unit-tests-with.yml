@@ -23,6 +23,16 @@ parameters:
   job_name: ""
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  external_repositories: []
+  # Git ref of tk-core to use.
+  tk_core_ref: master
 
 jobs:
 - job:
@@ -37,10 +47,12 @@ jobs:
       versionSpec: ${{ parameters.python_version }}
     displayName: Use Python ${{ parameters.python_version }}
 
-  # Install all Toolkit dependencies for this repo.
-  # TODO: Maybe look inside info.yml to find which frameworks need to be cloned?
-  - bash: git clone https://github.com/shotgunsoftware/tk-core --depth 1 --branch SG-13264-python-3-compat ../tk-core
-    displayName: Installing Toolkit Dependencies
+  - template: clone-repositories.yml
+    parameters:
+      external_repositories:
+      - name: tk-core
+        ref: ${{ tk_core_ref }}
+      - ${{ external_repositories }}
 
   # Install pip installable modules
   - bash: |

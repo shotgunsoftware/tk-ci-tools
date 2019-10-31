@@ -13,6 +13,16 @@ parameters:
   extra_test_dependencies: ""
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  external_repositories: []
+  # Git ref of tk-core to use.
+  tk_core_ref: master
 
 jobs:
 
@@ -29,9 +39,9 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Linux Python 3.7"
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    # pass through all parameters
+    ${{ insert }}: parameters
 
 # macOS Python 2.7 build
 - template: unit-tests-with.yml
@@ -42,9 +52,9 @@ jobs:
     # We're picking this build as the one responsible
     # for uploading code coverage
     upload_coverage: true
-    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "macOS Python 2.7"
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    # pass through all parameters
+    ${{ insert }}: parameters
 
 # macOS Python 3.7 build
 - template: unit-tests-with.yml
@@ -53,9 +63,9 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "macOS Python 3.7"
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    # pass through all parameters
+    ${{ insert }}: parameters
 
 # Windows Python 2.7 build
 - template: unit-tests-with.yml
@@ -64,9 +74,9 @@ jobs:
     qt_wrapper: PySide
     python_version: 2.7
     upload_coverage: false
-    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Windows Python 2.7"
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    # pass through all parameters
+    ${{ insert }}: parameters
 
 # Windows Python 3.7 build
 - template: unit-tests-with.yml
@@ -75,6 +85,6 @@ jobs:
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
-    extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
     job_name: "Windows Python 3.7"
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    # pass through all parameters
+    ${{ insert }}: parameters
