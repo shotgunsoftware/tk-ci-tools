@@ -36,4 +36,4 @@ jobs:
 - template: "templates/unit-tests.yml"
   parameters:
     # pass through all parameters
-    ${{ insert }}: parameters
+    ${{ insert }}: ${{ parameters }}
