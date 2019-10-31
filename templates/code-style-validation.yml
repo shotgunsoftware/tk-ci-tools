@@ -25,7 +25,8 @@ jobs:
   # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.x'
+      versionSpec: '3.7'
+    displayName: Use Python 3.7
 
   - template: pip-install-packages.yml
     parameters:
