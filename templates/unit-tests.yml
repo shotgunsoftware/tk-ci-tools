@@ -9,8 +9,8 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # space separated list of Python packages that need to be pip installed.
-  extra_test_dependencies: ""
+  # List of Python packages that need to be pip installed for testing.
+  extra_test_dependencies: []
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.

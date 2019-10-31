@@ -15,8 +15,8 @@ parameters:
   qt_wrapper: PySide2
   # Python version to use. Should be 2.7 or 3.7
   python_version: 3.7
-  # Any extra dependencies that should be pip installed.
-  extra_test_dependencies: ""
+  # List of Python packages that need to be pip installed for testing.
+  extra_test_dependencies: []
   # If true, the coverage report will be uploaded to Coveralls.io
   upload_coverage: false
   # Pretty name for the job.
@@ -57,7 +57,7 @@ jobs:
   # Install pip installable modules
   - bash: |
       pip install git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain &&
-      pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ parameters.extra_test_dependencies }}
+      pip install ${{ parameters.qt_wrapper }} pytest-azurepipelines ${{ join(" ", parameters.extra_test_dependencies) }}
     displayName: Installing Python modules
 
   # Start xvfb on Linux so we can test with a GUI.
