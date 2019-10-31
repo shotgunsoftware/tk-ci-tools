@@ -40,3 +40,4 @@ jobs:
     - name: tk-multi-testing
       ref: azure_test_branch
     - name: tk-framework-qtwidgets
+    tk_toolchain_ref: docs_validation
