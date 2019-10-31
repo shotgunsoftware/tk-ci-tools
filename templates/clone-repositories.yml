@@ -19,6 +19,6 @@ parameters:
   repositories: []
 
 steps:
-- ${{ each repo in parameters.repositories }}
+- ${{ each repo in parameters.repositories }}:
    - bash: git clone --depth 1 --branch ${{ coalesce(repo.ref, 'master') }} https://github.com/shotgunsoftware/${{ repo.name }} ../${{ repo.name }}
      displayName: Cloning ${{ repo.name }}(${{ coalesce(repo.ref, 'master') }})
