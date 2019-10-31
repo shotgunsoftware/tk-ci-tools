@@ -27,10 +27,12 @@ jobs:
     inputs:
       versionSpec: '3.x'
 
-  # We need pre-commit to ensure the pre-commit hooks were run.
-  # We need PySide2 and tk-toolchain to build the doc.
-  - bash: python -m pip install pre-commit PySide2 git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
-    displayName: Installing PySide2, pre-commit and tk-toolchain
+  - template: pip-install-packages.yml
+    parameters:
+      packages:
+      - PySide2
+      - pre-commit
+      - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
   - template: clone-repositories.yml
     parameters:
