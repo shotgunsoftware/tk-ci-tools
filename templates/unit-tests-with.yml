@@ -62,6 +62,8 @@ jobs:
         ref: ${{ parameters.tk_core_ref }}
       - ${{ parameters.additional_repositories }}
 
+  # We can't use eq(Agent.OS, 'linux') here because template expansion is done
+  # before the job is assigned to an agent.
   - ${{ if contains(parameter.image_name, 'ubuntu')) }}:
     # Start xvfb on Linux so we can test with a GUI.
     - bash: |
