@@ -68,8 +68,8 @@ jobs:
     # Start xvfb on Linux so we can test with a GUI.
     - bash: |
         /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        echo ">>> Started xvfb"
-      displayName: Start xvfb on Linux
+        echo ">>> Started Xvfb"
+      displayName: Start Xvfb
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
@@ -83,8 +83,8 @@ jobs:
       QT_QPA_PLATFORM: offscreen
       DISPLAY: ':99.0'
       TK_DEBUG: 1
-    displayName: Running tests
+    displayName: Run tests
 
   - ${{ if eq(parameters.upload_coverage, true) }}:
     - bash: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-      displayName: Uploading Code Coverage
+      displayName: Upload code coverage
