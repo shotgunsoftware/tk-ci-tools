@@ -37,5 +37,5 @@ jobs:
     extra_test_dependencies: Qt.py
     additional_repositories:
     - name: tk-multi-testing
-      branch: azure_test_branch
+      ref: azure_test_branch
     - name: tk-framework-qtwidgets
