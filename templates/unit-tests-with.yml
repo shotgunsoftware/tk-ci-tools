@@ -52,7 +52,7 @@ jobs:
       repositories:
       - name: tk-core
         ref: ${{ parameters.tk_core_ref }}
-      - ${{ additional_repositories }}
+      - ${{ parameters.additional_repositories }}
 
   # Install pip installable modules
   - bash: |
