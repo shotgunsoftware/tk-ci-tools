@@ -107,7 +107,4 @@ jobs:
 
 If you need to use an in-development version of these tools from a branch, you can update the `ref` in `repositories` section to point to a different branch.
 
-The `build-pipeline.yml` template has a few parameters. They are:
-
-- `extra_test_dependencies`: Space separated list of Python packages that need to be pip installed to run the tests. Defaults to `""`.
-- `tk_toolchain_ref`: Ref of tk-toolchain to use. Defaults to `master`.
+The `build-pipeline.yml` template has a few parameters. You can find out more about them in [build-pipeline.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/build-pipeline.yml).
