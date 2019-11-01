@@ -53,6 +53,15 @@ jobs:
       - ${{ parameters.qt_wrapper }}
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
       - pytest-azurepipelines
+      # Inserting a parameter that is a list into another list flattens
+      # the result instead of nesting it.
+      # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
+      # parameter will end up as
+      # - PySide2
+      # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      # - pytest-azurepipelines
+      # - Qt.py
+      # - numpy
       - ${{ parameters.extra_test_dependencies }}
 
   - template: clone-repositories.yml
@@ -60,6 +69,7 @@ jobs:
       repositories:
       - name: tk-core
         ref: ${{ parameters.tk_core_ref }}
+      # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
   # We can't use eq(Agent.OS, 'linux') here because template expansion is done
