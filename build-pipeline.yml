@@ -29,11 +29,11 @@ parameters:
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
 jobs:
-- template: "templates/code-style-validation.yml"
+- template: "internal/code-style-validation.yml"
   parameters:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
-- template: "templates/unit-tests.yml"
+- template: "internal/unit-tests.yml"
   parameters:
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
