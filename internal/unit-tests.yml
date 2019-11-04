@@ -69,7 +69,6 @@ jobs:
     image_name: 'ubuntu-18.04'
     qt_wrapper: PySide2
     python_version: 3.7
-    upload_coverage: false
     job_name: "Linux Python 3.7"
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
@@ -80,9 +79,6 @@ jobs:
     image_name: 'macos-10.13'
     qt_wrapper: PySide2
     python_version: 2.7
-    # We're picking this build as the one responsible
-    # for uploading code coverage
-    upload_coverage: true
     job_name: "macOS Python 2.7"
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
@@ -93,7 +89,6 @@ jobs:
     image_name: 'macos-10.13'
     qt_wrapper: PySide2
     python_version: 3.7
-    upload_coverage: false
     job_name: "macOS Python 3.7"
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
@@ -104,7 +99,6 @@ jobs:
     image_name: 'vs2017-win2016'
     qt_wrapper: PySide
     python_version: 2.7
-    upload_coverage: false
     job_name: "Windows Python 2.7"
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
