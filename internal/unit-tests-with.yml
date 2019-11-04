@@ -93,7 +93,9 @@ jobs:
       TK_DEBUG: 1
     displayName: Run tests
 
-  - bash: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - bash: |
+      curl -s https://codecov.io/bash > codecov.sh
+      bash codecov.sh
     displayName: Upload code coverage
     env:
       CODECOV_TOKEN: $(codecov.token)
