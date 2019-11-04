@@ -98,3 +98,5 @@ jobs:
   - ${{ if eq(parameters.upload_coverage, true) }}:
     - bash: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
       displayName: Upload code coverage
+      env:
+        CODECOV_TOKEN: $(codecov.token)
