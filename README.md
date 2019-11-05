@@ -113,21 +113,18 @@ Once you've added your `azure-pipelines.yml` file to your repository, it's time 
 2. Select any pipeline from the list, click on the triple dot button at the top right and select clone.
    ![cloning_build](resources/cloning_build.png)
 3. In the YAML tab, update the build info
-
-3.1 The name can be updated from the right-hand side of the page. You must name the build after the name of the repository.
+4. The name can be updated from the right-hand side of the page. You must name the build after the name of the repository.
    ![updating_build](resources/updating_build.png)
-   
-3.2 Click on `Get Sources` on the left-hand side and change the repository the code should be clone from.
+5. Click on `Get Sources` on the left-hand side and change the repository the code should be clone from.
     ![swiching_repo](resources/swiching_repo.png)
-
-4. Save the pipeline. Do not `Save and Queue`, as the master branch does not have an `azure-pipelines.yml` file yet. Make sure to pick the right folder for your build so that it shows at the right place in the build tree.
-5. The build is now created. Since it hasn't run yet, it does not show up in the recent builds tab. Switch the folder view by clicking on the folder icon above the build list.
+6. Save the pipeline. Do not `Save and Queue`, as the master branch does not have an `azure-pipelines.yml` file yet. Make sure to pick the right folder for your build so that it shows at the right place in the build tree.
+7. The build is now created. Since it hasn't run yet, it does not show up in the recent builds tab. Switch the folder view by clicking on the folder icon above the build list.
    ![folder_view](resources/folder_view.png)
-6. Find your build in the treeview and then click on the `Edit` button and then the `Variables` button on the right-hand side.
-7. In the Variables tab, create a new variable name `codecov.token` and make sure `Keep this value secret` is checked. This is important or people outside the organization could push coverage data.
+8. Find your build in the treeview and then click on the `Edit` button and then the `Variables` button on the right-hand side.
+9. In the Variables tab, create a new variable name `codecov.token` and make sure `Keep this value secret` is checked. This is important or people outside the organization could push coverage data.
    ![enter_token](resources/enter_token.png)
-8. The codecov token for your repository can be found at codecov.io. In this example, we're setting up `tk-framework-widget`, so we can find the key at https://codecov.io/gh/shotgunsoftware/tk-framework-widget.
+10. The codecov token for your repository can be found at codecov.io. In this example, we're setting up `tk-framework-widget`, so we can find the key at https://codecov.io/gh/shotgunsoftware/tk-framework-widget.
    ![copy_secret](resources/copy_secret.png)
-9. Click the copy button and paste it in the `Value` box over at Azure Pipelines. If you've done this right, the value should be masked in the edit box.
-10. Hit `Ok`, then `Save` at the bottom right.
-11. You're done! You can now push to Azure Pipelines and your changes will be picked up by the build pipeline.
+11. Click the copy button and paste it in the `Value` box over at Azure Pipelines. If you've done this right, the value should be masked in the edit box.
+12. Hit `Ok`, then `Save` at the bottom right.
+13. You're done! You can now push to Azure Pipelines and your changes will be picked up by the build pipeline.
