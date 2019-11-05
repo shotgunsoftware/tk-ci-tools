@@ -36,7 +36,7 @@ jobs:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
 
-- ${{ ne( parameters.skip_tests, true )}}:
+- ${{ if ne( parameters.skip_tests, true ) }}:
   - template: "internal/unit-tests.yml"
     parameters:
       # pass through all parameters
