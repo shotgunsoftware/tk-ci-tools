@@ -25,6 +25,8 @@ parameters:
   # TODO: Revert this to master when the Python 3 work for tk-core
   # is merged to master.
   tk_core_ref: SG-13264-python-3-compat
+  # Allows to skip test execution.
+  skip_tests: false
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -33,7 +35,9 @@ jobs:
   parameters:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
-- template: "internal/unit-tests.yml"
-  parameters:
-    # pass through all parameters
-    ${{ insert }}: ${{ parameters }}
+
+- ${{ ne( parameters.skip_tests, true )}}:
+  - template: "internal/unit-tests.yml"
+    parameters:
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
