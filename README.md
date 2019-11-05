@@ -110,13 +110,16 @@ The `build-pipeline.yml` template has a few parameters. You can find out more ab
 Once you've added your `azure-pipelines.yml` file to your repository, it's time to add the repository to the Azure Pipelines web service.
 
 1. Go to the [Shotgun Ecosystem Azure Pipelines](https://dev.azure.com/shotgun-ecosystem/Toolkit/_build) page.
-2. Select any pipeline from the list and clone it.
+2. Select any pipeline from the list, click on the triple dot button at the top right and select clone.
    ![cloning_build](resources/cloning_build.png)
 3. In the YAML tab, update the build info
+
 3.1 The name can be updated from the right-hand side of the page. You must name the build after the name of the repository.
    ![updating_build](resources/updating_build.png)
+   
 3.2 Click on `Get Sources` on the left-hand side and change the repository the code should be clone from.
     ![swiching_repo](resources/swiching_repo.png)
+
 4. Save the pipeline. Do not `Save and Queue`, as the master branch does not have an `azure-pipelines.yml` file yet. Make sure to pick the right folder for your build so that it shows at the right place in the build tree.
 5. The build is now created. Since it hasn't run yet, it does not show up in the recent builds tab. Switch the folder view by clicking on the folder icon above the build list.
    ![folder_view](resources/folder_view.png)
