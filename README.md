@@ -113,7 +113,7 @@ Once you've added your `azure-pipelines.yml` file to your repository, it's time 
 2. Select any pipeline from the list, click on the triple dot button at the top right and select clone.
    ![cloning_build](resources/cloning_build.png)
 3. In the YAML tab, update the build info
-    1. The name can be updated from the right-hand side of the page. You must name the build after the name of the repository. 
+    1. The name can be updated from the right-hand side of the page. You must name the build after the name of the repository.
         ![updating_build](resources/updating_build.png)
     2. Click on `Get Sources` on the left-hand side and change the repository the code should be clone from.
         ![swiching_repo](resources/swiching_repo.png)
