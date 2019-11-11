@@ -40,3 +40,8 @@ jobs:
     - name: tk-multi-testing
       ref: azure_test_branch
     - name: tk-framework-qtwidgets
+    # This one shouldn't get cloned.
+    - name: tk-ci-tools
+    post_tests_steps:
+    - bash: echo "Hello from the first post step!"
+    - bash: echo "Hello from the second post step!"

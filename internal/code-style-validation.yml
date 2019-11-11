@@ -35,11 +35,14 @@ jobs:
       - pre-commit
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
+
+
   - template: clone-repositories.yml
     parameters:
       repositories:
       - name: tk-core
         ref: ${{ parameters.tk_core_ref }}
+
 
   - bash: pre-commit run --all
     displayName: Validate code
