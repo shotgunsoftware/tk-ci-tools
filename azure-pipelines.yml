@@ -44,4 +44,6 @@ jobs:
     - name: tk-ci-tools
     post_tests_steps:
     - bash: echo "Hello from the first post step!"
+      displayName: Hello world!
     - bash: echo "Hello from the second post step!"
+      displayName: Hello again!
