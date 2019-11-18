@@ -31,6 +31,15 @@ parameters:
   additional_repositories: []
   # Git ref of tk-core to use.
   tk_core_ref: master
+  # Post test steps
+  # This is a list of Azure Pipeline steps that will be inserted
+  # right after the tests were run.
+  # If you wanted to run a non-standard suite of test as an extra
+  # you would specify post_tests_steps as:
+  # post_tests_steps:
+  # - bash: do_something
+  # - bash: do_something_else
+  post_tests_steps: []
 
 jobs:
 - job:
@@ -81,9 +90,11 @@ jobs:
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
+  # Note that we're hardcoding the name of the coverage file. This is important
+  # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      python -m pytest tests --cov --verbose
+      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --verbose
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
@@ -93,7 +104,13 @@ jobs:
       TK_DEBUG: 1
     displayName: Run tests
 
+  # The post_test_steps list will be flattened into this list of steps.
+  - ${{ parameters.post_tests_steps }}
+
+  # We're done, we can now upload code coverage, but first, we'll have to
+  # combine the results.
   - bash: |
+      python -m coverage combine
       curl -s https://codecov.io/bash > codecov.sh
       bash codecov.sh
     displayName: Upload code coverage

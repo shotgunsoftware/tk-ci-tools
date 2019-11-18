@@ -23,6 +23,15 @@ parameters:
   additional_repositories: []
   # Git ref of tk-core to use.
   tk_core_ref: master
+  # Post test steps
+  # This is a list of Azure Pipeline steps that will be inserted
+  # right after the tests were run.
+  # If you wanted to run a non-standard suite of test as an extra
+  # you would specify post_tests_steps as:
+  # post_tests_steps:
+  # - bash: do_something
+  # - bash: do_something_else
+  post_tests_steps: []
 
 # TODO: At some point, we should review how these environments are enumerated.
 # Something like:
