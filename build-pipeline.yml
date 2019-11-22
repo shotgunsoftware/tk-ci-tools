@@ -55,5 +55,5 @@ jobs:
 # this to the AppStore.
 # FIXME: We should find a way to avoid including this step on forked repos.
 - ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
-  - ${{ if eq( variables['System.PullRequest.IsFork'], false ) }}:
+  - ${{ if eq( variables['System.PullRequest.IsFork'], 'false' ) }}:
     - template: "internal/release-to-appstore.yml"
