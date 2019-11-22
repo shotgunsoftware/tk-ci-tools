@@ -41,18 +41,26 @@ jobs:
   #   - Service connection credentials
   #   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
   #   - Build variables marked secret
-  - task: DownloadSecureFile@1
-    name: app_store_zip
+  - task: InstallSSHKey@0
     inputs:
-      secureFile: app_store.zip
-    displayName: Download release scripts
+      knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+      # This is the public key
+      sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQmNFf8QD0oi4saZeT5kIT02h51HLdRe0SM7F8iMMwbvsNrvJ3wc4J7rr5deCEGotB7fiHkKHp7YseivD3JejUw8ajdA/Hpm+i5MMGDxwfWExLMOKmDSx8gDXeNpM65o2QUPwdJENFI+OcouBaFueXnn0C0BpfDSSM22IU51ghve0hpHOjLXxO9tn2+svaXsPcXK1F/kvt2fnOO0km3kM/ZvsLHMRH6qCfSRk+mq+RzjxwCWgj4pLwtFYXdJbqM/G1xp/HowB9Lvdn4Ew4LSccDoybZUWmcf2xorigTptA4++4G71R1/EIBMULonvOTh3r0fFNf6ScPR6vU102K6en
+      #sshPassphrase: # Optional
+      sshKeySecureFile: release-repo-deploy-key
 
+  # Clone the release scripts repository
+  - bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_scripts
+    env:
+      DEPLOY_REPO: $(Deploy.Repo)
+
+  # Pip install all the dependencies required to run the release scripts.
   - bash: |
-      unzip $(app_store_zip.secureFilePath) -d .. &&
-      pip install -r ../app_store/requirements.txt
+      pip install -r ../release_scripts/app_store/requirements_azure.txt
     displayName: Prepare release scripts
 
-  # Deploy the bundle to the Toolkit AppStore.
+  # Deploy the bundle to the Toolkit AppStore. The script expects
+  # the bundle type as a parameter, so attempt to guess it.
   - bash: |
       export BUNDLE_TYPE=`python -c '
       import os
@@ -67,7 +75,7 @@ jobs:
       else:
           print("config")
       '`
-      python ../app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
+      python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
     env:
       # Just like the DownloadSecureFile, the environment variables here can only
       # be used from builds on shotgunsoftware, not from forks, so we do not have
