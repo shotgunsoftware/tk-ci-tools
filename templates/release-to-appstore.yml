@@ -52,7 +52,7 @@ jobs:
   # Clone the release scripts repository
   - bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_scripts
     env:
-      DEPLOY_REPO: $(Deploy.Repo)
+      RELEASE_REPO: $(release.repo)
 
   # Pip install all the dependencies required to run the release scripts.
   - bash: |
