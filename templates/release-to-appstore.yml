@@ -56,7 +56,7 @@ jobs:
 
   # Pip install all the dependencies required to run the release scripts.
   - bash: |
-      pip install -r ../release_scripts/app_store/requirements_azure.txt
+      pip install -r ../release_scripts/app_store/requirements.txt
     displayName: Prepare release scripts
 
   # Deploy the bundle to the Toolkit AppStore. The script expects
