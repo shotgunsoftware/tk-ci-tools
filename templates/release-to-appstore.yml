@@ -50,7 +50,7 @@ jobs:
       sshKeySecureFile: release-repo-deploy-key
 
   # Clone the release scripts repository
-  - bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_scripts
+  - bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_from_azure
     env:
       RELEASE_REPO: $(release.repo)
 
