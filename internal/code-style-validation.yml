@@ -1,0 +1,48 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref: master
+  # Git ref of tk-core to use.
+  tk_core_ref: master
+
+jobs:
+# Spin up a Linux VM for validating code.
+- job: code_style_validation
+  displayName: Code Style Validation
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+
+  # Use Python 3 for validating the code.
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+    displayName: Use Python 3.7
+
+  - template: pip-install-packages.yml
+    parameters:
+      packages:
+      - PySide2
+      - pre-commit
+      - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+
+  - template: clone-repositories.yml
+    parameters:
+      repositories:
+      - name: tk-core
+        ref: ${{ parameters.tk_core_ref }}
+
+  - bash: pre-commit run --all
+    displayName: Validate code
+
+  - bash: tk-docs-preview --build-only --verbose
+    displayName: Validate documentation

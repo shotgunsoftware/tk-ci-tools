@@ -9,25 +9,48 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # comma separated list of globs that exclude files from flake8 validation
-  flake8_exclude: ""
-  # space separated list of Python packages that need to be pip installed.
-  extra_pip_dependencies: ""
-  # If true, the unit tests will be skipped
+  # List of Python packages that need to be pip installed for testing.
+  extra_test_dependencies: []
+  # Version of tk-toolchain to use.
+  tk_toolchain_ref: master
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  additional_repositories: []
+  # Git ref of tk-core to use.
+  # TODO: Revert this to master when the Python 3 work for tk-core
+  # is merged to master.
+  tk_core_ref: SG-13264-python-3-compat
+  # Allows to skip test execution.
   skip_tests: false
+  # Post test steps
+  # This is a list of Azure Pipeline steps that will be inserted
+  # right after the tests were run.
+  # If you wanted to run a non-standard suite of test as an extra
+  # you would specify post_tests_steps as:
+  # post_tests_steps:
+  # - bash: do_something
+  # - bash: do_something_else
+  post_tests_steps: []
 
+# This build pipeline will validate the code style and our test suite on
+# multiple platforms.
 jobs:
-# Makes sure the code adheres to our quality standards.
-- template: "templates/code-style-validation.yml"
+- template: "internal/code-style-validation.yml"
   parameters:
-    flake8_exclude: ${{ parameters.flake8_exclude }}
-
-# Runs tests on the repository.
-- ${{ if ne( parameters.skip_tests, true ) }}:
-  - template: "templates/unit-tests.yml"
-    parameters:
+    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+    tk_core_ref: ${{ parameters.tk_core_ref }}
       extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
+- ${{ if ne( parameters.skip_tests, true ) }}:
+  - template: "internal/unit-tests.yml"
+    parameters:
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
 # FIXME: We should find a way to avoid including this step on forked repos.

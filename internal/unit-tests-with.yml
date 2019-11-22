@@ -1,0 +1,118 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  # Name of the virtual machine image to load.
+  image_name: ""
+  # Name of the Qt wrapper to pip install. Should be PySide or PySide2
+  qt_wrapper: PySide2
+  # Python version to use. Should be 2.7 or 3.7
+  python_version: 3.7
+  # List of Python packages that need to be pip installed for testing.
+  extra_test_dependencies: []
+  # Pretty name for the job.
+  job_name: ""
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref: master
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  additional_repositories: []
+  # Git ref of tk-core to use.
+  tk_core_ref: master
+  # Post test steps
+  # This is a list of Azure Pipeline steps that will be inserted
+  # right after the tests were run.
+  # If you wanted to run a non-standard suite of test as an extra
+  # you would specify post_tests_steps as:
+  # post_tests_steps:
+  # - bash: do_something
+  # - bash: do_something_else
+  post_tests_steps: []
+
+jobs:
+- job:
+  displayName: ${{ parameters.job_name }}
+  pool:
+    vmImage: ${{ parameters.image_name }}
+  steps:
+
+  # Switch to the right Python Version.
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: ${{ parameters.python_version }}
+    displayName: Use Python ${{ parameters.python_version }}
+
+  - template: pip-install-packages.yml
+    parameters:
+      packages:
+      - ${{ parameters.qt_wrapper }}
+      - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      - pytest-azurepipelines
+      # Inserting a parameter that is a list into another list flattens
+      # the result instead of nesting it.
+      # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
+      # parameter will end up as
+      # - PySide2
+      # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      # - pytest-azurepipelines
+      # - Qt.py
+      # - numpy
+      - ${{ parameters.extra_test_dependencies }}
+
+  - template: clone-repositories.yml
+    parameters:
+      repositories:
+      - name: tk-core
+        ref: ${{ parameters.tk_core_ref }}
+      # Nested lists are flattened, as explained above in pip-install-packages.yml.
+      - ${{ parameters.additional_repositories }}
+
+  # We can't use eq(Agent.OS, 'linux') here because template expansion is done
+  # before the job is assigned to an agent.
+  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+    # Start xvfb on Linux so we can test with a GUI.
+    - bash: |
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        echo ">>> Started Xvfb"
+      displayName: Start Xvfb
+
+  # Run the tests. The task will create a simple coverage file if one is missing.
+  # It will include all code except for the "tests" folder.
+  # Note that we're hardcoding the name of the coverage file. This is important
+  # as "coverage combine" will combine all coverage files that match .coverage.*.
+  - bash: |
+      (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
+      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --verbose
+    # These environment variables need to be set so Linux runs can connect
+    # to xvfb and to have complete logging. Each test logging output will
+    # be captured by pytest and displayed on failure.
+    env:
+      QT_QPA_PLATFORM: offscreen
+      DISPLAY: ':99.0'
+      TK_DEBUG: 1
+    displayName: Run tests
+
+  # The post_test_steps list will be flattened into this list of steps.
+  - ${{ parameters.post_tests_steps }}
+
+  # We're done, we can now upload code coverage, but first, we'll have to
+  # combine the results.
+  - bash: |
+      python -m coverage combine
+      curl -s https://codecov.io/bash > codecov.sh
+      bash codecov.sh
+    displayName: Upload code coverage
+    env:
+      CODECOV_TOKEN: $(codecov.token)

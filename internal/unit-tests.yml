@@ -1,0 +1,124 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  # List of Python packages that need to be pip installed for testing.
+  extra_test_dependencies: []
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref: master
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  additional_repositories: []
+  # Git ref of tk-core to use.
+  tk_core_ref: master
+  # Post test steps
+  # This is a list of Azure Pipeline steps that will be inserted
+  # right after the tests were run.
+  # If you wanted to run a non-standard suite of test as an extra
+  # you would specify post_tests_steps as:
+  # post_tests_steps:
+  # - bash: do_something
+  # - bash: do_something_else
+  post_tests_steps: []
+
+# TODO: At some point, we should review how these environments are enumerated.
+# Something like:
+#
+# parameters:
+#   variants:
+#     Linux:
+#     - Qt: PySide2
+#       Python: 3.7
+#     - Qt: PyQt5
+#       Python: 3.7
+#     macOS:
+#     - Qt: PySide2
+#       Python: 3.7
+#     - Qt: PyQt5
+#       Python: 3.7
+#     - Qt: PySide2
+#       Python: 2.7
+#     - Qt: PySide
+#       Python: 2.7
+#     Windows:
+#     - Qt: PySide
+#       Python: 2.7
+#     - Qt: PySide2
+#       Python: 3.7
+#     - Qt: PyQt5
+#       Python: 3.7
+#
+# This would give us a better view of what variants we are running.
+# Having it as a parameter would allow us also us to pick
+# which builds to use for certain repositories, is necessary.
+
+jobs:
+
+# TODO: We're missing the Python 2.7 build here. This is because the Python 2.7
+# That Azure Pipelines ships with uses USC4 encoding for strings but PySide1
+# and PySide2 on pip using USC2, which breaks. We should look into building
+# our own copy or creating our own docker container that has Python compiled
+# the right way.
+
+# Linux Python 3.7 build
+- template: unit-tests-with.yml
+  parameters:
+    image_name: 'ubuntu-18.04'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    job_name: "Linux Python 3.7"
+    # pass through all parameters
+    ${{ insert }}: ${{ parameters }}
+
+# macOS Python 2.7 build
+- template: unit-tests-with.yml
+  parameters:
+    image_name: 'macos-10.13'
+    qt_wrapper: PySide2
+    python_version: 2.7
+    job_name: "macOS Python 2.7"
+    # pass through all parameters
+    ${{ insert }}: ${{ parameters }}
+
+# macOS Python 3.7 build
+- template: unit-tests-with.yml
+  parameters:
+    image_name: 'macos-10.13'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    job_name: "macOS Python 3.7"
+    # pass through all parameters
+    ${{ insert }}: ${{ parameters }}
+
+# Windows Python 2.7 build
+- template: unit-tests-with.yml
+  parameters:
+    image_name: 'vs2017-win2016'
+    qt_wrapper: PySide
+    python_version: 2.7
+    job_name: "Windows Python 2.7"
+    # pass through all parameters
+    ${{ insert }}: ${{ parameters }}
+
+# Windows Python 3.7 build
+- template: unit-tests-with.yml
+  parameters:
+    image_name: 'vs2017-win2016'
+    qt_wrapper: PySide2
+    python_version: 3.7
+    upload_coverage: false
+    job_name: "Windows Python 3.7"
+    # pass through all parameters
+    ${{ insert }}: ${{ parameters }}

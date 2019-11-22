@@ -1,0 +1,26 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  # List of repositories to clone alongside this repository.
+  # To clone the tk-framework-shotgunutils's master branch
+  # and a specific tk-framework-qtwidget ref, you would
+  # set this parameter to the following:
+  # - name: tk-framework-shotgunutils
+  # - name: tk-framework-qtwidgets
+  #   ref: <branch-or-tag>
+  repositories: []
+
+steps:
+- ${{ each repo in parameters.repositories }}:
+   - bash: git clone --depth 1 --branch ${{ coalesce(repo.ref, 'master') }} https://github.com/shotgunsoftware/${{ repo.name }} ../${{ repo.name }}
+     displayName: Clone ${{ repo.name }}(${{ coalesce(repo.ref, 'master') }})
+     # Allows us to easily skip when cloning tk-core inside the tk-core repo.
+     condition: ne(variables['Build.DefinitionName'], '${{ repo.name }}')
