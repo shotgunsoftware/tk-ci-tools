@@ -24,10 +24,6 @@ pr:
     include:
     - "*"
 
-# This pulls in a variable group from Azure. Variables can be encrypted or not.
-variables:
-- group: deploy-secrets
-
 # Invoke the build pipeline template with Qt.py has an extra dependency so
 # the tests can run properly.
 jobs:
