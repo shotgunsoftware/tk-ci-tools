@@ -44,13 +44,13 @@ jobs:
   parameters:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
-      extra_pip_dependencies: ${{ parameters.extra_pip_dependencies }}
 
 - ${{ if ne( parameters.skip_tests, true ) }}:
   - template: "internal/unit-tests.yml"
     parameters:
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
+
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
 # FIXME: We should find a way to avoid including this step on forked repos.
