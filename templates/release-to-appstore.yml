@@ -13,7 +13,7 @@ jobs:
 - job: release_to_appstore
   displayName: Release to AppStore
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'macos-10.13'
   steps:
 
   # Switch to the right Python Version.
