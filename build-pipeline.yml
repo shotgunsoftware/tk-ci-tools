@@ -54,8 +54,16 @@ jobs:
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
 - ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
-  # FIXME: We should find a better to avoid including this step on forked repos.
-  # This assumes that all repositories will be under a project name Toolkit
-  # in Azure.
+  # Repositories using our build pipeline outside of the
+  # shotgunsoftware organization can be tagged, but they can't
+  # use our deploy scripts as they do not have the necessary
+  # permissions to access our secrets, as they should.
+  #
+  # Therefore, we need to avoid including this template for repos that are
+  # not under the shotgunsoftware organization.
+  #
+  # FIXME: There is no way to tell if an Azure build is running under
+  # out organization or not. What we can do however is check the name
+  # of the Azure project from which this build is launched.
   - ${{ if eq( variables['System.TeamProject'], 'Toolkit' ) }}:
     - template: "internal/release-to-appstore.yml"
