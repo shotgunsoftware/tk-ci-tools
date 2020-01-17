@@ -66,4 +66,4 @@ jobs:
   # out organization or not. What we can do however is check the name
   # of the Azure project from which this build is launched.
   - ${{ if eq( variables['System.TeamProject'], 'Toolkit' ) }}:
-    - template: "internal/release-to-appstore.yml"
+    - template: "internal/release.yml"

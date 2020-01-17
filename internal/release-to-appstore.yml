@@ -8,80 +8,73 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-jobs:
-  # Launch a Linux VM
-- job: release_to_appstore
-  displayName: Release to AppStore
-  pool:
-    vmImage: 'macos-10.13'
-  steps:
+steps:
+# Switch to the right Python Version.
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: 2.7
+  displayName: Use Python 2.7
 
-  # Switch to the right Python Version.
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: 2.7
-    displayName: Use Python 2.7
+# This task can be executed only from the "shotgunsoftware"
+# organization repositories. It will fail on forks of our
+# repos from other users.
+#
+# Therefore, the appstore release scripts in app_store.zip
+# are safe from the outside world.
+#
+# Excerpt from https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#validate-contributions-from-forks
+#
+# By default with GitHub pipelines, secrets associated with
+# your build pipeline are not made available to pull request
+# builds of forks. These secrets are enabled by default with
+# GitHub Enterprise Server pipelines. Secrets include:
+#
+# - A security token with access to your GitHub repository.
+# - These items, if your build uses them:
+#   - Service connection credentials
+#   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
+#   - Build variables marked secret
+- task: InstallSSHKey@0
+  inputs:
+    knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+    # This is the public key
+    sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQmNFf8QD0oi4saZeT5kIT02h51HLdRe0SM7F8iMMwbvsNrvJ3wc4J7rr5deCEGotB7fiHkKHp7YseivD3JejUw8ajdA/Hpm+i5MMGDxwfWExLMOKmDSx8gDXeNpM65o2QUPwdJENFI+OcouBaFueXnn0C0BpfDSSM22IU51ghve0hpHOjLXxO9tn2+svaXsPcXK1F/kvt2fnOO0km3kM/ZvsLHMRH6qCfSRk+mq+RzjxwCWgj4pLwtFYXdJbqM/G1xp/HowB9Lvdn4Ew4LSccDoybZUWmcf2xorigTptA4++4G71R1/EIBMULonvOTh3r0fFNf6ScPR6vU102K6en
+    #sshPassphrase: # Optional
+    sshKeySecureFile: release-repo-deploy-key
 
-  # This task can be executed only from the "shotgunsoftware"
-  # organization repositories. It will fail on forks of our
-  # repos from other users.
-  #
-  # Therefore, the appstore release scripts in app_store.zip
-  # are safe from the outside world.
-  #
-  # Excerpt from https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#validate-contributions-from-forks
-  #
-  # By default with GitHub pipelines, secrets associated with
-  # your build pipeline are not made available to pull request
-  # builds of forks. These secrets are enabled by default with
-  # GitHub Enterprise Server pipelines. Secrets include:
-  #
-  # - A security token with access to your GitHub repository.
-  # - These items, if your build uses them:
-  #   - Service connection credentials
-  #   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
-  #   - Build variables marked secret
-  - task: InstallSSHKey@0
-    inputs:
-      knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
-      # This is the public key
-      sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQmNFf8QD0oi4saZeT5kIT02h51HLdRe0SM7F8iMMwbvsNrvJ3wc4J7rr5deCEGotB7fiHkKHp7YseivD3JejUw8ajdA/Hpm+i5MMGDxwfWExLMOKmDSx8gDXeNpM65o2QUPwdJENFI+OcouBaFueXnn0C0BpfDSSM22IU51ghve0hpHOjLXxO9tn2+svaXsPcXK1F/kvt2fnOO0km3kM/ZvsLHMRH6qCfSRk+mq+RzjxwCWgj4pLwtFYXdJbqM/G1xp/HowB9Lvdn4Ew4LSccDoybZUWmcf2xorigTptA4++4G71R1/EIBMULonvOTh3r0fFNf6ScPR6vU102K6en
-      #sshPassphrase: # Optional
-      sshKeySecureFile: release-repo-deploy-key
+# Clone the release scripts repository
+- bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_from_azure
+  env:
+    RELEASE_REPO: $(release.repo)
 
-  # Clone the release scripts repository
-  - bash: git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts --branch release_from_azure
-    env:
-      RELEASE_REPO: $(release.repo)
+# Pip install all the dependencies required to run the release scripts.
+- bash: |
+    pip install -r ../release_scripts/app_store/requirements.txt
+  displayName: Prepare release scripts
 
-  # Pip install all the dependencies required to run the release scripts.
-  - bash: |
-      pip install -r ../release_scripts/app_store/requirements.txt
-    displayName: Prepare release scripts
-
-  # Deploy the bundle to the Toolkit AppStore. The script expects
-  # the bundle type as a parameter, so attempt to guess it.
-  - bash: |
-      export BUNDLE_TYPE=`python -c '
-      import os
-      # Detects the bundle type by looking at the python file at the root of the repo.
-      repo = os.path.basename(os.getcwd())
-      if os.path.exists("app.py"):
-          print("app")
-      elif os.path.exists("framework.py"):
-          print("framework")
-      elif os.path.exists("engine.py"):
-          print("engine")
-      else:
-          print("config")
-      '`
-      python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
-    env:
-      # Just like the DownloadSecureFile, the environment variables here can only
-      # be used from builds on shotgunsoftware, not from forks, so we do not have
-      # to worry about our credentials leaking to clients, nor do we have to
-      # worry about clients pushing code to our appstore from their pull requests.
-      sgtk_app_store_api_server: $(sgtk_app_store_api_server)
-      sgtk_app_store_api_user: $(sgtk_app_store_api_user)
-      sgtk_app_store_api_key: $(sgtk_app_store_api_key)
-    displayName: Deploy Toolkit bundle to AppStore
+# Deploy the bundle to the Toolkit AppStore. The script expects
+# the bundle type as a parameter, so attempt to guess it.
+- bash: |
+    export BUNDLE_TYPE=`python -c '
+    import os
+    # Detects the bundle type by looking at the python file at the root of the repo.
+    repo = os.path.basename(os.getcwd())
+    if os.path.exists("app.py"):
+        print("app")
+    elif os.path.exists("framework.py"):
+        print("framework")
+    elif os.path.exists("engine.py"):
+        print("engine")
+    else:
+        print("config")
+    '`
+    python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
+  env:
+    # Just like the DownloadSecureFile, the environment variables here can only
+    # be used from builds on shotgunsoftware, not from forks, so we do not have
+    # to worry about our credentials leaking to clients, nor do we have to
+    # worry about clients pushing code to our appstore from their pull requests.
+    sgtk_app_store_api_server: $(sgtk_app_store_api_server)
+    sgtk_app_store_api_user: $(sgtk_app_store_api_user)
+    sgtk_app_store_api_key: $(sgtk_app_store_api_key)
+  displayName: Deploy Toolkit bundle to AppStore
