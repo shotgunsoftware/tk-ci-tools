@@ -56,5 +56,5 @@ steps:
 
 # Run the update tool for the given bundle and tag.
 - bash: |
-    tk-config-update git@github.com:shotgunsoftware/${{ parameters.name }}.git $(Build.DefinitionName) $(Build.SourceBranchName) --push-changes
+    tk-config-update git@github.com:shotgunsoftware/${{ parameters.name }}.git $(Build.DefinitionName) $(Build.SourceBranchName)
   displayName: Updating ${{ parameters.name }}
