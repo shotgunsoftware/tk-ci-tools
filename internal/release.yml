@@ -36,12 +36,12 @@ jobs:
     # We need to update the basic and default2 configs.
 
     # Updates the basic config.
-    - template: "update-configuration.yml"
-      parameters:
-        name: tk-config-basic
-        secure_file: basic-repo-deploy-key
-        public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCqsgPqp2HffphwE1l/oeYOkOmRyXNYKBffsniGJHN4Fjf6yLU7jCiTvYXW6ZkjEmDn295BMuaWFGl3CWN5A+2wHImXfunxPyqiwI27/UEa5MHR0iPsrL29vr68fipQMAlgy0ecDhkHJ+u9lom7+dJiw7xSBYy4cVKec6+ame7yl9RyQQO7RTOSmmyWBskyRKtDv64AbKV0cZ/oVhiiDpxhAADIHjDWKGVwRjaChJrzuIqS3hiyGbCBWFnWZZ+5ztGKPvfsGysS1AncC1r09ovf3GdCzx2F/liSe2MmzhcpJXepznrDbn/hwtrLgp8yK6NoaYzxHaMSm5owrK1LD+RD
-        known_host: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+    # - template: "update-configuration.yml"
+    #   parameters:
+    #     name: tk-config-basic
+    #     secure_file: basic-repo-deploy-key
+    #     public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCqsgPqp2HffphwE1l/oeYOkOmRyXNYKBffsniGJHN4Fjf6yLU7jCiTvYXW6ZkjEmDn295BMuaWFGl3CWN5A+2wHImXfunxPyqiwI27/UEa5MHR0iPsrL29vr68fipQMAlgy0ecDhkHJ+u9lom7+dJiw7xSBYy4cVKec6+ame7yl9RyQQO7RTOSmmyWBskyRKtDv64AbKV0cZ/oVhiiDpxhAADIHjDWKGVwRjaChJrzuIqS3hiyGbCBWFnWZZ+5ztGKPvfsGysS1AncC1r09ovf3GdCzx2F/liSe2MmzhcpJXepznrDbn/hwtrLgp8yK6NoaYzxHaMSm5owrK1LD+RD
+    #     known_host: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
 
     # Updates the default2 config
     - template: "update-configuration.yml"
