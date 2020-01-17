@@ -24,7 +24,7 @@ parameters:
   # Git ref of tk-core to use.
   # TODO: Revert this to master when the Python 3 work for tk-core
   # is merged to master.
-  tk_core_ref: SG-13264-python-3-compat
+  tk_core_ref: master
   # Allows to skip test execution.
   skip_tests: false
   # Post test steps
