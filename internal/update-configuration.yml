@@ -53,6 +53,7 @@ steps:
 - bash: |
     git config --global user.name "Toolkitty"
     git config --global user.email toolkitty@shotgunsoftware.com
-
     tk-config-update git@github.com:shotgunsoftware/${{ parameters.name }}.git $(Build.DefinitionName) $(Build.SourceBranchName) --push-changes
   displayName: Updating ${{ parameters.name }}
+  env:
+    GIT_SSH_COMMAND: "'ssh -i $AGENT_TEMPDIRECTORY)/${{ parameters.secure_file }} -o IdentitiesOnly=yes'"
