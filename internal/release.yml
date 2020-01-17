@@ -8,13 +8,29 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+parameters:
+  # Version of tk-toolchain to use.
+  tk_toolchain_ref: master
+
 jobs:
   # Launch a Linux VM
-- job: release_to_appstore
-  displayName: Release to AppStore
+- job: release_toolkit_bundle
+  displayName: Release Toolkit bundle
   pool:
     vmImage: 'macos-10.13'
   steps:
+    # Switch to the right Python Version.
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: 2.7
+      displayName: Use Python 2.7
+
+    # We need tk-toolchain to release packages.
+    - template: pip-install-packages.yml
+      parameters:
+        packages:
+        - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+
     - template: release-to-appstore.yml
 
     # We need to update the basic and default2 configs.

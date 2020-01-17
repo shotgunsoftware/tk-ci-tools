@@ -9,18 +9,15 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
+  # Name of the repository to update. Repository is assumed to be under the shotgunsoftware
+  # organization on Github.com
   name: ""
+  # Name of the secure deploy key to install to update the repository.
   secure_file: ""
+  # Public of the repository to update
   public_key: ""
-  tk_toolchain_ref: master
 
 steps:
-# Switch to the right Python Version.
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: 2.7
-  displayName: Use Python 2.7
-
 # This task can be executed only from the "shotgunsoftware"
 # organization repositories. It will fail on forks of our
 # repos from other users.
@@ -47,12 +44,6 @@ steps:
     sshPublicKey: ${{ parameters.public_key }}
     #sshPassphrase: # Optional
     sshKeySecureFile: ${{ parameters.secure_file }}
-
-# The configuration update script is in tk-toolchain
-- template: pip-install-packages.yml
-  parameters:
-    packages:
-    - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
 # Run the update tool for the given bundle and tag.
 - bash: |

@@ -67,3 +67,5 @@ jobs:
   # of the Azure project from which this build is launched.
   - ${{ if eq( variables['System.TeamProject'], 'Toolkit' ) }}:
     - template: "internal/release.yml"
+      parameters:
+        tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
