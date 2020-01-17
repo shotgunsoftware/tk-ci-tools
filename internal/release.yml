@@ -31,7 +31,7 @@ jobs:
         packages:
         - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
-    - template: release-to-appstore.yml
+    # - template: release-to-appstore.yml
 
     # We need to update the basic and default2 configs.
 
