@@ -16,6 +16,8 @@ parameters:
   secure_file: ""
   # Public of the repository to update
   public_key: ""
+  # Known host of the server hosting the repository.
+  known_host: ""
 
 steps:
 # This task can be executed only from the "shotgunsoftware"
@@ -36,9 +38,12 @@ steps:
 #   - Service connection credentials
 #   - Files from the secure files library (this is what '${{ parameters.secure_file }}' is)
 #   - Build variables marked secret
+
+# Here's a link to the documentation of SSH key and how to generate all it's inputs.
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ssh-key?view=azure-devops
 - task: InstallSSHKey@0
   inputs:
-    knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+    knownHostsEntry: ${{ parameters.known_host }}
     # This is the public key
     sshPublicKey: ${{ parameters.public_key }}
     #sshPassphrase: # Optional
