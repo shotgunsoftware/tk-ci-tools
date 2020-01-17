@@ -26,7 +26,7 @@ steps:
 # - A security token with access to your GitHub repository.
 # - These items, if your build uses them:
 #   - Service connection credentials
-#   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
+#   - Files from the secure files library (this is what 'release-repo-deploy-key' is)
 #   - Build variables marked secret
 - task: InstallSSHKey@0
   inputs:

@@ -22,8 +22,7 @@ steps:
 # organization repositories. It will fail on forks of our
 # repos from other users.
 #
-# Therefore, the appstore release scripts in app_store.zip
-# are safe from the outside world.
+# Therefore, the deloy key is secured.
 #
 # Excerpt from https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#validate-contributions-from-forks
 #
@@ -35,7 +34,7 @@ steps:
 # - A security token with access to your GitHub repository.
 # - These items, if your build uses them:
 #   - Service connection credentials
-#   - Files from the secure files library (this is what 'azure_internal_deploy_key' is)
+#   - Files from the secure files library (this is what '${{ parameters.secure_file }}' is)
 #   - Build variables marked secret
 - task: InstallSSHKey@0
   inputs:
