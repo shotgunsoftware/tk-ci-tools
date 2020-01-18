@@ -14,8 +14,6 @@ parameters:
   name: ""
 
 steps:
-
-
 # Run the update tool for the given bundle and tag.
 - bash: |
     git config --global user.name "Toolkitty"
