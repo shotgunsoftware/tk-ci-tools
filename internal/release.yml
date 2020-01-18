@@ -59,7 +59,7 @@ jobs:
         - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
     # Temporarily commented out.
-    # - template: release-to-appstore.yml
+    - template: release-to-appstore.yml
 
     # Updates the basic and default2 configs
     - template: "update-configuration.yml"
