@@ -33,7 +33,13 @@ steps:
     else:
         print("config")
     '`
-    python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --use-https --tag $(Build.SourceBranchName)
+    if [ $(Build.DefinitionName) = tk-core ]
+    then
+        python ../release_scripts/app_store/core_to_app_store.py --no-ftp --tag $(Build.SourceBranchName)
+    else
+        python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --no-ftp --tag $(Build.SourceBranchName)
+    fi
+
   env:
     # Just like the DownloadSecureFile, the environment variables here can only
     # be used from builds on shotgunsoftware, not from forks, so we do not have
