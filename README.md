@@ -123,5 +123,5 @@ Once you've added your `azure-pipelines.yml` file to your repository, it's time 
 11. The codecov token for your repository can be found at [codecov.io](codecov.io). In this example, we are setting up a pipeline for `tk-multi-launchapp`, so we can find the key at https://codecov.io/gh/shotgunsoftware/tk-multi-launchapp.
 12. Click the copy button and paste it in the `Value` box over at Azure Pipelines. If you've done this right, the value should be masked in the edit box.
 13. Hit `Ok`, then `Save` at the bottom right of the variable creation page.
-14. You're now back to the pipeline edit page. You can now click `Run` at the top right if you want to save and launch the pipeline on that branch or simply click on the arrow next to `Run` and pick `Save`.
-15. You're done! You can now push to Azure Pipelines and your changes will be picked up by the build pipeline according to the rules defined in `azure-pipelines.yml`.
+14. You're now back to the pipeline edit page. Select the branch you've pushed your azure-pipelines.yml file to kick-off the first build. You can now click `Run` at the top right if you want to save and launch the pipeline on that branch or simply click on the arrow next to `Run` and pick `Save`.
+15. You're done! You can now push to Github and your changes will be picked up by the build pipeline according to the rules defined in `azure-pipelines.yml`. As mentionned above, Azure Pipelines will launch a build for any commits done to master, any commits pushed to a pull request and when a tag is created.
