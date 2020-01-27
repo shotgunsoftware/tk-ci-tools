@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/shotgun-ecosystem/Toolkit/_apis/build/status/tk-ci-tools?branchName=master)](https://dev.azure.com/shotgun-ecosystem/Toolkit/_build/latest?definitionId=39&branchName=master)
+
 # tk-ci-tools
 
 Tools for Azure Pipelines. These tools allow a Toolkit developer to validate their code using Azure Pipelines, ensuring the code is formatted properly, does not contain ambiguous statements and passes all the tests.
