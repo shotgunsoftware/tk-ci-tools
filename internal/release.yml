@@ -52,14 +52,17 @@ jobs:
         versionSpec: 2.7
       displayName: Use Python 2.7
 
-    # We need tk-toolchain to release packages.
+    # Pushes the bundle to the appstore.
+    - template: release-to-appstore.yml
+
+    # We need tk-toolchain to use update-configurations.yml
+    # Note that we have to run this after release-to-appstore. Running that
+    # script forces a downgrade to six 1.10.0, which is older than what tk-toolchain
+    # expects, but most importantly 1.10.0 is missing functionality we need.
     - template: pip-install-packages.yml
       parameters:
         packages:
         - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
-
-    # Pushes the bundle to the appstore.
-    - template: release-to-appstore.yml
 
     # Updates the basic and default2 configs
     - template: "update-configuration.yml"
