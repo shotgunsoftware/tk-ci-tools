@@ -12,6 +12,8 @@
   - id: check-executables-have-shebangs
   # Ensure there's no incomplete merges
   - id: check-merge-conflict
+  # Make sure yml files are formatted properly.
+  - id: check-yaml
   # Adds an empty line if missing at the end of a file.
   - id: end-of-file-fixer
   # Makes sure requirements.txt is properly formatted
