@@ -36,6 +36,11 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
+  # Version of the release repository to use.
+  # This is meant for deployment to the Toolkit AppStore. This repository is private
+  # to the Shotgun team and cannot be accessed by external organizations. This is meant
+  # for internal use by the team for testing and should not be modified otherwise.
+  release_repo_ref: master
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -69,3 +74,4 @@ jobs:
     - template: "internal/release.yml"
       parameters:
         tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+        release_repo_ref: ${{ parameters.release_repo_ref }}

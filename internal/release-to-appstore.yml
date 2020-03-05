@@ -8,10 +8,13 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+parameters:
+    release_repo_ref: master
+
 steps:
 # Install the release scripts
 - bash: |
-    git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts
+    git clone --depth 1 git@github.com:$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
     pip install -r ../release_scripts/app_store/requirements.txt
   env:
     RELEASE_REPO: $(release.repo)
