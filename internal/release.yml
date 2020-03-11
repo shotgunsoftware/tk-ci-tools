@@ -22,7 +22,7 @@ jobs:
 - job: release_toolkit_bundle
   displayName: Release Toolkit bundle
   pool:
-    vmImage: 'macos-10.13'
+    vmImage: 'macos-10.14'
   steps:
     # This task can be executed only from the "shotgunsoftware"
     # organization repositories. It will fail on forks of our
