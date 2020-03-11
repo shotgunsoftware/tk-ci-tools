@@ -85,7 +85,7 @@ jobs:
 # macOS Python 2.7 build
 - template: unit-tests-with.yml
   parameters:
-    image_name: 'macos-10.13'
+    image_name: 'macos-10.14'
     qt_wrapper: PySide2
     python_version: 2.7
     job_name: "macOS Python 2.7"
@@ -95,7 +95,7 @@ jobs:
 # macOS Python 3.7 build
 - template: unit-tests-with.yml
   parameters:
-    image_name: 'macos-10.13'
+    image_name: 'macos-10.14'
     qt_wrapper: PySide2
     python_version: 3.7
     job_name: "macOS Python 3.7"
