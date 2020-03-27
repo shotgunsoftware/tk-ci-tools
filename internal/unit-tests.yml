@@ -105,7 +105,7 @@ jobs:
 # Windows Python 2.7 build
 - template: unit-tests-with.yml
   parameters:
-    image_name: 'vs2017-win2016'
+    image_name: 'windows-2019'
     qt_wrapper: PySide
     python_version: 2.7
     job_name: "Windows Python 2.7"
@@ -115,7 +115,7 @@ jobs:
 # Windows Python 3.7 build
 - template: unit-tests-with.yml
   parameters:
-    image_name: 'vs2017-win2016'
+    image_name: 'windows-2019'
     qt_wrapper: PySide2
     python_version: 3.7
     upload_coverage: false
