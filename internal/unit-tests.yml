@@ -76,7 +76,7 @@ jobs:
 - template: unit-tests-with.yml
   parameters:
     image_name: 'ubuntu-18.04'
-    qt_wrapper: PySide2
+    qt_wrapper: PySide2==5.14.1
     python_version: 3.7
     job_name: "Linux Python 3.7"
     # pass through all parameters
@@ -86,7 +86,7 @@ jobs:
 - template: unit-tests-with.yml
   parameters:
     image_name: 'macos-10.14'
-    qt_wrapper: PySide2
+    qt_wrapper: PySide2==5.14.1
     python_version: 2.7
     job_name: "macOS Python 2.7"
     # pass through all parameters
@@ -96,7 +96,7 @@ jobs:
 - template: unit-tests-with.yml
   parameters:
     image_name: 'macos-10.14'
-    qt_wrapper: PySide2
+    qt_wrapper: PySide2==5.14.1
     python_version: 3.7
     job_name: "macOS Python 3.7"
     # pass through all parameters
@@ -106,7 +106,7 @@ jobs:
 - template: unit-tests-with.yml
   parameters:
     image_name: 'windows-2019'
-    qt_wrapper: PySide
+    qt_wrapper: PySide==5.14.1
     python_version: 2.7
     job_name: "Windows Python 2.7"
     # pass through all parameters
@@ -116,7 +116,7 @@ jobs:
 - template: unit-tests-with.yml
   parameters:
     image_name: 'windows-2019'
-    qt_wrapper: PySide2
+    qt_wrapper: PySide2==5.14.1
     python_version: 3.7
     upload_coverage: false
     job_name: "Windows Python 3.7"
