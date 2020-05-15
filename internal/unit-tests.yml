@@ -100,6 +100,16 @@ jobs:
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
 
+  # macOS Python 2.7 build
+  - template: unit-tests-with.yml
+    parameters:
+      image_name: 'macos-10.14'
+      qt_wrapper: PySide2==5.14.1
+      python_version: 2.7
+      job_name: "macOS Python 2.7"
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
+
   # macOS Python 3.7 build
   - template: unit-tests-with.yml
     parameters:
