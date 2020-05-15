@@ -55,11 +55,17 @@ jobs:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
 
-- ${{ if or( ne( parameters.skip_tests, true ), parameters.has_unit_tests, parameters.has_ui_tests ) }}:
+- ${{ if ne( parameters.skip_tests, true ) }}:
   - template: "internal/unit-tests.yml"
     parameters:
-      ${{ insert }}: ${{ parameters }}
-
+      # pass through all parameters
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
+      has_unit_tests: ${{ parameters.has_unit_tests }}
+      has_ui_tests: ${{ parameters.has_ui_tests }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
