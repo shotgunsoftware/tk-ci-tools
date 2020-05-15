@@ -146,5 +146,5 @@ jobs:
       curl -s https://codecov.io/bash > codecov.sh
       bash codecov.sh
     displayName: Upload code coverage
-    # env:
-    #   CODECOV_TOKEN: $(codecov.token)
+    env:
+      CODECOV_TOKEN: $(codecov.token)
