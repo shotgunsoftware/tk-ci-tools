@@ -32,6 +32,7 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
+  skip_tests: false
   # If set to true, the build agent will install the necessary libraries to run ui tests.
   has_ui_tests: false
   # If set to true, the build agent will run unit tests.
@@ -89,7 +90,7 @@ jobs:
 # Note: The automation library we use is not Python 3 compliant, which means we can't
 # run our automation on Python 3. This means that having ui tests will only launch the
 # Python 2 build agents instead of all of them.
-- ${{ if eq(parameters.has_unit_tests, true) }}:
+- ${{ if or( ne( parameters.skip_tests, true ), eq( parameters.has_unit_tests, true ) ) }}:
   # Linux Python 3.7 build
   - template: unit-tests-with.yml
     parameters:
