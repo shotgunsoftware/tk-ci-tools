@@ -111,6 +111,7 @@ jobs:
     - template: install_ssh_key.yml
     - bash: |
         git clone --depth 1 git@github.com:$UI_AUTOMATION_REPO ../ui_automation
+      displayName: Cloning UI automation tools
       env:
         UI_AUTOMATION_REPO: $(ui_automation.repo)
 
