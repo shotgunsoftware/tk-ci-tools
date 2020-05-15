@@ -40,6 +40,12 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
+  # When set to true, the ui automation tools are cloned on the build agent.
+  # Note that the ui automation tools can only be cloned on repositories that
+  # are in the shotgunsoftware organization due to the need to private
+  # repo access.
+  has_ui_tests: false
+  has_unit_tests: true
 
 jobs:
 - job:
@@ -88,13 +94,29 @@ jobs:
         echo ">>> Started Xvfb"
       displayName: Start Xvfb
 
+  # Repositories using our build pipeline outside of the
+  # shotgunsoftware organization should not be able to run our UI automation
+  # so do not clone the ui automation in that case.
+  #
+  # Therefore, we need to avoid including this template for repos that are
+  # not under the shotgunsoftware organization.
+  #
+  # FIXME: There is no way to tell if an Azure build is running under
+  # our organization or not. What we can do however is check the name
+  # of the Azure project from which this build is launched.
+  - ${{ if and(parameters.has_ui_tests, eq( variables['System.TeamProject'], 'Toolkit' )) }}:
+    - bash: |
+        git clone --depth 1 git@github.com:$UI_AUTOMATION_REPO ../ui_automation
+      env:
+        UI_AUTOMATION_REPO: $(ui_automation.repo)
+
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
   # Note that we're hardcoding the name of the coverage file. This is important
   # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv
+      PYTHONPATH=$PYTHONPATH:../ui_automation COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
