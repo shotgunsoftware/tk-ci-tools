@@ -89,7 +89,7 @@ jobs:
 # Note: The automation library we use is not Python 3 compliant, which means we can't
 # run our automation on Python 3. This means that having ui tests will only launch the
 # Python 2 build agents instead of all of them.
-- ${{ if parameters.has_unit_tests }}:
+- ${{ if eq(parameters.has_unit_tests, true) }}:
   # Linux Python 3.7 build
   - template: unit-tests-with.yml
     parameters:
