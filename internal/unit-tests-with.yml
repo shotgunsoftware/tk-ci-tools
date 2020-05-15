@@ -129,6 +129,11 @@ jobs:
       QT_QPA_PLATFORM: offscreen
       DISPLAY: ':99.0'
       TK_DEBUG: 1
+      # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
+      # slowing down automation. Using Mockgun is still the best way to have speedy tests.
+      SHOTGUN_HOST: $(shotgun_site)
+      SHOTGUN_SCRIPT_NAME: $(shotgun_script_name)
+      SHOTGUN_SCRIPT_KEY: $(shotgun_script_key)
     displayName: Run tests
 
   # The post_test_steps list will be flattened into this list of steps.
