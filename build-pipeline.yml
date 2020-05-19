@@ -78,7 +78,8 @@ jobs:
 # Note: once we've removed skip_tests from existing pipelines, we can remove the
 # the first if.
 - ${{ if eq(parameters.skip_tests, false) }}:
-  - ${{ if or(parameters.has_unit_tests, parameters.has_ui_tests) }}:
+  # - ${{ if or(parameters.has_unit_tests, parameters.has_ui_tests) }}:
+  - ${{ if eq(parameters.has_ui_tests, true) }}:
     - template: "internal/unit-tests.yml"
       parameters:
         # pass through all parameters
