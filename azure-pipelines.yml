@@ -38,6 +38,7 @@ jobs:
     - Qt.py
     #
     has_unit_tests: false
+    has_ui_tests: true
     additional_repositories:
     - name: tk-multi-testing
       ref: azure_test_branch
