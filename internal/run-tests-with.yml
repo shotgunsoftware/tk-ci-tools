@@ -45,6 +45,8 @@ parameters:
   # are in the shotgunsoftware organization due to the need to private
   # repo access.
   has_ui_tests: false
+  # When set to true, the agents for all platforms are set so tests can be executed
+  # on all platforms.
   has_unit_tests: true
 
 jobs:
