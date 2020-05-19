@@ -78,7 +78,7 @@ jobs:
 # the right way.
 
 # Windows Python 2.7 build
-- template: unit-tests-with.yml
+- template: run-tests-with.yml
   parameters:
     image_name: 'windows-2019'
     qt_wrapper: PySide
@@ -91,7 +91,7 @@ jobs:
 # target Windows which means we run our automation only on Windows and Python 2 for now.
 - ${{ if eq( parameters.has_unit_tests, true ) }}:
   # Linux Python 3.7 build
-  - template: unit-tests-with.yml
+  - template: run-tests-with.yml
     parameters:
       image_name: 'ubuntu-18.04'
       qt_wrapper: PySide2==5.14.1
@@ -101,7 +101,7 @@ jobs:
       ${{ insert }}: ${{ parameters }}
 
   # macOS Python 2.7 build
-  - template: unit-tests-with.yml
+  - template: run-tests-with.yml
     parameters:
       image_name: 'macos-10.14'
       qt_wrapper: PySide2==5.14.1
@@ -111,7 +111,7 @@ jobs:
       ${{ insert }}: ${{ parameters }}
 
   # macOS Python 3.7 build
-  - template: unit-tests-with.yml
+  - template: run-tests-with.yml
     parameters:
       image_name: 'macos-10.14'
       qt_wrapper: PySide2==5.14.1
@@ -121,7 +121,7 @@ jobs:
       ${{ insert }}: ${{ parameters }}
 
   # Windows Python 3.7 build
-  - template: unit-tests-with.yml
+  - template: run-tests-with.yml
     parameters:
       image_name: 'windows-2019'
       qt_wrapper: PySide2==5.14.1

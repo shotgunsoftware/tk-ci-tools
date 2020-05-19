@@ -79,7 +79,7 @@ jobs:
 # the first if.
 - ${{ if eq(parameters.skip_tests, false) }}:
   - ${{ if or(parameters.has_unit_tests, parameters.has_ui_tests) }}:
-    - template: "internal/unit-tests.yml"
+    - template: "internal/run-tests.yml"
       parameters:
         # pass through all parameters
         extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
