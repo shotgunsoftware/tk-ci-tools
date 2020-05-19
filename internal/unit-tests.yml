@@ -71,7 +71,7 @@ parameters:
 
 jobs:
 
-# TODO: We're missing the Python 2.7 build here. This is because the Python 2.7
+# TODO: We're missing the Linux  Python 2.7 build here. This is because the Python 2.7
 # That Azure Pipelines ships with uses USC4 encoding for strings but PySide1
 # and PySide2 on pip using USC2, which breaks. We should look into building
 # our own copy or creating our own docker container that has Python compiled
@@ -87,9 +87,8 @@ jobs:
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
 
-# Note: The automation library we use is not Python 3 compliant, which means we can't
-# run our automation on Python 3. This means that having ui tests will only launch the
-# Python 2 build agents instead of all of them.
+# Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
+# target Windows which means we run our automation only on Windows and Python 2 for now.
 - ${{ if eq( parameters.has_unit_tests, true ) }}:
   # Linux Python 3.7 build
   - template: unit-tests-with.yml
