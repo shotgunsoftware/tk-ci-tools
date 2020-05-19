@@ -36,8 +36,6 @@ jobs:
     # There's a test inside this repo that requires Qt.py
     extra_test_dependencies:
     - Qt.py
-    #
-    has_unit_tests: false
     has_ui_tests: true
     additional_repositories:
     - name: tk-multi-testing
