@@ -1,0 +1,37 @@
+# Copyright (c) 2020 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+# This task can be executed only from the "shotgunsoftware"
+# organization repositories. It will fail on forks of our
+# repos from other users.
+#
+# Therefore, the deloy key is secured.
+#
+# Excerpt from https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#validate-contributions-from-forks
+#
+# By default with GitHub pipelines, secrets associated with
+# your build pipeline are not made available to pull request
+# builds of forks. These secrets are enabled by default with
+# GitHub Enterprise Server pipelines. Secrets include:
+#
+# - A security token with access to your GitHub repository.
+# - These items, if your build uses them:
+#   - Service connection credentials
+#   - Files from the secure files library (this is what '${{ parameters.secure_file }}' is)
+#   - Build variables marked secret
+
+# Here's a link to the documentation of SSH key and how to generate all it's inputs.
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ssh-key?view=azure-devops
+steps:
+- task: InstallSSHKey@0
+  inputs:
+    sshKeySecureFile: automation-deploy-key
+    sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHnMT6N2VflhnpPTc8nNgITjaIMhajA26v135Ow5GGD3pO++4T24GD65YhQGXKNTd6avCluxdbgWiH6v7NPU+DLcpguZGVHjEGG45UVTr+LimWbUoJPzWfRJ1VGk2+iJUCS+1UQ4VdGTAP/W8cyejqNytd3ebP419x4fXfVMAGqxYNk78pYxod1oIuKJA6LJ5Cz0E/dw9t5C4Xg0CQoqmYdIYhCK1pUiLW3hxoI0IhApbk4/+8kQBi2r5TJQRQU0s7xyQFxOAXyuP466BVkBylz1gsIeDY1ub4WAYEQE4czoXVqohTiAmNwY092EY88sy5yeDRqTIWY5dGAu+M2XHT
+    knownHostsEntry: github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==

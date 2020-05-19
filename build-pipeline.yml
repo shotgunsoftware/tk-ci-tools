@@ -10,9 +10,13 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  - name: extra_test_dependencies
+    type: object
+    default: []
   # Version of tk-toolchain to use.
-  tk_toolchain_ref: master
+  - name: tk_toolchain_ref
+    type: string
+    default: master
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
@@ -20,13 +24,28 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  additional_repositories: []
+  - name: additional_repositories
+    type: object
+    default: []
   # Git ref of tk-core to use.
   # TODO: Revert this to master when the Python 3 work for tk-core
   # is merged to master.
-  tk_core_ref: master
+  - name: tk_core_ref
+    type: string
+    default: master
   # Allows to skip test execution.
-  skip_tests: false
+  # This parameter is deprecated. Please use has_unit_tests and has_ui_tests.
+  - name: skip_tests
+    type: boolean
+    default: false
+  # Tells the build pipeline that the repository has unit tests to execute
+  - name: has_unit_tests
+    type: boolean
+    default: true
+  # Tells the build pipeline that there are ui automation tests to execute
+  - name: has_ui_tests
+    type: boolean
+    default: false
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -35,12 +54,16 @@ parameters:
   # post_tests_steps:
   # - bash: do_something
   # - bash: do_something_else
-  post_tests_steps: []
+  - name: post_tests_steps
+    type: object
+    default: []
   # Version of the release repository to use.
   # This is meant for deployment to the Toolkit AppStore. This repository is private
   # to the Shotgun team and cannot be accessed by external organizations. This is meant
   # for internal use by the team for testing and should not be modified otherwise.
-  release_repo_ref: master
+  - name: release_repo_ref
+    type: string
+    default: master
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -50,11 +73,22 @@ jobs:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
 
-- ${{ if ne( parameters.skip_tests, true ) }}:
-  - template: "internal/unit-tests.yml"
-    parameters:
-      # pass through all parameters
-      ${{ insert }}: ${{ parameters }}
+# template expressions are hard to parse visually, so using two ifs instead
+# of a single if and(..., ...)
+# Note: once we've removed skip_tests from existing pipelines, we can remove the
+# the first if.
+- ${{ if eq(parameters.skip_tests, false) }}:
+  - ${{ if or(parameters.has_unit_tests, parameters.has_ui_tests) }}:
+    - template: "internal/run-tests.yml"
+      parameters:
+        # pass through all parameters
+        extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+        tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+        additional_repositories: ${{ parameters.additional_repositories }}
+        tk_core_ref: ${{ parameters.tk_core_ref }}
+        post_tests_steps: ${{ parameters.post_tests_steps }}
+        has_unit_tests: ${{ parameters.has_unit_tests }}
+        has_ui_tests: ${{ parameters.has_ui_tests }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.

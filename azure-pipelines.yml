@@ -36,6 +36,7 @@ jobs:
     # There's a test inside this repo that requires Qt.py
     extra_test_dependencies:
     - Qt.py
+    has_ui_tests: true
     additional_repositories:
     - name: tk-multi-testing
       ref: azure_test_branch
@@ -47,3 +48,5 @@ jobs:
       displayName: Hello world!
     - bash: echo "Hello from the second post step!"
       displayName: Hello again!
+    - bash: PYTHONPATH=../ui_automation python -c "import sys; sys.version_info[0] == 2 or sys.exit(0); import MA.UI"
+      displayName: Testing import of UI automation framework.

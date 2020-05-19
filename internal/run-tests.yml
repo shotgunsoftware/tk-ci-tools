@@ -32,6 +32,11 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
+  skip_tests: false
+  # If set to true, the build agent will install the necessary libraries to run ui tests.
+  has_ui_tests: false
+  # If set to true, the build agent will run unit tests.
+  has_unit_tests: true
 
 # TODO: At some point, we should review how these environments are enumerated.
 # Something like:
@@ -66,44 +71,14 @@ parameters:
 
 jobs:
 
-# TODO: We're missing the Python 2.7 build here. This is because the Python 2.7
+# TODO: We're missing the Linux  Python 2.7 build here. This is because the Python 2.7
 # That Azure Pipelines ships with uses USC4 encoding for strings but PySide1
 # and PySide2 on pip using USC2, which breaks. We should look into building
 # our own copy or creating our own docker container that has Python compiled
 # the right way.
 
-# Linux Python 3.7 build
-- template: unit-tests-with.yml
-  parameters:
-    image_name: 'ubuntu-18.04'
-    qt_wrapper: PySide2==5.14.1
-    python_version: 3.7
-    job_name: "Linux Python 3.7"
-    # pass through all parameters
-    ${{ insert }}: ${{ parameters }}
-
-# macOS Python 2.7 build
-- template: unit-tests-with.yml
-  parameters:
-    image_name: 'macos-10.14'
-    qt_wrapper: PySide2==5.14.1
-    python_version: 2.7
-    job_name: "macOS Python 2.7"
-    # pass through all parameters
-    ${{ insert }}: ${{ parameters }}
-
-# macOS Python 3.7 build
-- template: unit-tests-with.yml
-  parameters:
-    image_name: 'macos-10.14'
-    qt_wrapper: PySide2==5.14.1
-    python_version: 3.7
-    job_name: "macOS Python 3.7"
-    # pass through all parameters
-    ${{ insert }}: ${{ parameters }}
-
 # Windows Python 2.7 build
-- template: unit-tests-with.yml
+- template: run-tests-with.yml
   parameters:
     image_name: 'windows-2019'
     qt_wrapper: PySide
@@ -112,13 +87,46 @@ jobs:
     # pass through all parameters
     ${{ insert }}: ${{ parameters }}
 
-# Windows Python 3.7 build
-- template: unit-tests-with.yml
-  parameters:
-    image_name: 'windows-2019'
-    qt_wrapper: PySide2==5.14.1
-    python_version: 3.7
-    upload_coverage: false
-    job_name: "Windows Python 3.7"
-    # pass through all parameters
-    ${{ insert }}: ${{ parameters }}
+# Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
+# target Windows which means we run our automation only on Windows and Python 2 for now.
+- ${{ if eq( parameters.has_unit_tests, true ) }}:
+  # Linux Python 3.7 build
+  - template: run-tests-with.yml
+    parameters:
+      image_name: 'ubuntu-18.04'
+      qt_wrapper: PySide2==5.14.1
+      python_version: 3.7
+      job_name: "Linux Python 3.7"
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
+
+  # macOS Python 2.7 build
+  - template: run-tests-with.yml
+    parameters:
+      image_name: 'macos-10.14'
+      qt_wrapper: PySide2==5.14.1
+      python_version: 2.7
+      job_name: "macOS Python 2.7"
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
+
+  # macOS Python 3.7 build
+  - template: run-tests-with.yml
+    parameters:
+      image_name: 'macos-10.14'
+      qt_wrapper: PySide2==5.14.1
+      python_version: 3.7
+      job_name: "macOS Python 3.7"
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
+
+  # Windows Python 3.7 build
+  - template: run-tests-with.yml
+    parameters:
+      image_name: 'windows-2019'
+      qt_wrapper: PySide2==5.14.1
+      python_version: 3.7
+      upload_coverage: false
+      job_name: "Windows Python 3.7"
+      # pass through all parameters
+      ${{ insert }}: ${{ parameters }}
