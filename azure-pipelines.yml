@@ -47,5 +47,5 @@ jobs:
       displayName: Hello world!
     - bash: echo "Hello from the second post step!"
       displayName: Hello again!
-    - bash: PYTHONPATH=../ui_automation python -c "import MA.UI"
+    - bash: PYTHONPATH=../ui_automation python -c "import sys; sys.version_info[0] == 2 or sys.exit(0); import MA.UI"
       displayName: Testing import of UI automation framework.
