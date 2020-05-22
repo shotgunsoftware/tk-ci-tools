@@ -99,6 +99,8 @@ jobs:
       job_name: "Linux Python 3.7"
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
+      # Force UI tests off for platforms that don't support them yet.
+      has_ui_tests: false
 
   # macOS Python 2.7 build
   - template: run-tests-with.yml
@@ -109,6 +111,8 @@ jobs:
       job_name: "macOS Python 2.7"
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
+      # Force UI tests off for platforms that don't support them yet.
+      has_ui_tests: false
 
   # macOS Python 3.7 build
   - template: run-tests-with.yml
@@ -119,6 +123,8 @@ jobs:
       job_name: "macOS Python 3.7"
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
+      # Force UI tests off for platforms that don't support them yet.
+      has_ui_tests: false
 
   # Windows Python 3.7 build
   - template: run-tests-with.yml
@@ -126,7 +132,8 @@ jobs:
       image_name: 'windows-2019'
       qt_wrapper: PySide2==5.14.1
       python_version: 3.7
-      upload_coverage: false
       job_name: "Windows Python 3.7"
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
+      # Force UI tests off for platforms that don't support them yet.
+      has_ui_tests: false
