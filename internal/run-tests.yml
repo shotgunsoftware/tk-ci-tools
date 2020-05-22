@@ -32,7 +32,6 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
-  skip_tests: false
   # If set to true, the build agent will install the necessary libraries to run ui tests.
   has_ui_tests: false
   # If set to true, the build agent will run unit tests.
@@ -98,9 +97,14 @@ jobs:
       python_version: 3.7
       job_name: "Linux Python 3.7"
       # pass through all parameters
-      ${{ insert }}: ${{ parameters }}
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
       # Force UI tests off for platforms that don't support them yet.
       has_ui_tests: false
+      has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # macOS Python 2.7 build
   - template: run-tests-with.yml
@@ -110,9 +114,14 @@ jobs:
       python_version: 2.7
       job_name: "macOS Python 2.7"
       # pass through all parameters
-      ${{ insert }}: ${{ parameters }}
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
       # Force UI tests off for platforms that don't support them yet.
       has_ui_tests: false
+      has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # macOS Python 3.7 build
   - template: run-tests-with.yml
@@ -121,10 +130,15 @@ jobs:
       qt_wrapper: PySide2==5.14.1
       python_version: 3.7
       job_name: "macOS Python 3.7"
-      # pass through all parameters
-      ${{ insert }}: ${{ parameters }}
+      # pass through all parameters.
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
       # Force UI tests off for platforms that don't support them yet.
       has_ui_tests: false
+      has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # Windows Python 3.7 build
   - template: run-tests-with.yml
@@ -134,6 +148,11 @@ jobs:
       python_version: 3.7
       job_name: "Windows Python 3.7"
       # pass through all parameters
-      ${{ insert }}: ${{ parameters }}
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
       # Force UI tests off for platforms that don't support them yet.
       has_ui_tests: false
+      has_unit_tests: ${{ parameters.has_unit_tests }}
