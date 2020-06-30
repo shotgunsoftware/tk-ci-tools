@@ -46,7 +46,7 @@ jobs:
         packages:
         - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
-    # Updates the basic and default2 configs
+    # Updates the basic, default2 and flame configs
     - template: "update-configuration.yml"
       parameters:
         name: tk-config-basic
@@ -54,3 +54,7 @@ jobs:
     - template: "update-configuration.yml"
       parameters:
         name: tk-config-default2
+        
+    - template: "update-configuration.yml"
+      parameters:
+        name: tk-config-flameplugin
