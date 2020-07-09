@@ -131,6 +131,7 @@ jobs:
       QT_QPA_PLATFORM: offscreen
       DISPLAY: ':99.0'
       TK_DEBUG: 1
+      CI: 1
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
       TK_TOOLCHAIN_HOST: $(shotgun_site)
