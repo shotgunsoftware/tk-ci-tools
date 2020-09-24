@@ -15,7 +15,7 @@ steps:
 # Install the release scripts
 - bash: |
     git clone --depth 1 git@github.com:$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
-    pip install -r ../release_scripts/app_store/requirements.txt
+    pip install -r ../release_scripts/app_store/requirements.txt --use-feature=2020-resolver
   env:
     RELEASE_REPO: $(release.repo)
   displayName: Prepare release script
