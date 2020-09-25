@@ -30,6 +30,6 @@ if __name__ == "__main__" and sys.version_info[0] == 2 and sys.platform == "win3
                 "../release_scripts",
             ]
         )
-    except:
+    except subprocess.CalledProcessError:
         # Catch the error so we don't leak the repository location when running the tests.
         sys.exit(1)

@@ -12,4 +12,5 @@ from tk_toolchain.authentication import get_toolkit_user
 
 # This test is meant to be called from the command-line and not by pytest.
 if __name__ == "__main__":
+    # This ensures that tk-toolchain was able to build credentials that are valid.
     get_toolkit_user().create_sg_connection()
