@@ -78,6 +78,6 @@ jobs:
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.ci.host)
-        TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.human.login)
-        TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.human.password)
+        TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
+        TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       displayName: Testing CI human user credentials
