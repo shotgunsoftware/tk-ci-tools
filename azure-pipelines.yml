@@ -53,19 +53,7 @@ jobs:
     # framework is missing, so it's important that has_ui_tests triggers a clone
     # only for builds we can run automation for.
     - bash: |
-         PYTHONPATH=../ui_automation python -c '
-         import sys
-         # Windows & Python 2.7 builds should be able to import
-         # the automation code since it should have been cloned.
-         if sys.version_info[0] == 2 and sys.platform == "win32":
-             import MA.UI
-         else:
-             # Other platforms should not.
-             try:
-                 import MA.UI
-             except ImportError:
-                 pass
-         '
+        PYTHONPATH=../ui_automation python test_ui_automation.py
       displayName: Testing import of UI automation framework.
     - bash: |
         git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts

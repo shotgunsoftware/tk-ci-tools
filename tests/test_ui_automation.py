@@ -8,8 +8,17 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from tk_toolchain.authentication import get_toolkit_user
-
 # This test is meant to be called from the command-line and not by pytest.
 if __name__ == "__main__":
-    get_toolkit_user().create_sg_connection()
+    import sys
+
+    # Windows & Python 2.7 builds should be able to import
+    # the automation code since it should have been cloned.
+    if sys.version_info[0] == 2 and sys.platform == "win32":
+        import MA.UI
+    else:
+        # Other platforms should not.
+        try:
+            import MA.UI
+        except ImportError:
+            pass
