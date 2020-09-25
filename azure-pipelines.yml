@@ -48,18 +48,18 @@ jobs:
       displayName: Hello world!
     - bash: echo "Hello from the second post step!"
       displayName: Hello again!
-    - bash: |
-        PYTHONPATH=../ui_automation python -c '
-        import sys
-        # Windows & Python 2.7 builds should be able to import
-        # the automation code since it should have been cloned.
-        if sys.version_info[0] == 2 and sys.platform == "win32":
-            import MA.UI
-        else:
-            # Other platforms should not.
-            try:
-                import MA.UI
-            except ImportError:
-                pass
-        '
-      displayName: Testing import of UI automation framework.
+    - bash: python tests/test_credentials.py
+      env:
+        TK_TOOLCHAIN_HOST: $(sg.app_store.host)
+        TK_TOOLCHAIN_SCRIPT_NAME: $(sg.app_store.script.name)
+        TK_TOOLCHAIN_SCRIPT_KEY: $(sg.app_store.script.key)
+    - bash: python tests/test_credentials.py
+      env:
+        TK_TOOLCHAIN_HOST: $(sg.ci.host)
+        TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.script.name)
+        TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.script.key)
+    - bash: python tests/test_credentials.py
+      env:
+        TK_TOOLCHAIN_HOST: $(sg.ci.host)
+        TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.human.login)
+        TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.human.password)
