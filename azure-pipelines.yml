@@ -38,6 +38,8 @@ jobs:
     - Qt.py
     has_ui_tests: true
     additional_repositories:
+    # This will ensure we can clone other repositories on a branch
+    # or directly on master.
     - name: tk-multi-testing
       ref: azure_test_branch
     - name: tk-framework-qtwidgets
@@ -63,19 +65,19 @@ jobs:
                  pass
          '
       displayName: Testing import of UI automation framework.
-    - bash: PYTHONPATH=../tk-core python tests/test_credentials.py
+    - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.app_store.host)
         TK_TOOLCHAIN_SCRIPT_NAME: $(sg.app_store.script.name)
         TK_TOOLCHAIN_SCRIPT_KEY: $(sg.app_store.script.key)
       displayName: Testing AppStore credentials
-    - bash: PYTHONPATH=../tk-core python tests/test_credentials.py
+    - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.ci.host)
         TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.script.name)
         TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.script.key)
       displayName: Testing CI script user credentials
-    - bash: PYTHONPATH=../tk-core python tests/test_credentials.py
+    - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.ci.host)
         TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.human.login)
