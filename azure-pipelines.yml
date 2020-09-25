@@ -55,7 +55,10 @@ jobs:
     - bash: |
         PYTHONPATH=../ui_automation python tests/test_ui_automation.py
       displayName: Testing import of UI automation framework.
-    - template: internal/install-ssh-key.yml
+    # Okay, so install-ssh-key.yml, relative to the current file, is at internal/install-ssh-key.yml
+    # However, keep in mind that this parameter will be expanded inside internal/run-with-tests.yml,
+    # so we need to put the path relative to that.
+    - template: install-ssh-key.yml
     - bash: |
         git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts
       env:
