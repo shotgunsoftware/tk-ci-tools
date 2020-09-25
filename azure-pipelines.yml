@@ -55,6 +55,7 @@ jobs:
     - bash: |
         PYTHONPATH=../ui_automation python tests/test_ui_automation.py
       displayName: Testing import of UI automation framework.
+    - template: internal/install_ssh_key.yml
     - bash: |
         git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts
       env:
