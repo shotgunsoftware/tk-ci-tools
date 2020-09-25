@@ -9,6 +9,8 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import sys
+
+# Qt.py should have been installed by the build pipeline.
 from Qt import QtWidgets
 
 
