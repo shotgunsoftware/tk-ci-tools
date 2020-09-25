@@ -67,6 +67,11 @@ jobs:
                  pass
          '
       displayName: Testing import of UI automation framework.
+    - bash: |
+        git clone --depth 1 git@github.com:$RELEASE_REPO ../release_scripts
+      env:
+        RELEASE_REPO: $(repo.release)
+      displayName: Testing release scripts cloning
     # Ensures the Shotgun script credentials can connect to the AppStore.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
