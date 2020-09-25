@@ -24,7 +24,7 @@ jobs:
   pool:
     vmImage: 'macos-10.14'
   steps:
-    - template: install_ssh_key.yml
+    - template: install-ssh-key.yml
 
     # Switch to the right Python Version.
     - task: UsePythonVersion@0

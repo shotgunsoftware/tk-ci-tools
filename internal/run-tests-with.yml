@@ -110,7 +110,7 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
-    - template: install_ssh_key.yml
+    - template: install-ssh-key.yml
     - bash: |
         git clone --depth 1 git@github.com:$UI_AUTOMATION_REPO ../ui_automation
       displayName: Cloning UI automation tools
