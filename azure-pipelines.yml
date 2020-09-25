@@ -36,20 +36,22 @@ jobs:
     # There's a test inside this repo that requires Qt.py
     extra_test_dependencies:
     - Qt.py
+    # This has the side effect that it ensures we can clone the UI automation
+    # repo with the SSH key
     has_ui_tests: true
-    additional_repositories:
     # This will ensure we can clone other repositories on a branch
     # or directly on master.
+    additional_repositories:
     - name: tk-multi-testing
       ref: azure_test_branch
     - name: tk-framework-qtwidgets
     # This one shouldn't get cloned.
     - name: tk-ci-tools
     post_tests_steps:
-    - bash: echo "Hello from the first post step!"
-      displayName: Hello world!
-    - bash: echo "Hello from the second post step!"
-      displayName: Hello again!
+    # Ensures the automation library get cloned only on Windows+Python 2.7.
+    # Our tests are written in a way that they are skipped if the automation
+    # framework is missing, so it's important that has_ui_tests triggers a clone
+    # only for builds we can run automation for.
     - bash: |
          PYTHONPATH=../ui_automation python -c '
          import sys
@@ -65,18 +67,21 @@ jobs:
                  pass
          '
       displayName: Testing import of UI automation framework.
+    # Ensures the Shotgun script credentials can connect to the AppStore.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.app_store.host)
         TK_TOOLCHAIN_SCRIPT_NAME: $(sg.app_store.script.name)
         TK_TOOLCHAIN_SCRIPT_KEY: $(sg.app_store.script.key)
       displayName: Testing AppStore credentials
+    # Ensures the Shotgun script credentials can connect to the CI site.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.ci.host)
         TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.script.name)
         TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.script.key)
       displayName: Testing CI script user credentials
+    # Ensures the Shotgun user credentials can connect to the CI site.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
         TK_TOOLCHAIN_HOST: $(sg.ci.host)
