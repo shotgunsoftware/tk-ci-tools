@@ -134,9 +134,9 @@ jobs:
       CI: 1
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
-      TK_TOOLCHAIN_HOST: $(shotgun_site)
-      TK_TOOLCHAIN_SCRIPT_NAME: $(shotgun_script_name)
-      TK_TOOLCHAIN_SCRIPT_KEY: $(shotgun_script_key)
+      TK_TOOLCHAIN_HOST: $(sg.ci.host)
+      TK_TOOLCHAIN_SCRIPT_NAME: $(sg.ci.script.name)
+      TK_TOOLCHAIN_SCRIPT_KEY: $(sg.ci.script.key)
     displayName: Run tests
 
   # The post_test_steps list will be flattened into this list of steps.
