@@ -17,7 +17,7 @@ steps:
     git clone --depth 1 git@github.com:$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
     pip install -r ../release_scripts/app_store/requirements.txt --use-feature=2020-resolver
   env:
-    RELEASE_REPO: $(release.repo)
+    RELEASE_REPO: $(repo.release)
   displayName: Prepare release script
 
 # Deploy the bundle to the Toolkit AppStore. The script expects
@@ -48,9 +48,9 @@ steps:
     # be used from builds on shotgunsoftware, not from forks, so we do not have
     # to worry about our credentials leaking to clients, nor do we have to
     # worry about clients pushing code to our appstore from their pull requests.
-    sgtk_app_store_api_server: $(sgtk_app_store_api_server)
-    sgtk_app_store_api_user: $(sgtk_app_store_api_user)
-    sgtk_app_store_api_key: $(sgtk_app_store_api_key)
-    AWS_ACCESS_KEY_ID: $(sg.toolkit.access.id)
-    AWS_SECRET_ACCESS_KEY: $(sg.toolkit.access.key)
+    sgtk_app_store_api_server: $(sg.app_store.host)
+    sgtk_app_store_api_user: $(sg.app_store.script.name)
+    sgtk_app_store_api_key: $(sg.app_store.script.key)
+    AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
+    AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
   displayName: Deploy Toolkit bundle to AppStore
