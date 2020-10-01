@@ -110,12 +110,12 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
-    - template: install_ssh_key.yml
+    - template: install-ssh-key.yml
     - bash: |
         git clone --depth 1 git@github.com:$UI_AUTOMATION_REPO ../ui_automation
       displayName: Cloning UI automation tools
       env:
-        UI_AUTOMATION_REPO: $(ui_automation.repo)
+        UI_AUTOMATION_REPO: $(repo.ui_automation)
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
@@ -134,9 +134,9 @@ jobs:
       CI: 1
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
-      TK_TOOLCHAIN_HOST: $(shotgun_site)
-      TK_TOOLCHAIN_SCRIPT_NAME: $(shotgun_script_name)
-      TK_TOOLCHAIN_SCRIPT_KEY: $(shotgun_script_key)
+      TK_TOOLCHAIN_HOST: $(sg.ci.host)
+      TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
+      TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
     displayName: Run tests
 
   # The post_test_steps list will be flattened into this list of steps.
