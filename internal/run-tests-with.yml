@@ -137,6 +137,7 @@ jobs:
       TK_TOOLCHAIN_HOST: $(sg.ci.host)
       TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
+      SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
     displayName: Run tests
 
   # The post_test_steps list will be flattened into this list of steps.
