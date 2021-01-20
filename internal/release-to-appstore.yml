@@ -13,6 +13,8 @@ parameters:
 
 steps:
 # Install the release scripts
+# We don't need to call the internal script's prepare_repo.sh since we will be stating with a fresh environment each time
+# which is setup by Azure. So just clone the repo and install the requirements.
 - bash: |
     git clone --depth 1 git@github.com:$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
     pip install -r ../release_scripts/app_store/requirements.txt --use-feature=2020-resolver
