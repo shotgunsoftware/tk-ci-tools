@@ -28,8 +28,6 @@ parameters:
     type: object
     default: []
   # Git ref of tk-core to use.
-  # TODO: Revert this to master when the Python 3 work for tk-core
-  # is merged to master.
   - name: tk_core_ref
     type: string
     default: master
