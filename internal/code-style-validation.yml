@@ -19,7 +19,7 @@ jobs:
 - job: code_style_validation
   displayName: Code Style Validation
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   steps:
 
   # Use Python 3 for validating the code.
