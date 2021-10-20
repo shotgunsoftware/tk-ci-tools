@@ -77,7 +77,7 @@ jobs:
 # the right way.
 
 # Windows Python 2.7 build
-- template: run-tests-with.yml
+- template: run-tests-with-windows.yml
   parameters:
     image_name: 'windows-2019'
     qt_wrapper: PySide
@@ -107,7 +107,7 @@ jobs:
       has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # macOS Python 2.7 build
-  - template: run-tests-with.yml
+  - template: run-tests-with-mac.yml
     parameters:
       image_name: 'macos-10.14'
       qt_wrapper: PySide2==5.14.1
@@ -124,7 +124,7 @@ jobs:
       has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # macOS Python 3.7 build
-  - template: run-tests-with.yml
+  - template: run-tests-with-mac.yml
     parameters:
       image_name: 'macos-10.14'
       qt_wrapper: PySide2==5.14.1
@@ -141,7 +141,7 @@ jobs:
       has_unit_tests: ${{ parameters.has_unit_tests }}
 
   # Windows Python 3.7 build
-  - template: run-tests-with.yml
+  - template: run-tests-with-windows.yml
     parameters:
       image_name: 'windows-2019'
       qt_wrapper: PySide2==5.14.1
