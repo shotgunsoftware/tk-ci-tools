@@ -147,7 +147,6 @@ jobs:
   # combine the results.
   - bash: |
       python -m coverage combine
-      python -m coverage xml
       curl -Os https://uploader.codecov.io/latest/linux/codecov
       chmod +x codecov
       ./codecov
