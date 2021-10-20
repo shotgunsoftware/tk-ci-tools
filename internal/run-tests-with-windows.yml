@@ -147,10 +147,10 @@ jobs:
   # combine the results.
   - powershell: |
       python -m coverage combine
-      python -m coverage xml 
+      python -m coverage xml
       $ProgressPreference = 'SilentlyContinue'
       Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
       .\codecov.exe
     displayName: Upload code coverage
     env:
-      CODECOV_TOKEN: $(codecov.token) 
+      CODECOV_TOKEN: $(codecov.token)
