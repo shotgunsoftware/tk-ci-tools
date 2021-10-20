@@ -147,8 +147,10 @@ jobs:
   # combine the results.
   - bash: |
       python -m coverage combine
-      curl -s https://codecov.io/bash > codecov.sh
-      bash codecov.sh
+      python -m coverage xml 
+      curl -Os https://uploader.codecov.io/latest/linux/codecov
+      chmod +x codecov
+      ./codecov
     displayName: Upload code coverage
     env:
-      CODECOV_TOKEN: $(codecov.token)
+      CODECOV_TOKEN: $(codecov.token) 
