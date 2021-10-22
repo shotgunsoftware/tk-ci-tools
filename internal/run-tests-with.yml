@@ -154,8 +154,7 @@ jobs:
           chmod +x codecov
           ./codecov
         displayName: Upload code coverage
-        env:
-          CODECOV_TOKEN: $(codecov.token)
+
 
   - ${{ if contains(parameters.image_name, 'macos') }}:
 
@@ -165,8 +164,7 @@ jobs:
           chmod +x codecov
           ./codecov
         displayName: Upload code coverage
-        env:
-          CODECOV_TOKEN: $(codecov.token)
+
 
   - ${{ if contains(parameters.image_name, 'windows') }}:
 
@@ -176,5 +174,4 @@ jobs:
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
           .\codecov.exe
         displayName: Upload code coverage
-        env:
-          CODECOV_TOKEN: $(codecov.token)
+
