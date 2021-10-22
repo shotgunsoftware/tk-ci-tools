@@ -152,7 +152,7 @@ jobs:
           python -m coverage combine
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov
+          ./codecov -f .coverage
         displayName: Upload code coverage
 
 
@@ -162,7 +162,7 @@ jobs:
           python -m coverage combine
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
-          ./codecov
+          ./codecov -f .coverage
         displayName: Upload code coverage
 
 
@@ -172,5 +172,5 @@ jobs:
           python -m coverage combine
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
-          .\codecov.exe
+          .\codecov.exe -f .coverage
         displayName: Upload code coverage
