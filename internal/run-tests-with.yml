@@ -150,6 +150,9 @@ jobs:
 
       - bash: |
           python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
           python -m coverage xml -i
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
@@ -161,6 +164,9 @@ jobs:
 
       - bash: |
           python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
           python -m coverage xml -i
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
@@ -172,6 +178,9 @@ jobs:
 
       - powershell: |
           python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
           python -m coverage xml -i
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
