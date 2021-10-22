@@ -145,11 +145,38 @@ jobs:
 
   # We're done, we can now upload code coverage, but first, we'll have to
   # combine the results.
-  - bash: |
-      python -m coverage combine
-      curl -Os https://uploader.codecov.io/latest/linux/codecov
-      chmod +x codecov
-      ./codecov
-    displayName: Upload code coverage
-    env:
-      CODECOV_TOKEN: $(codecov.token)
+
+  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+
+      - bash: |
+          python -m coverage combine
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov
+        displayName: Upload code coverage
+        env:
+          CODECOV_TOKEN: $(codecov.token)
+
+  - ${{ if contains(parameters.image_name, 'macos') }}:
+
+      - bash: |
+          python -m coverage combine
+          curl -Os https://uploader.codecov.io/latest/macos/codecov
+          chmod +x codecov
+          ./codecov
+        displayName: Upload code coverage
+        env:
+          CODECOV_TOKEN: $(codecov.token)
+
+  - ${{ if contains(parameters.image_name, 'windows') }}:
+
+      - powershell: |
+          python -m coverage combine
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
+          .\codecov.exe
+        displayName: Upload code coverage
+        env:
+          CODECOV_TOKEN: $(codecov.token)
+
+
