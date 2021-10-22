@@ -178,5 +178,3 @@ jobs:
         displayName: Upload code coverage
         env:
           CODECOV_TOKEN: $(codecov.token)
-
-
