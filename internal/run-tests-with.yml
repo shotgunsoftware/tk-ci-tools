@@ -150,9 +150,10 @@ jobs:
 
       - bash: |
           python -m coverage combine
+          python -m coverage xml -i
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov -f .coverage
+          ./codecov
         displayName: Upload code coverage
 
 
@@ -160,9 +161,10 @@ jobs:
 
       - bash: |
           python -m coverage combine
+          python -m coverage xml -i
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
-          ./codecov -f .coverage
+          ./codecov
         displayName: Upload code coverage
 
 
@@ -170,7 +172,8 @@ jobs:
 
       - powershell: |
           python -m coverage combine
+          python -m coverage xml -i
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
-          .\codecov.exe -f .coverage
+          .\codecov.exe
         displayName: Upload code coverage
