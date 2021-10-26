@@ -145,10 +145,44 @@ jobs:
 
   # We're done, we can now upload code coverage, but first, we'll have to
   # combine the results.
-  - bash: |
-      python -m coverage combine
-      curl -s https://codecov.io/bash > codecov.sh
-      bash codecov.sh
-    displayName: Upload code coverage
-    env:
-      CODECOV_TOKEN: $(codecov.token)
+
+  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+
+      - bash: |
+          python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
+          python -m coverage xml -i
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov
+        displayName: Upload code coverage
+
+
+  - ${{ if contains(parameters.image_name, 'macos') }}:
+
+      - bash: |
+          python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
+          python -m coverage xml -i
+          curl -Os https://uploader.codecov.io/latest/macos/codecov
+          chmod +x codecov
+          ./codecov
+        displayName: Upload code coverage
+
+
+  - ${{ if contains(parameters.image_name, 'windows') }}:
+
+      - powershell: |
+          python -m coverage combine
+          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+          # genearte would generate errors otherwise since these are not actual source files
+          python -m coverage xml -i
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
+          .\codecov.exe
+        displayName: Upload code coverage
