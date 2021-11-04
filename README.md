@@ -12,6 +12,17 @@ Code style validation is enforced by running the `pre-commit` hook on all the fi
 
 > Due to a technical limitation, Linux can't run Python 2.7 tests at the moment.
 
+# Learning more about Azure Piplines
+
+If you want to learn more about how Azure Pipelines yml files work, you can visit the following pages:
+
+- [YAML Schema](https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema)
+- [YAML Syntax](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops)
+- [Expressions](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/expressions?view=azure-devops) (aka the `{{ }}` syntax)
+- [Pre-defined build variables](https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml)
+- [Library Secrets](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch)
+- [List of available `task`s](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/?view=azure-devops)
+
 # Requirements to the build pipeline
 
 ## pre-commit hook
