@@ -18,7 +18,7 @@ parameters:
   release_repo_ref: master
 
 jobs:
-  # Launch a Linux VM
+  # Launch a MacOS VM
 - job: release_toolkit_bundle
   displayName: Release Toolkit bundle
   pool:
