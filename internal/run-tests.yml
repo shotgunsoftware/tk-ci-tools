@@ -199,7 +199,7 @@ jobs:
         qt_wrapper: PySide2==5.15.2
         python_version: 3.9
         job_name: "Linux Python 3.9"
-        # pass through all parameters
+        # pass through all parameters.
         extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
         tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
         additional_repositories: ${{ parameters.additional_repositories }}
