@@ -157,7 +157,6 @@ jobs:
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # PYTHON 3.9
       # Windows python 3.9 build
       - template: run-tests-with.yml
         parameters:
@@ -191,7 +190,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
-      #
+
       # Linux Python 3.9 build
       - template: run-tests-with.yml
         parameters:
