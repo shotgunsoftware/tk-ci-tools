@@ -10,7 +10,7 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: [ ]
+  extra_test_dependencies: []
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.
@@ -20,7 +20,7 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  additional_repositories: [ ]
+  additional_repositories: []
   # Git ref of tk-core to use.
   tk_core_ref: master
   # Post test steps
@@ -31,7 +31,7 @@ parameters:
   # post_tests_steps:
   # - bash: do_something
   # - bash: do_something_else
-  post_tests_steps: [ ]
+  post_tests_steps: []
   # If set to true, the build agent will install the necessary libraries to run ui tests.
   has_ui_tests: false
   # If set to true, the build agent will run unit tests.
