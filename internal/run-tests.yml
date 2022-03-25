@@ -84,8 +84,15 @@ jobs:
       python_version: 2.7
       job_name: "Windows Python 2.7"
       # pass through all parameters
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+      post_tests_steps: ${{ parameters.post_tests_steps }}
+      # Force UI tests off for platforms that don't support them yet.
+      has_ui_tests: true
+      has_unit_tests: ${{ parameters.has_unit_tests }}
       ui_automation_ref: python2-version
-      ${{ insert }}: ${{ parameters }}
 
   # Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
   # target Windows which means we run our automation only on Windows and Python 2 for now.
