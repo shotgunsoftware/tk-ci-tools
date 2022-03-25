@@ -65,7 +65,7 @@ parameters:
   # Version of mpas-ma repository to use. Default one is for Python 2 only
   - name: ui_automation_ref
     type: string
-    default: 93b235efe47765276a6d014b97d9bbe60a3d3c3e
+    default: python2-version
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
