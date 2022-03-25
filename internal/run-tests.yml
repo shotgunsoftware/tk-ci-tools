@@ -156,6 +156,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: true
           has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: master
 
       # Windows python 3.9 build
       - template: run-tests-with.yml
@@ -173,6 +174,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: true
           has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: master
 
       # macOS Python 3.9 build
       - template: run-tests-with.yml
