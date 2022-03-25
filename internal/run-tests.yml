@@ -154,7 +154,7 @@ jobs:
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
-          has_ui_tests: false
+          has_ui_tests: true
           has_unit_tests: ${{ parameters.has_unit_tests }}
 
       # Windows python 3.9 build
@@ -171,7 +171,7 @@ jobs:
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
-          has_ui_tests: false
+          has_ui_tests: true
           has_unit_tests: ${{ parameters.has_unit_tests }}
 
       # macOS Python 3.9 build
