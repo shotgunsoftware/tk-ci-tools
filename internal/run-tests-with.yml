@@ -116,6 +116,7 @@ jobs:
       displayName: Cloning UI automation tools
       env:
         UI_AUTOMATION_REPO: $(repo.ui_automation)
+    - template: pip-install-packages.yml
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
