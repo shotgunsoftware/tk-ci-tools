@@ -16,7 +16,7 @@ parameters:
   # Python version to use. Should be 2.7 or 3.7
   python_version: 3.7
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  extra_test_dependencies: [comtype]
   # Pretty name for the job.
   job_name: ""
   # Git ref of tk-toolchain to use.
@@ -68,7 +68,6 @@ jobs:
       - ${{ parameters.qt_wrapper }}
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
       - pytest-azurepipelines
-      - comtypes
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
