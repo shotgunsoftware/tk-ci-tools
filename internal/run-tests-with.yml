@@ -68,6 +68,7 @@ jobs:
       - ${{ parameters.qt_wrapper }}
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
       - pytest-azurepipelines
+      - comtypes
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
@@ -116,7 +117,6 @@ jobs:
       displayName: Cloning UI automation tools
       env:
         UI_AUTOMATION_REPO: $(repo.ui_automation)
-    - template: pip-install-packages.yml
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
