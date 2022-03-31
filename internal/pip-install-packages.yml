@@ -10,7 +10,7 @@
 
 parameters:
   # List of Python packages to install.
-  packages: []
+  packages: [comtypes]
 
 steps:
 - ${{ each package in parameters.packages }}:
