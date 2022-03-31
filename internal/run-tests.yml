@@ -10,7 +10,7 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  extra_test_dependencies: [comtypes]
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.
