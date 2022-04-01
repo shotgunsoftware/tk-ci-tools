@@ -67,6 +67,7 @@ jobs:
       packages:
       - ${{ parameters.qt_wrapper }}
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      - comtypes
       - pytest-azurepipelines
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
