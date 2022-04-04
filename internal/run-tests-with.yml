@@ -16,7 +16,7 @@ parameters:
   # Python version to use. Should be 2.7 or 3.7
   python_version: 3.7
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: [comtypes]
+  extra_test_dependencies: []
   # Pretty name for the job.
   job_name: ""
   # Git ref of tk-toolchain to use.
