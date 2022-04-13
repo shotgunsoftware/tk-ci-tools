@@ -157,7 +157,7 @@ jobs:
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-          additional_repositories: ${{ parameters.additional_repositories }}
+          additional_repositories: comtypes
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
@@ -175,7 +175,7 @@ jobs:
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-          additional_repositories: ${{ parameters.additional_repositories }}
+          additional_repositories: comtypes
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
