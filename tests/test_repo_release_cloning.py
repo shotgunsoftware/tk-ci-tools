@@ -18,7 +18,7 @@ import os
 # Unfortunately we can't just install the ssh key before running this test
 # because it has already been installed once of the Windows+2.7 build and the
 # task will fail if you install it a second time.
-if __name__ == "__main__" and sys.version_info[0] == 2 and sys.platform == "win32":
+if __name__ == "__main__" and sys.platform == "win32":
     try:
         subprocess.check_call(
             [
