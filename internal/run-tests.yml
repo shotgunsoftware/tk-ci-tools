@@ -155,7 +155,7 @@ jobs:
           python_version: 3.7
           job_name: "Windows Python 3.7"
           # pass through all parameters
-          extra_test_dependencies: comtypes
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
@@ -173,7 +173,7 @@ jobs:
           python_version: 3.9
           job_name: "Windows Python 3.9"
           # pass through all parameters
-          extra_test_dependencies: comtypes
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
