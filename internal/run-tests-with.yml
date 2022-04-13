@@ -112,10 +112,8 @@ jobs:
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
     - template: install-ssh-key.yml
     - bash: |
-        git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
-      displayName: Cloning UI automation tools
-      env:
-        UI_AUTOMATION_REPO: $(repo.ui_automation)
+        pip install -I git+https://github.com/shotgunsoftware/mpas-ma@${{ parameters.ui_automation_ref }}#egg=MA
+      displayName: Pip install UI automation tools
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
@@ -123,7 +121,7 @@ jobs:
   # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      PYTHONPATH=../ui_automation COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv
+      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
