@@ -53,7 +53,7 @@ jobs:
     # framework is missing, so it's important that has_ui_tests triggers a clone
     # only for builds we can run automation for.
     - bash: |
-        python tests/test_ui_automation.py
+        PYTHONPATH=../ui_automation python tests/test_ui_automation.py
       displayName: Testing import of UI automation framework.
     - bash: |
         python tests/test_repo_release_cloning.py
