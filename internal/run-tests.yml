@@ -85,7 +85,7 @@ jobs:
       job_name: "Windows Python 2.7"
       # pass through all parameters
       ${{ insert }}: ${{ parameters }}
-  
+
   # Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
   # target Windows which means we run our automation only on Windows and Python 2 for now.
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
