@@ -14,5 +14,5 @@ parameters:
 
 steps:
 - ${{ each package in parameters.packages }}:
-   - bash: pip install ${{ package }} --use-feature=2020-resolver
+   - bash: pip install ${{ package }}
      displayName: Install Python package ${{ package }}
