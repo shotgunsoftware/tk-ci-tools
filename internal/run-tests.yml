@@ -79,7 +79,7 @@ jobs:
   # Windows Python 2.7 build
   - template: run-tests-with.yml
     parameters:
-      image_name: 'windows-2019'
+      image_name: 'windows-2022'
       qt_wrapper: PySide
       python_version: 2.7
       job_name: "Windows Python 2.7"
@@ -92,7 +92,7 @@ jobs:
       # Linux Python 3.7 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'ubuntu-18.04'
+          image_name: 'ubuntu-22.04'
           qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "Linux Python 3.7"
@@ -109,7 +109,7 @@ jobs:
       # macOS Python 2.7 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macos-10.15'
+          image_name: 'macos-12'
           qt_wrapper: PySide2==5.14.1
           python_version: 2.7
           job_name: "macOS Python 2.7"
@@ -126,7 +126,7 @@ jobs:
       # macOS Python 3.7 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macos-10.15'
+          image_name: 'macos-12'
           qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "macOS Python 3.7"
@@ -143,7 +143,7 @@ jobs:
       # Windows Python 3.7 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'windows-2019'
+          image_name: 'windows-2022'
           qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "Windows Python 3.7"
@@ -177,7 +177,7 @@ jobs:
       # macOS Python 3.9 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macOS-11'
+          image_name: 'macOS-12'
           qt_wrapper: PySide2==5.15.2
           python_version: 3.9
           job_name: "macOS Python 3.9"
@@ -194,7 +194,7 @@ jobs:
       # Linux Python 3.9 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'ubuntu-20.04'
+          image_name: 'ubuntu-22.04'
           qt_wrapper: PySide2==5.15.2
           python_version: 3.9
           job_name: "Linux Python 3.9"
