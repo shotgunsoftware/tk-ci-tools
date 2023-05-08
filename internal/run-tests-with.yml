@@ -113,7 +113,6 @@ jobs:
     - template: install-ssh-key.yml
     - bash: |
         ssh-keyscan github.com > ~/.ssh/known_hosts
-        echo Cloning git@github.com:$UI_AUTOMATION_REPO 
         git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
       displayName: Cloning UI automation tools
       env:
