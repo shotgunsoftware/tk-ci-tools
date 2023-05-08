@@ -150,7 +150,7 @@ jobs:
           python_version: 3.7
           job_name: "Windows Python 3.7"
           # pass through all parameters
-          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          extra_test_dependencies: [Qt.py, comtypes]
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
