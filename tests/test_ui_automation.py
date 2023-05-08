@@ -20,6 +20,8 @@ if __name__ == "__main__":
         except Exception as e:
             err_tuple = sys.exc_info()
             print(f"{err_tuple!r}")
+        else:
+            print("Successfully imported!")
     else:
         # Other platforms should not.
         try:
