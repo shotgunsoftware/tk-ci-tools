@@ -18,7 +18,8 @@ if __name__ == "__main__":
         try:
             import MA.UI  # noqa
         except Exception as e:
-            print(str(e))
+            err_tuple = sys.exc_info()
+            print(f"{err_tuple!r}")
     else:
         # Other platforms should not.
         try:
