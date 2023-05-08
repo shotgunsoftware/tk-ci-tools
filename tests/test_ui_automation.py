@@ -15,7 +15,10 @@ if __name__ == "__main__":
     # Windows & Python 2.7 builds should be able to import
     # the automation code since it should have been cloned.
     if sys.platform == "win32":
-        import MA.UI  # noqa
+        try:
+            import MA.UI  # noqa
+        except Exception as e:
+            print(str(e))
     else:
         # Other platforms should not.
         try:
