@@ -106,7 +106,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
-          ui_automation_ref: merging-from-git-autodesk
+          ui_automation_ref: master
 
       # macOS Python 2.7 build
       - ${{ if eq( parameters.has_python_27_tests, true ) }}:
