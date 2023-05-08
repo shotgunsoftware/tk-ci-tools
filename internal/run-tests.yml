@@ -10,7 +10,7 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  extra_test_dependencies: [Qt.py, comtypes]
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.
@@ -87,8 +87,8 @@ jobs:
         # pass through all parameters
         ${{ insert }}: ${{ parameters }}
 
-  # Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
-  # target Windows which means we run our automation only on Windows and Python 2 for now.
+  # Note: Our ui tests currently only target Windows which means we run our automation only
+  # on Windows for now
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
       # Linux Python 3.7 build
       - template: run-tests-with.yml
@@ -106,6 +106,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: merging-from-git-autodesk
 
       # macOS Python 2.7 build
       - ${{ if eq( parameters.has_python_27_tests, true ) }}:
