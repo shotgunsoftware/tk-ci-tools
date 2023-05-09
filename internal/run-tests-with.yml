@@ -112,9 +112,8 @@ jobs:
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
     - template: install-ssh-key.yml
     - bash: |
-        ssh-keyscan github.com > ~/.ssh/known_hosts
-        git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
-      displayName: Cloning UI automation tools
+        pip install -I git+https://github.com/shotgunsoftware/mpas-ma@${{ parameters.ui_automation_ref }}#egg=MA
+      displayName: Pip install UI automation tools
       env:
         UI_AUTOMATION_REPO: $(repo.ui_automation)
 
