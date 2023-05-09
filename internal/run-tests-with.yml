@@ -109,13 +109,13 @@ jobs:
   # in theory have a project named Toolkit and run these commands. In practice however,
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
-  - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
-    - template: install-ssh-key.yml
-    - bash: |
-        pip install -I git+https://github.com/shotgunsoftware/mpas-ma@${{ parameters.ui_automation_ref }}#egg=MA
-      displayName: Pip install UI automation tools
-      env:
-        UI_AUTOMATION_REPO: $(repo.ui_automation)
+#  - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
+#    - template: install-ssh-key.yml
+#    - bash: |
+#        pip install -I git+https://github.com/shotgunsoftware/mpas-ma@${{ parameters.ui_automation_ref }}#egg=MA
+#      displayName: Pip install UI automation tools
+#      env:
+#        UI_AUTOMATION_REPO: $(repo.ui_automation)
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
