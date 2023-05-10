@@ -116,7 +116,7 @@ jobs:
         pwd
         git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
         ls -al ../ui_automation
-        pip install /d/a/1/ui_automation/mpas-ma
+        pip install /d/a/1/ui_automation
       displayName: Cloning and pip install UI automation tools
       env:
         UI_AUTOMATION_REPO: $(repo.ui_automation)
