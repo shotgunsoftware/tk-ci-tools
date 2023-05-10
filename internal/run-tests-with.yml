@@ -110,10 +110,15 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
-    - template: pip-install-packages.yml
-      parameters:
-        packages:
-          - git+https://github.com/shotgunsoftware/mpas-ma@${{ parameters.ui_automation_ref }}#egg=MA
+    - template: install-ssh-key.yml
+    - bash: |
+        ssh-keyscan github.com > ~/.ssh/known_hosts
+        pwd
+        git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
+        pip install ../ui_automation/mpas-ma
+      displayName: Cloning and pip install UI automation tools
+      env:
+        UI_AUTOMATION_REPO: $(repo.ui_automation)
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
