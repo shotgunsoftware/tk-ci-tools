@@ -113,9 +113,7 @@ jobs:
     - template: install-ssh-key.yml
     - bash: |
         ssh-keyscan github.com > ~/.ssh/known_hosts
-        pwd
         git clone --depth 1 -b ${{ parameters.ui_automation_ref }} --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
-        ls -al ../ui_automation
         pip install /d/a/1/ui_automation
       displayName: Cloning and pip install UI automation tools
       env:

@@ -145,7 +145,7 @@ jobs:
       # Windows Python 3.7 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'windows-2022'
+          image_name: 'windows-2019'
           qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "Windows Python 3.7"
@@ -163,7 +163,7 @@ jobs:
       # Windows python 3.9 build
       - template: run-tests-with.yml
         parameters:
-          image_name: 'windows-2022'
+          image_name: 'windows-2019'
           qt_wrapper: PySide2==5.15.2
           python_version: 3.9
           job_name: "Windows Python 3.9"
