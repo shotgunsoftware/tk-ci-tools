@@ -123,7 +123,7 @@ jobs:
   # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      PYTHONPATH=../ui_automation COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv
+      PYTHONPATH=../ui_automation COVERAGE_FILE=.coverage.tests python -m pytest tests --cov -vv --no-coverage-upload
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
@@ -158,6 +158,11 @@ jobs:
           chmod +x codecov
           ./codecov
         displayName: Upload code coverage
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
 
 
   - ${{ if contains(parameters.image_name, 'macos') }}:
