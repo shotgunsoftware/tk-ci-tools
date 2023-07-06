@@ -161,8 +161,8 @@ jobs:
 
       - task: PublishCodeCoverageResults@1
         inputs:
-          codeCoverageTool: 'JaCoCo'
-          summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/test-output.xml
 
 
   - ${{ if contains(parameters.image_name, 'macos') }}:
