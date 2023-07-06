@@ -146,6 +146,11 @@ jobs:
   # We're done, we can now upload code coverage, but first, we'll have to
   # combine the results.
 
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/test-output.xml
+
   - ${{ if contains(parameters.image_name, 'ubuntu') }}:
 
       - bash: |
@@ -158,11 +163,6 @@ jobs:
           chmod +x codecov
           ./codecov
         displayName: Upload code coverage
-
-      - task: PublishCodeCoverageResults@1
-        inputs:
-          codeCoverageTool: 'Cobertura'
-          summaryFileLocation: $(System.DefaultWorkingDirectory)/test-output.xml
 
 
   - ${{ if contains(parameters.image_name, 'macos') }}:
