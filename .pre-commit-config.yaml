@@ -22,7 +22,7 @@
   - id: trailing-whitespace
 # Leave black at the bottom so all touchups are done before it is run.
 - repo: https://github.com/ambv/black
-  rev: stable
+  rev: 23.7.0
   hooks:
   - id: black
     language_version: python3
