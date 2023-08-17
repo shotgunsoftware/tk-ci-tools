@@ -1,5 +1,6 @@
 # Styles the code properly
 # List of super useful formatters.
+repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.2.3
   hooks:
