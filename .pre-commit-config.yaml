@@ -1,5 +1,6 @@
 # Styles the code properly
 # List of super useful formatters.
+repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.2.3
   hooks:
@@ -22,7 +23,7 @@
   - id: trailing-whitespace
 # Leave black at the bottom so all touchups are done before it is run.
 - repo: https://github.com/ambv/black
-  rev: stable
+  rev: 23.7.0
   hooks:
   - id: black
     language_version: python3
