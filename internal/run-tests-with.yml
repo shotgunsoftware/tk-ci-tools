@@ -145,9 +145,9 @@ jobs:
       CI: 1
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
-      TK_TOOLCHAIN_HOST: $(sg.ci.host)
-      TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
-      TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
+      TK_TOOLCHAIN_HOST: $(sg.ui.host)
+      TK_TOOLCHAIN_USER_LOGIN: $(sg.ui.human.login)
+      TK_TOOLCHAIN_USER_PASSWORD: $(sg.ui.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
     displayName: Run tests
 
