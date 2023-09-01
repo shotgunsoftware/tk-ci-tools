@@ -48,6 +48,8 @@ parameters:
   # When set to true, the agents for all platforms are set so tests can be executed
   # on all platforms.
   has_unit_tests: true
+  # MPAS-MA repo ref value to be installed.
+  ui_automation_ref: ""
 
 jobs:
 - job:
@@ -114,11 +116,16 @@ jobs:
     - bash: |
         ssh-keyscan github.com > ~/.ssh/known_hosts
         git clone --depth 1 --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
-        pip install /d/a/1/ui_automation
-      displayName: Cloning and pip install UI automation tools
+      displayName: Cloning UI automation tools
       env:
         # repo.ui_automation can be found on Azure Pipelines Library
         UI_AUTOMATION_REPO: $(repo.ui_automation)
+
+    - bash: |
+        git checkout ${{ parameters.ui_automation_ref }}
+        pip install .
+      displayName: PIP install UI automation tools
+      workingDirectory: ../ui_automation
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.

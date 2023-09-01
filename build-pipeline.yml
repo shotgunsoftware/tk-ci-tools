@@ -66,6 +66,12 @@ parameters:
   - name: release_repo_ref
     type: string
     default: master
+  # MPAS-MA repo ref value to be installed.
+  # We're using a github.com private sync with the latest working value in order to
+  # install that MA module version.
+  - name: ui_automation_ref
+    type: string
+    default: d621a86d52eb9d45704393a9d5cc02b30e836a8e
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -91,6 +97,7 @@ jobs:
         post_tests_steps: ${{ parameters.post_tests_steps }}
         has_unit_tests: ${{ parameters.has_unit_tests }}
         has_ui_tests: ${{ parameters.has_ui_tests }}
+        ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
