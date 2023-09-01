@@ -124,7 +124,8 @@ jobs:
     - bash: |
         git checkout ${{ parameters.ui_automation_ref }}
         pip install .
-      displayName: PIP install UI automation tools
+        pip install --force-reinstall comtypes==1.1.14
+      displayName: PIP install UI automation tools and comtypes 1.1.14
       workingDirectory: ../ui_automation
 
   # Run the tests. The task will create a simple coverage file if one is missing.
