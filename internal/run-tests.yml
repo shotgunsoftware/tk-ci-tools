@@ -10,7 +10,7 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: [Qt.py, comtypes]
+  extra_test_dependencies: []
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.
@@ -150,15 +150,14 @@ jobs:
           python_version: 3.7
           job_name: "Windows Python 3.7"
           # pass through all parameters
-          extra_test_dependencies: [Qt.py, comtypes]
+          extra_test_dependencies: [Qt.py, comtypes==1.1.14]
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
-          has_ui_tests: true
+          has_ui_tests: ${{ parameters.has_ui_tests }}
           has_unit_tests: ${{ parameters.has_unit_tests }}
-          ui_automation_ref: merging-from-git-autodesk
 
       # Windows python 3.9 build
       - template: run-tests-with.yml
@@ -168,15 +167,14 @@ jobs:
           python_version: 3.9
           job_name: "Windows Python 3.9"
           # pass through all parameters
-          extra_test_dependencies: [Qt.py, comtypes]
+          extra_test_dependencies: [Qt.py, comtypes==1.1.14]
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
           post_tests_steps: ${{ parameters.post_tests_steps }}
           # Force UI tests off for platforms that don't support them yet.
-          has_ui_tests: true
+          has_ui_tests: ${{ parameters.has_ui_tests }}
           has_unit_tests: ${{ parameters.has_unit_tests }}
-          ui_automation_ref: merging-from-git-autodesk
 
       # macOS Python 3.9 build
       - template: run-tests-with.yml
