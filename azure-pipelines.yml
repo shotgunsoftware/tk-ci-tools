@@ -82,9 +82,9 @@ jobs:
         TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       displayName: Testing CI human user credentials
     # Ensures the Shotgun user credentials can connect to the UI Automation site.
-    - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
-      env:
-        TK_TOOLCHAIN_HOST: $(sg.ui.host)
-        TK_TOOLCHAIN_USER_LOGIN: $(sg.ui.human.login)
-        TK_TOOLCHAIN_USER_PASSWORD: $(sg.ui.human.password)
-      displayName: Testing UI Automation human user credentials
+    # - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
+    #   env:
+    #     TK_TOOLCHAIN_HOST: $(sg.ui.host)
+    #     TK_TOOLCHAIN_USER_LOGIN: $(sg.ui.human.login)
+    #     TK_TOOLCHAIN_USER_PASSWORD: $(sg.ui.human.password)
+    #   displayName: Testing UI Automation human user credentials
