@@ -48,6 +48,8 @@ parameters:
   # When set to true, the agents for all platforms are set so tests can be executed
   # on all platforms.
   has_unit_tests: true
+  # MPAS-MA repo ref value to be installed.
+  ui_automation_ref: ""
 
 jobs:
 - job:
@@ -112,10 +114,19 @@ jobs:
   - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
     - template: install-ssh-key.yml
     - bash: |
-        git clone --depth 1 git@github.com:$UI_AUTOMATION_REPO ../ui_automation
+        ssh-keyscan github.com > ~/.ssh/known_hosts
+        git clone --depth 1 --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
       displayName: Cloning UI automation tools
       env:
+        # repo.ui_automation can be found on Azure Pipelines Library
         UI_AUTOMATION_REPO: $(repo.ui_automation)
+
+    - bash: |
+        git checkout ${{ parameters.ui_automation_ref }}
+        pip install .
+        pip install --force-reinstall comtypes==1.1.14
+      displayName: PIP install UI automation tools and comtypes 1.1.14
+      workingDirectory: ../ui_automation
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
@@ -123,7 +134,7 @@ jobs:
   # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      PYTHONPATH=../ui_automation COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv
+      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv -s
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.

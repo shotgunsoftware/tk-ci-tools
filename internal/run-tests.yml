@@ -36,6 +36,8 @@ parameters:
   has_ui_tests: false
   # If set to true, the build agent will run unit tests.
   has_unit_tests: true
+  # MPAS-MA repo ref value to be installed.
+  ui_automation_ref: ""
 
 # TODO: At some point, we should review how these environments are enumerated.
 # Something like:
@@ -87,8 +89,8 @@ jobs:
         # pass through all parameters
         ${{ insert }}: ${{ parameters }}
 
-  # Note: The automation library we use is not Python 3 compliant, and our ui tests currently only
-  # target Windows which means we run our automation only on Windows and Python 2 for now.
+  # Note: Our ui tests currently only target Windows which means we run our automation only
+  # on Windows for now
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
       # Linux Python 3.7 build
       - template: run-tests-with.yml
@@ -158,6 +160,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
       # Windows python 3.9 build
       - template: run-tests-with.yml
@@ -175,6 +178,7 @@ jobs:
           # Force UI tests off for platforms that don't support them yet.
           has_ui_tests: false
           has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
       # macOS Python 3.9 build
       - template: run-tests-with.yml
