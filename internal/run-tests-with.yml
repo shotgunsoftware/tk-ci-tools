@@ -12,7 +12,7 @@ parameters:
   # Name of the virtual machine image to load.
   image_name: ""
   # Name of the Qt wrapper to pip install. Should be PySide or PySide2
-  qt_wrapper: PySide2
+  qt_wrapper: PySide2==5.15.2
   # Python version to use. Should be 2.7 or 3.7
   python_version: 3.7
   # List of Python packages that need to be pip installed for testing.
@@ -53,7 +53,7 @@ parameters:
 
 jobs:
 - job:
-  displayName: ${{ parameters.job_name }}
+  displayName: ${{ parameters.job_name }} Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
