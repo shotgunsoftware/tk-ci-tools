@@ -12,7 +12,7 @@
 if __name__ == "__main__":
     import sys
 
-    # Windows & Python 2.7 builds should be able to import
+    # Windows builds should be able to import
     # the automation code since it should have been cloned.
     if sys.platform == "win32":
         try:

@@ -57,13 +57,7 @@ parameters:
 #       Python: 3.7
 #     - Qt: PyQt5
 #       Python: 3.7
-#     - Qt: PySide2
-#       Python: 2.7
-#     - Qt: PySide
-#       Python: 2.7
 #     Windows:
-#     - Qt: PySide
-#       Python: 2.7
 #     - Qt: PySide2
 #       Python: 3.7
 #     - Qt: PyQt5

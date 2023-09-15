@@ -16,7 +16,8 @@ parameters:
   # Version of tk-toolchain to use.
   - name: tk_toolchain_ref
     type: string
-    default: master
+    # default: master
+    default: ticket/SG-32657_py310  # To revert to master before merge
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would

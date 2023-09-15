@@ -13,7 +13,7 @@ parameters:
   image_name: ""
   # Name of the Qt wrapper to pip install. Should be PySide or PySide2
   qt_wrapper: PySide2==5.15.2.1
-  # Python version to use. Should be 2.7 or 3.7
+  # Python version to use.
   python_version: 3.7
   # List of Python packages that need to be pip installed for testing.
   extra_test_dependencies: []

@@ -48,7 +48,7 @@ jobs:
     # This one shouldn't get cloned.
     - name: tk-ci-tools
     post_tests_steps:
-    # Ensures the automation library get cloned only on Windows+Python 2.7.
+    # Ensures the automation library get cloned only on Windows.
     # Our tests are written in a way that they are skipped if the automation
     # framework is missing, so it's important that has_ui_tests triggers a clone
     # only for builds we can run automation for.

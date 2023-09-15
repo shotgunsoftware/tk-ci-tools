@@ -8,9 +8,7 @@ The pipeline is split into two main sections
 - code style validation
 - running tests
 
-Code style validation is enforced by running the `pre-commit` hook on all the files in the repository. Tests are run on Windows, macOS and Linux and with both Python 2.7 and 3.7 using `pytest` and [`tk-toolchain`](https://github.com/shotgunsoftware/tk-toolchain)
-
-> Due to a technical limitation, Linux can't run Python 2.7 tests at the moment.
+Code style validation is enforced by running the `pre-commit` hook on all the files in the repository. Tests are run on Windows, macOS and Linux using `pytest` and [`tk-toolchain`](https://github.com/shotgunsoftware/tk-toolchain)
 
 # Learning more about Azure Piplines
 
