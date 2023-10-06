@@ -44,10 +44,6 @@ parameters:
   - name: has_ui_tests
     type: boolean
     default: false
-  # Tells the build pipeline that there are python 2.7 tests to execute
-  - name: has_python_27_tests
-    type: boolean
-    default: true
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.

@@ -12,8 +12,8 @@ parameters:
   # Name of the virtual machine image to load.
   image_name: ""
   # Name of the Qt wrapper to pip install. Should be PySide or PySide2
-  qt_wrapper: PySide2
-  # Python version to use. Should be 2.7 or 3.7
+  qt_wrapper: PySide2==5.15.2.1
+  # Python version to use.
   python_version: 3.7
   # List of Python packages that need to be pip installed for testing.
   extra_test_dependencies: []
@@ -53,7 +53,7 @@ parameters:
 
 jobs:
 - job:
-  displayName: ${{ parameters.job_name }}
+  displayName: ${{ parameters.job_name }} Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
@@ -134,7 +134,7 @@ jobs:
   # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
       (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv -s
+      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
