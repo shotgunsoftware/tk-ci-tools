@@ -33,15 +33,14 @@ jobs:
       if [[ "$(Agent.OS)" != "Linux" ]]; then
         echo "Skipping PNG profile validation as it is not running on ubuntu-latest agent"
         exit 0
-      fi   
-      # Usually resources folder are located at the root of the repo, 
+      fi
+      # Usually resources folder are located at the root of the repo,
       so navigate to the directory containing the PNG files
       cd $(Build.SourcesDirectory)/resources
-      
+
       # Print the full paths of PNG files
       find . -type f -name "*.png" -print
-      
+
       # Run mogrify command on PNG files
       find . -type f -name "*.png" -exec mogrify {} \;
     displayName: 'Process PNG files using mogrify'
-
