@@ -1,0 +1,44 @@
+# Copyright (c) 2019 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  # Git ref of tk-toolchain to use.
+  tk_toolchain_ref:
+  # Git ref of tk-core to use.
+  tk_core_ref: master
+
+jobs:
+# Spin up a Linux VM for validating code.
+- job: png_resources_validation
+  displayName: PNG Resources Validation
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: |
+      # Dependencies installation
+      sudo apt update
+      sudo apt install imagemagick -y
+    displayName: 'Install Dependencies'
+
+  - script: |
+      # Skip PNG profile validation on non-ubuntu-latest agents
+      if [[ "$(Agent.OS)" != "Linux" ]]; then
+        echo "Skipping PNG profile validation as it is not running on ubuntu-latest agent"
+        exit 0
+      fi   
+      # Usually resources folder are located at the root of the repo, 
+      so navigate to the directory containing the PNG files
+      cd $(Build.SourcesDirectory)/resources
+      
+      # Run mogrify command on PNG files
+      find . -type f -name "*.png" -exec mogrify {} \;
+    displayName: 'Process PNG files using mogrify'
+
