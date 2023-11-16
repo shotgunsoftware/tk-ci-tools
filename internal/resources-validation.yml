@@ -38,6 +38,9 @@ jobs:
       so navigate to the directory containing the PNG files
       cd $(Build.SourcesDirectory)/resources
       
+      # Print the full paths of PNG files
+      find . -type f -name "*.png" -print
+      
       # Run mogrify command on PNG files
       find . -type f -name "*.png" -exec mogrify {} \;
     displayName: 'Process PNG files using mogrify'
