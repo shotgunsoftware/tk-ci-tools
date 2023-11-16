@@ -68,6 +68,10 @@ parameters:
   - name: ui_automation_ref
     type: string
     default: d621a86d52eb9d45704393a9d5cc02b30e836a8e
+  # Tells the build pipeline that there are resources to validate
+  - name: has_resources
+    type: boolean
+    default: false
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
