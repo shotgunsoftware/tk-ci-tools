@@ -77,6 +77,16 @@ jobs:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
 
+# Check PNG profiles
+- ${{ if eq(parameters.has_resources, true) }}:
+  - template: "internal/resources-validation.yml"
+    parameters:
+      # pass through all parameters
+      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      additional_repositories: ${{ parameters.additional_repositories }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+
 # template expressions are hard to parse visually, so using two ifs instead
 # of a single if and(..., ...)
 # Note: once we've removed skip_tests from existing pipelines, we can remove the
