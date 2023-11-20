@@ -58,3 +58,7 @@ jobs:
     - template: "update-configuration.yml"
       parameters:
         name: tk-config-flameplugin
+
+    - template: "update-configuration.yml"
+      parameters:
+        name: tk-config-rv
