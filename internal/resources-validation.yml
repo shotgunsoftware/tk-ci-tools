@@ -22,25 +22,30 @@ jobs:
     vmImage: 'ubuntu-latest'
 
   steps:
-  - script: |
-      # Dependencies installation
-      sudo apt update
-      sudo apt install imagemagick -y
-    displayName: 'Install Dependencies'
-
-  - script: |
-      # Skip PNG profile validation on non-ubuntu-latest agents
-      if [[ "$(Agent.OS)" != "Linux" ]]; then
-        echo "Skipping PNG profile validation as it is not running on ubuntu-latest agent"
-        exit 0
-      fi
-      # Usually resources folder are located at the root of the repo,
-      so navigate to the directory containing the PNG files
-      cd $(Build.SourcesDirectory)/resources
-
-      # Print the full paths of PNG files
-      find . -type f -name "*.png" -print
-
-      # Run mogrify command on PNG files
-      find . -type f -name "*.png" -exec mogrify {} \;
-    displayName: 'Process PNG files using mogrify'
+    - script: |
+        # Dependencies installation
+        sudo apt update
+        sudo apt install -y pngcrush
+      displayName: 'Install Dependencies'
+    - script: |
+        # Skip PNG profile validation on non-ubuntu-latest agents
+        if [[ "$(Agent.OS)" != "Linux" ]]; then
+          echo "Skipping PNG profile validation as it is not running on ubuntu-latest agent"
+          exit 0
+        fi
+        # Usually resources folder are located at the root of the repo,
+        # so navigate to the directory containing the PNG files
+        cd $(Build.SourcesDirectory)/resources
+        # Print the full paths of PNG files
+        find . -type f -name "*.png" -print
+        # Run pngcrush command on PNG files and display all output
+        process_png() {
+          pngcrush -n -q "$1" 2>&1
+          if [ $? -ne 0 ]; then
+            echo "Error processing file $1"
+            exit 1
+          fi
+        }
+        export -f process_png
+        find . -type f -name "*.png" -exec bash -c 'process_png "$0"' {} \;
+      displayName: 'Process PNG files using pngcrush'
