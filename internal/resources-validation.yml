@@ -38,15 +38,13 @@ jobs:
         cd $(Build.SourcesDirectory)/resources
         # Print the full paths of PNG files
         find . -type f -name "*.png" -print
-        # Run pngcrush command on PNG files and display all output
-        process_png() {
-          output=$(pngcrush -n -q "$1" 2>&1)
+        # Run pngcrush command on PNG files and check for Profile issues
+        for file in $(find . -type f -name "*.png"); do
+          output=$(pngcrush -n -q "$file" 2>&1)
           echo "$output"
           if [[ "$output" == *"pngcrush: iCCP:"* ]]; then
-            echo "Warning processing file $1"
-            exit 1;
+            echo "Warning processing file $file"
+            exit 1
           fi
-        }
-        export -f process_png
-        find . -type f -name "*.png" -exec bash -c 'process_png "$0"' {} \;
+        done
       displayName: 'Process PNG files using pngcrush'
