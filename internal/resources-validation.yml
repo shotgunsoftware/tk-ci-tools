@@ -23,7 +23,6 @@ jobs:
 
   steps:
     - script: |
-        # Dependencies installation
         sudo apt update
         sudo apt install -y pngcrush
       displayName: 'Install Dependencies'
@@ -33,8 +32,7 @@ jobs:
           echo "Skipping PNG profile validation as it is not running on ubuntu-latest agent"
           exit 0
         fi
-        # Usually resources folder are located at the root of the repo,
-        # so navigate to the directory containing the PNG files
+        # Navigate to the directory containing the PNG files
         cd $(Build.SourcesDirectory)/resources
         # Print the full paths of PNG files
         find . -type f -name "*.png" -print
