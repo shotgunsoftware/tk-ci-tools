@@ -69,7 +69,7 @@ parameters:
     type: string
     default: d621a86d52eb9d45704393a9d5cc02b30e836a8e
   # Tells the build pipeline that there are resources to validate
-  - name: has_resources
+  - name: has_ui_resources
     type: boolean
     default: false
 
@@ -82,14 +82,8 @@ jobs:
     tk_core_ref: ${{ parameters.tk_core_ref }}
 
 # Check PNG profiles
-- ${{ if eq(parameters.has_resources, true) }}:
+- ${{ if eq(parameters.has_ui_resources, true) }}:
   - template: "internal/resources-validation.yml"
-    parameters:
-      # pass through all parameters
-      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      additional_repositories: ${{ parameters.additional_repositories }}
-      tk_core_ref: ${{ parameters.tk_core_ref }}
 
 # template expressions are hard to parse visually, so using two ifs instead
 # of a single if and(..., ...)
