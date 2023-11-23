@@ -8,12 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-parameters:
-  # Git ref of tk-toolchain to use.
-  tk_toolchain_ref: master
-  # Git ref of tk-core to use.
-  tk_core_ref: master
-
 jobs:
 # Spin up a Linux VM for validating code.
 - job: png_resources_validation
