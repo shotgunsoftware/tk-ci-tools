@@ -22,7 +22,8 @@ jobs:
         wget https://downloads.sourceforge.net/project/pmt/pngcrush/1.8.13/pngcrush-1.8.13.tar.gz
         tar xzf pngcrush-1.8.13.tar.gz
         cd pngcrush-1.8.13
-        make && sudo make install
+        make
+        sudo mv pngcrush /usr/local/bin
       displayName: 'Install Dependencies'
     - script: |
         # Initialize error counter and error messages
