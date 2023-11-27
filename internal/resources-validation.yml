@@ -19,7 +19,11 @@ jobs:
     - displayName: 'Install Dependencies'
       script: |
         sudo apt update
-        sudo apt install -y pngcrush
+        sudo apt install -y build-essential
+        wget https://downloads.sourceforge.net/project/pmt/pngcrush/1.8.13/pngcrush-1.8.13.tar.gz
+        tar xzf pngcrush-1.8.13.tar.gz
+        cd pngcrush-1.8.13
+        make && sudo make install
     - displayName: 'Process PNG files using pngcrush'
       script: |
         # Initialize error counter and error messages
