@@ -16,11 +16,12 @@ jobs:
     vmImage: 'ubuntu-latest'
 
   steps:
-    - script: |
+    - displayName: 'Install Dependencies'
+      script: |
         sudo apt update
         sudo apt install -y pngcrush
-      displayName: 'Install Dependencies'
-    - script: |
+    - displayName: 'Process PNG files using pngcrush'
+      script: |
         # Print the full paths of PNG files
         find . -type f -name "*.png" -print
         # Run pngcrush command on PNG files and check for Profile issues
@@ -32,5 +33,4 @@ jobs:
             exit 1
           fi
         done
-      displayName: 'Process PNG files using pngcrush'
       workingDirectory: $(Build.SourcesDirectory)/resources
