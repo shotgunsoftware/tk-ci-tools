@@ -16,16 +16,15 @@ jobs:
     vmImage: 'ubuntu-latest'
 
   steps:
-    - displayName: 'Install Dependencies'
-      script: |
+    - script: |
         sudo apt update
         sudo apt install -y build-essential
         wget https://downloads.sourceforge.net/project/pmt/pngcrush/1.8.13/pngcrush-1.8.13.tar.gz
         tar xzf pngcrush-1.8.13.tar.gz
         cd pngcrush-1.8.13
         make && sudo make install
-    - displayName: 'Process PNG files using pngcrush'
-      script: |
+      displayName: 'Install Dependencies'
+    - script: |
         # Initialize error counter and error messages
         errors=0
         error_messages=""    
@@ -46,4 +45,5 @@ jobs:
           echo -e "$error_messages"
           exit $(($errors > 254 ? 254 : $errors))
         fi
+      displayName: 'Process PNG files using pngcrush'
       workingDirectory: $(Build.SourcesDirectory)/resources
