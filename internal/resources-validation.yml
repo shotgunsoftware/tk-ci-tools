@@ -11,7 +11,7 @@
 jobs:
 # Spin up a Linux VM for validating code.
 - job: png_resources_validation
-  displayName: PNG Resources Validation
+  displayName: Resources Validation
   pool:
     vmImage: 'ubuntu-latest'
 
@@ -26,6 +26,8 @@ jobs:
         sudo mv pngcrush /usr/local/bin
       displayName: 'Install Dependencies'
     - script: |
+        # Display pngcrush version.
+        pngcrush -version
         # Initialize error counter and error messages
         errors=0
         error_messages=""    
