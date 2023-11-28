@@ -75,7 +75,7 @@ parameters:
   # Specifies the version of pngcrush to be used for validating the ui resources.
   - name: pngcrush_ref
     type: string
-    default: 'pngcrush-1.8.13'
+    default: '1.8.13'
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.

@@ -25,9 +25,9 @@ jobs:
     - script: |
         sudo apt update
         sudo apt install -y build-essential
-        wget https://downloads.sourceforge.net/project/pmt/${{ parameters.pngcrush_ref }}.tar.gz
-        tar xzf ${{ parameters.pngcrush_ref }}.tar.gz
-        cd ${{ parameters.pngcrush_ref }}
+        wget https://downloads.sourceforge.net/project/pmt/pngcrush/${{ parameters.pngcrush_ref }}/pngcrush-${{ parameters.pngcrush_ref }}.tar.gz
+        tar xzf pngcrush-${{ parameters.pngcrush_ref }}.tar.gz
+        cd pngcrush-${{ parameters.pngcrush_ref }}
         make
         sudo mv pngcrush /usr/local/bin
       displayName: 'Install Dependencies'
