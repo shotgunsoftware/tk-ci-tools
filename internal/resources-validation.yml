@@ -36,7 +36,7 @@ jobs:
         pngcrush -version
         # Initialize error counter and error messages
         errors=0
-        error_messages=""    
+        error_messages=""
 
         # Run pngcrush command on PNG files and check for errors
         for file in $(find . -type f -name "*.png"); do
@@ -47,7 +47,7 @@ jobs:
               error_messages+="$output\n"
           fi
         done
-        
+
         # If there were any errors, print custom message and error messages
         if [ $errors -gt 0 ]; then
           echo -e "\nThe following PNG files have profile errors. Consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles:\n"
