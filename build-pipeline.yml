@@ -71,7 +71,11 @@ parameters:
   # Tells the build pipeline that there are resources to validate
   - name: has_ui_resources
     type: boolean
-    default: false
+    default: true
+  # Specifies the version of pngcrush to be used for validating the ui resources.
+  - name: pngcrush_ref
+    type: string
+    default: 'pngcrush-1.8.13'
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -84,6 +88,8 @@ jobs:
 # Check PNG profiles
 - ${{ if eq(parameters.has_ui_resources, true) }}:
   - template: "internal/resources-validation.yml"
+    parameters:
+      pngcrush_ref: ${{ parameters.pngcrush_ref }}
 
 # template expressions are hard to parse visually, so using two ifs instead
 # of a single if and(..., ...)
