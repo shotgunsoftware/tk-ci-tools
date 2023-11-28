@@ -17,11 +17,17 @@ jobs:
 
   steps:
     - script: |
+        if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
+          echo "No resources directory found, skipping job."
+          exit 0
+        fi
+      displayName: 'Check for resources'
+    - script: |
         sudo apt update
         sudo apt install -y build-essential
-        wget https://downloads.sourceforge.net/project/pmt/pngcrush/1.8.13/pngcrush-1.8.13.tar.gz
-        tar xzf pngcrush-1.8.13.tar.gz
-        cd pngcrush-1.8.13
+        wget https://downloads.sourceforge.net/project/pmt/${{ parameters.pngcrush_ref }}.tar.gz
+        tar xzf ${{ parameters.pngcrush_ref }}.tar.gz
+        cd ${{ parameters.pngcrush_ref }}
         make
         sudo mv pngcrush /usr/local/bin
       displayName: 'Install Dependencies'
