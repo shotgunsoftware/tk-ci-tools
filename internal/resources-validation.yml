@@ -28,11 +28,23 @@ jobs:
         sudo apt install -y pngcrush
       displayName: 'Install Dependencies'
 
-    - template: clone-repositories.yml
-      parameters:
-        repositories:
-          - name: tk-core
-            ref: ${{ parameters.tk_ci_tools_ref }}
+    - ${{ if ne(variables['Build.Repository.Name'], 'ci-tools') }}:
+      - template: clone-repositories.yml
+        parameters:
+          repositories:
+            - name: tk-ci-tools
+              ref: ${{ parameters.tk_ci_tools_ref }}
+
+    - script: |
+        # Set the path to the ci-tools repository, which is either the current directory
+        # if the pipeline is running in the ci-tools repository, or the tk-ci-tools directory otherwise
+        if [ "${{ variables['Build.Repository.Name'] }}" = 'ci-tools' ]; then
+          ci_tools_path="."
+        else
+          ci_tools_path="tk-ci-tools"
+        fi
+        echo "ci_tools_path=$ci_tools_path"
+      displayName: 'Set tk-ci-tools path'
 
     - script: |
         function validate_png {
@@ -57,9 +69,9 @@ jobs:
             fi
           fi
         }
-
-        validate_png "tk-ci-tools/tests/test_images/good_profile.png" false
-        validate_png "tk-ci-tools/tests/test_images/wrong_profile.png" true
+        
+        validate_png "$ci_tools_path/tests/test_images/good_profile.png" false
+        validate_png "$ci_tools_path/tests/test_images/wrong_profile.png" true
       displayName: 'Validate Test Images'
 
     - script: |
