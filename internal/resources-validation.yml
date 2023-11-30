@@ -45,7 +45,7 @@ jobs:
           ci_tools_path="tk-ci-tools"
         fi
         echo "ci_tools_path=$ci_tools_path"
-          
+
         function validate_png {
           filepath=$1
           filename=$(basename $filepath)
@@ -68,7 +68,7 @@ jobs:
             fi
           fi
         }
-        
+
         validate_png "$ci_tools_path/tests/test_images/good_profile.png" false
         validate_png "$ci_tools_path/tests/test_images/wrong_profile.png" true
       displayName: 'Validate Test Images'
