@@ -28,6 +28,7 @@ jobs:
         sudo apt install -y pngcrush
       displayName: 'Install Dependencies'
 
+    # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
     - ${{ if ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools') }}:
       - template: clone-repositories.yml
         parameters:
@@ -42,7 +43,7 @@ jobs:
         if [ "$repo_name" = 'tk-ci-tools' ]; then
           ci_tools_path="."
         else
-          ci_tools_path="tk-ci-tools"
+          ci_tools_path="../tk-ci-tools"
         fi
         echo "ci_tools_path=$ci_tools_path"
 
