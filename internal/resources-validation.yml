@@ -37,7 +37,8 @@ jobs:
 
     - script: |
         # Print the name of the repository where the pipeline is running for debug
-        echo "Build.Repository.Name: ${{ variables['Build.Repository.Name'] }}"
+        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
+        echo "Repository Name: $repo_name"
         # Set the path to the tk-ci-tools repo, which is either the current directory
         # if the pipeline is running in the ci-tools repository, or the tk-ci-tools directory otherwise
         if [ "${{ variables['Build.Repository.Name'] }}" = 'tk-ci-tools' ]; then
