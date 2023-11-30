@@ -36,17 +36,15 @@ jobs:
               ref: ${{ parameters.tk_ci_tools_ref }}
 
     - script: |
-        # Set the path to the ci-tools repository, which is either the current directory
+        # Set the path to the tk-ci-tools repo, which is either the current directory
         # if the pipeline is running in the ci-tools repository, or the tk-ci-tools directory otherwise
-        if [ "${{ variables['Build.Repository.Name'] }}" = 'tk-ci-tools' ]; then
+        if [ "${{ variables['Build.Repository.Name'] }}" = 'ci-tools' ]; then
           ci_tools_path="."
         else
           ci_tools_path="tk-ci-tools"
         fi
         echo "ci_tools_path=$ci_tools_path"
-      displayName: 'Set tk-ci-tools path'
-
-    - script: |
+        
         function validate_png {
           filepath=$1
           filename=$(basename $filepath)
