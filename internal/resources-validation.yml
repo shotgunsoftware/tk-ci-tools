@@ -28,7 +28,7 @@ jobs:
         sudo apt install -y pngcrush
       displayName: 'Install Dependencies'
 
-    - ${{ if ne(variables['Build.Repository.Name'], 'ci-tools') }}:
+    - ${{ if ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools') }}:
       - template: clone-repositories.yml
         parameters:
           repositories:
@@ -36,18 +36,16 @@ jobs:
               ref: ${{ parameters.tk_ci_tools_ref }}
 
     - script: |
-        # Print the name of the repository where the pipeline is running for debug
-        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
-        echo "Repository Name: $repo_name"
         # Set the path to the tk-ci-tools repo, which is either the current directory
-        # if the pipeline is running in the ci-tools repository, or the tk-ci-tools directory otherwise
-        if [ "${{ variables['Build.Repository.Name'] }}" = 'tk-ci-tools' ]; then
+        # if the job is running in the ci-tools repository, or the tk-ci-tools directory otherwise
+        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
+        if [ "$repo_name" = 'tk-ci-tools' ]; then
           ci_tools_path="."
         else
           ci_tools_path="tk-ci-tools"
         fi
         echo "ci_tools_path=$ci_tools_path"
-        
+          
         function validate_png {
           filepath=$1
           filename=$(basename $filepath)
