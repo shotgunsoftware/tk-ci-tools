@@ -23,14 +23,33 @@ jobs:
         fi
       displayName: 'Check for resources'
     - script: |
-        sudo apt update
-        sudo apt install -y build-essential
-        wget https://downloads.sourceforge.net/project/pmt/pngcrush/${{ parameters.pngcrush_ref }}/pngcrush-${{ parameters.pngcrush_ref }}.tar.gz
-        tar xzf pngcrush-${{ parameters.pngcrush_ref }}.tar.gz
-        cd pngcrush-${{ parameters.pngcrush_ref }}
-        make
-        sudo mv pngcrush /usr/local/bin
-      displayName: 'Install Dependencies'
+        function validate_png {
+          filepath=$1
+          filename=$(basename $filepath)
+          expected_fail=$2
+          output=$(pngcrush -n -q "$filepath" 2>&1)
+          echo "$output"
+          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
+            if $expected_fail; then
+                echo "Success: $filename is invalid as expected"
+            else
+                echo "Error: $filename validation expected to succeed failed, please consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles."
+                exit 1
+            fi
+          else
+            if $expected_fail; then
+                echo "Error: $filename validation expected to fail passed, please check if pngcrush's error output used for profile validation ('pngcrush: iCCP') has changed."
+                exit 1
+            else
+                echo "Success: $filename is valid as expected"
+            fi
+          fi
+        }
+
+        validate_png "tk-ci-tools/tests/test_images/good_profile.png" false
+        validate_png "tk-ci-tools/tests/test_images/wrong_profile.png" true
+      displayName: 'Validate Test Images'
+
     - script: |
         # Display pngcrush version.
         pngcrush -version
