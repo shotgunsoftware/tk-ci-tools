@@ -22,6 +22,18 @@ jobs:
           exit 0
         fi
       displayName: 'Check for resources'
+
+    - script: |
+        sudo apt update
+        sudo apt install -y pngcrush
+      displayName: 'Install Dependencies'
+
+    - template: clone-repositories.yml
+      parameters:
+        repositories:
+          - name: tk-core
+            ref: ${{ parameters.tk_ci_tools_ref }}
+
     - script: |
         function validate_png {
           filepath=$1
