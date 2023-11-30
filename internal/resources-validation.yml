@@ -38,7 +38,7 @@ jobs:
     - script: |
         # Set the path to the ci-tools repository, which is either the current directory
         # if the pipeline is running in the ci-tools repository, or the tk-ci-tools directory otherwise
-        if [ "${{ variables['Build.Repository.Name'] }}" = 'ci-tools' ]; then
+        if [ "${{ variables['Build.Repository.Name'] }}" = 'tk-ci-tools' ]; then
           ci_tools_path="."
         else
           ci_tools_path="tk-ci-tools"
