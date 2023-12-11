@@ -19,6 +19,7 @@ jobs:
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
           echo "No resources directory found, skipping job."
+          echo "##vso[task.setvariable variable=SkipJob]true"  
           exit 0
         fi
       displayName: 'Check for resources'
@@ -99,3 +100,4 @@ jobs:
         fi
       displayName: 'Process PNG files using pngcrush'
       workingDirectory: $(Build.SourcesDirectory)/resources
+  condition: ne(variables['SkipJob'], 'true')
