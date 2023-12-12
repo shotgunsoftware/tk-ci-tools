@@ -19,10 +19,10 @@ jobs:
     - script: |
         if [ -d "$(Build.SourcesDirectory)/resources" ]; then
           echo "Resources directory found."
-          echo "##vso[task.setvariable variable=resourcesExists;isOutput=true]true"
+          echo "##vso[task.setvariable variable=resourcesExists;isoutput=true]true"
         else
           echo "No resources directory found."
-          echo "##vso[task.setvariable variable=resourcesExists;isOutput=true]false"
+          echo "##vso[task.setvariable variable=resourcesExists;isoutput=true]false"
         fi
       name: setVarStep
 
@@ -32,8 +32,12 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   dependsOn: CheckResources
-  condition: eq(dependencies.CheckResources.outputs['setVarStep.resourcesExists'], 'true')
+  variables:
+    hasResources: $[ dependencies.CheckResources.outputs['setVarStep.resourcesExists'] ]
+#  condition: eq(dependencies.CheckResources.outputs['setVarStep.resourcesExists'], 'true')
   steps:
+    - bash: |
+        echo $(hasResources)
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
           echo "No resources directory found, skipping job."
