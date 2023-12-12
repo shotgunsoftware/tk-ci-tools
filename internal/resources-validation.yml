@@ -33,12 +33,12 @@ jobs:
       condition: eq(variables['resourcesExist'], 'true')
 
     # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
-    - ${{ if and(ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'), eq(variables['resourcesExist'], 'true')) }}:
-      - template: clone-repositories.yml
-        parameters:
-          repositories:
-            - name: tk-ci-tools
-              ref: ${{ parameters.tk_ci_tools_ref }}
+    - template: clone-repositories.yml
+      parameters:
+        repositories:
+          - name: tk-ci-tools
+            ref: ${{ parameters.tk_ci_tools_ref }}
+      condition: and(ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'), eq(variables['resourcesExist'], 'true'))
 
     - script: |
         # Set the path to the tk-ci-tools repo, which is either the current directory
