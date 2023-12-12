@@ -14,7 +14,20 @@ jobs:
   displayName: Resources Validation
   pool:
     vmImage: 'ubuntu-latest'
-
+  # Custom condition to check if 'resources' directory exists
+  condition: |
+    and(
+      succeeded(),
+      eq(
+        bash: |
+          if [ -d "$(Build.SourcesDirectory)/resources" ]; then 
+            echo "true"; 
+          else 
+            echo "false"; 
+          fi,
+        'true'
+      )
+    )
   steps:
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
@@ -100,4 +113,3 @@ jobs:
         fi
       displayName: 'Process PNG files using pngcrush'
       workingDirectory: $(Build.SourcesDirectory)/resources
-  condition: ne(variables['SkipJob'], 'true')
