@@ -39,7 +39,6 @@ jobs:
           repositories:
             - name: tk-ci-tools
               ref: ${{ parameters.tk_ci_tools_ref }}
-      condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
         # Set the path to the tk-ci-tools repo, which is either the current directory
