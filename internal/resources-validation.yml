@@ -18,15 +18,13 @@ jobs:
   steps:
     - script: |
         if [ -d "$(Build.SourcesDirectory)/resources" ]; then
+          echo "Resources directory found."
           echo "##vso[task.setvariable variable=resourcesExists;isOutput=true]true"
         else
+          echo "No resources directory found."
           echo "##vso[task.setvariable variable=resourcesExists;isOutput=true]false"
         fi
-      name: checkStep
-    - script: |
-        echo $(resourcesExists)
-      env:
-        resourcesExists: $[ dependencies.CheckResources.outputs['checkStep.resourcesExists'] ]
+      name: setVarStep
 
 # Spin up a Linux VM for validating code.
 - job: png_resources_validation
@@ -34,7 +32,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   dependsOn: CheckResources
-  condition: eq(dependencies.CheckResources.outputs['checkStep.resourcesExists'], 'true')
+  condition: eq(dependencies.CheckResources.outputs['setVarStep.resourcesExists'], 'true')
   steps:
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
