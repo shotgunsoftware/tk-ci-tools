@@ -19,7 +19,7 @@ jobs:
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
           echo "No resources directory found, skipping job steps."
-          echo "##vso[task.setvariable variable=resourcesExist]false"  
+          echo "##vso[task.setvariable variable=resourcesExist]false"
         else
           echo "Resources directory found."
           echo "##vso[task.setvariable variable=resourcesExist]true"
