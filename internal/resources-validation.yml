@@ -10,39 +10,19 @@
 
 
 jobs:
-# First job to check for the 'resources' directory
-- job: CheckResources
-  displayName: Check Resources Directory
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-    - script: |
-        if [ -d "$(Build.SourcesDirectory)/resources" ]; then
-          echo "Resources directory found."
-          echo "##vso[task.setvariable variable=resourcesExists;isoutput=true]true"
-        else
-          echo "No resources directory found."
-          echo "##vso[task.setvariable variable=resourcesExists;isoutput=true]false"
-        fi
-      name: setVarStep
-
 # Spin up a Linux VM for validating code.
 - job: png_resources_validation
   displayName: Resources Validation
   pool:
     vmImage: 'ubuntu-latest'
-  dependsOn: CheckResources
-  variables:
-    hasResources: $[ dependencies.CheckResources.outputs['setVarStep.resourcesExists'] ]
-#  condition: eq(dependencies.CheckResources.outputs['setVarStep.resourcesExists'], 'true')
   steps:
-    - bash: |
-        echo $(hasResources)
     - script: |
         if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
-          echo "No resources directory found, skipping job."
-          echo "##vso[task.setvariable variable=SkipJob]true"  
-          exit 0
+          echo "No resources directory found, skipping job steps."
+          echo "##vso[task.setvariable variable=resourcesExist]false"  
+        else
+          echo "Resources directory found."
+          echo "##vso[task.setvariable variable=resourcesExist]true"
         fi
       displayName: 'Check for resources'
 
@@ -50,14 +30,16 @@ jobs:
         sudo apt update
         sudo apt install -y pngcrush
       displayName: 'Install Dependencies'
+      condition: eq(variables['resourcesExist'], 'true')
 
     # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
-    - ${{ if ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools') }}:
+    - ${{ if and(ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'), eq(variables['resourcesExist'], 'true')) }}:
       - template: clone-repositories.yml
         parameters:
           repositories:
             - name: tk-ci-tools
               ref: ${{ parameters.tk_ci_tools_ref }}
+      condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
         # Set the path to the tk-ci-tools repo, which is either the current directory
@@ -96,6 +78,7 @@ jobs:
         validate_png "$ci_tools_path/tests/test_images/good_profile.png" false
         validate_png "$ci_tools_path/tests/test_images/wrong_profile.png" true
       displayName: 'Validate Test Images'
+      condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
         # Display pngcrush version.
@@ -122,3 +105,4 @@ jobs:
         fi
       displayName: 'Process PNG files using pngcrush'
       workingDirectory: $(Build.SourcesDirectory)/resources
+      condition: eq(variables['resourcesExist'], 'true')
