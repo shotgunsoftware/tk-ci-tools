@@ -75,7 +75,7 @@ parameters:
   # Git ref of tk-ci-tools to use.
   - name: tk_ci_tools_ref
     type: string
-    default: SG-31854_Update_Build_ResourcesSh_Scripts_To_Prevent_Making_Invisible_Changes_To_All_Png_Files
+    default: master
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
