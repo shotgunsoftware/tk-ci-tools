@@ -1,0 +1,105 @@
+# Copyright (c) 2023 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+
+jobs:
+# Spin up a Linux VM for validating code.
+- job: png_resources_validation
+  displayName: Resources Validation
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - script: |
+        if [ ! -d "$(Build.SourcesDirectory)/resources" ]; then
+          echo "No resources directory found, skipping job steps."
+          echo "##vso[task.setvariable variable=resourcesExist]false"
+        else
+          echo "Resources directory found."
+          echo "##vso[task.setvariable variable=resourcesExist]true"
+        fi
+      displayName: 'Check for resources'
+
+    - script: |
+        sudo apt update
+        sudo apt install -y pngcrush
+      displayName: 'Install Dependencies'
+      condition: eq(variables['resourcesExist'], 'true')
+
+    # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
+    - bash: |
+        git clone --depth 1 --branch ${{ parameters.tk_ci_tools_ref }} https://github.com/shotgunsoftware/tk-ci-tools ../tk-ci-tools
+      displayName: 'Clone tk-ci-tools'
+      condition: and(eq(variables['resourcesExist'], 'true'), ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'))
+
+    - script: |
+        # Set the path to the tk-ci-tools repo, which is either the current directory
+        # if the job is running in the ci-tools repository, or the tk-ci-tools directory otherwise
+        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
+        if [ "$repo_name" = 'tk-ci-tools' ]; then
+          ci_tools_path="."
+        else
+          ci_tools_path="../tk-ci-tools"
+        fi
+        echo "ci_tools_path=$ci_tools_path"
+
+        function validate_png {
+          filepath=$1
+          filename=$(basename $filepath)
+          expected_fail=$2
+          output=$(pngcrush -n -q "$filepath" 2>&1)
+          echo "$output"
+          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
+            if $expected_fail; then
+                echo "Success: $filename is invalid as expected"
+            else
+                echo "Error: $filename validation expected to succeed failed, please consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles."
+                exit 1
+            fi
+          else
+            if $expected_fail; then
+                echo "Error: $filename validation expected to fail passed, please check if pngcrush's error output used for profile validation ('pngcrush: iCCP') has changed."
+                exit 1
+            else
+                echo "Success: $filename is valid as expected"
+            fi
+          fi
+        }
+
+        validate_png "$ci_tools_path/tests/test_images/good_profile.png" false
+        validate_png "$ci_tools_path/tests/test_images/wrong_profile.png" true
+      displayName: 'Validate Test Images'
+      condition: eq(variables['resourcesExist'], 'true')
+
+    - script: |
+        # Display pngcrush version.
+        pngcrush -version
+        # Initialize error counter and error messages
+        errors=0
+        error_messages=""
+
+        # Run pngcrush command on PNG files and check for errors
+        for file in $(find . -type f -name "*.png"); do
+          output=$(pngcrush -n -q "$file" 2>&1)
+          echo "$output"
+          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
+              errors=$((errors + 1))
+              error_messages+="$output\n"
+          fi
+        done
+
+        # If there were any errors, print custom message and error messages
+        if [ $errors -gt 0 ]; then
+          echo -e "\nThe following PNG files have profile errors. Consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles:\n"
+          echo -e "$error_messages"
+          exit $(($errors > 254 ? 254 : $errors))
+        fi
+      displayName: 'Process PNG files using pngcrush'
+      workingDirectory: $(Build.SourcesDirectory)/resources
+      condition: eq(variables['resourcesExist'], 'true')
