@@ -72,7 +72,6 @@ jobs:
       - template: run-tests-with.yml
         parameters:
           image_name: 'ubuntu-22.04'
-          qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "Linux"
           # pass through all parameters
@@ -86,7 +85,6 @@ jobs:
       - template: run-tests-with.yml
         parameters:
           image_name: 'macos-12'
-          qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "macOS"
           # pass through all parameters.
@@ -100,7 +98,6 @@ jobs:
       - template: run-tests-with.yml
         parameters:
           image_name: 'windows-2022'
-          qt_wrapper: PySide2==5.14.1
           python_version: 3.7
           job_name: "Windows"
           # pass through all parameters
