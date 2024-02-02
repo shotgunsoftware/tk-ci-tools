@@ -25,13 +25,13 @@ jobs:
   # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.10'
-    displayName: Use Python 3.10
+      versionSpec: '3.11'
+    displayName: Use Python 3.11
 
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - PySide2
+      - PySide6==6.6.1
       - pre-commit
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 

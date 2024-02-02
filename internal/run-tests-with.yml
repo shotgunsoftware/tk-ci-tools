@@ -64,9 +64,6 @@ jobs:
       versionSpec: ${{ parameters.python_version }}
     displayName: Use Python ${{ parameters.python_version }}
 
-  - bash: pip debug --verbose
-    displayName: Debug pip
-  
   - template: pip-install-packages.yml
     parameters:
       packages:

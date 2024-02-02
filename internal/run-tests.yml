@@ -196,6 +196,7 @@ jobs:
         parameters:
           image_name: 'windows-2022'
           python_version: 3.11
+          qt_wrapper: PySide6==6.6.1
           job_name: "Windows"
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -210,6 +211,7 @@ jobs:
         parameters:
           image_name: 'macOS-12'
           python_version: 3.11
+          qt_wrapper: PySide6==6.6.1
           job_name: "macOS"
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -222,6 +224,7 @@ jobs:
       - template: run-tests-with.yml
         parameters:
           image_name: 'ubuntu-22.04'
+          qt_wrapper: PySide6==6.6.1
           python_version: 3.11
           job_name: "Linux"
           # pass through all parameters.
