@@ -69,127 +69,127 @@ parameters:
 
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'ubuntu-22.04'
-      #     python_version: 3.7
-      #     job_name: "Linux"
-      #     # pass through all parameters
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'ubuntu-22.04'
+          python_version: 3.7
+          job_name: "Linux"
+          # pass through all parameters
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'macos-12'
-      #     python_version: 3.7
-      #     job_name: "macOS"
-      #     # pass through all parameters.
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'macos-12'
+          python_version: 3.7
+          job_name: "macOS"
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'windows-2022'
-      #     python_version: 3.7
-      #     job_name: "Windows"
-      #     # pass through all parameters
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
-      #     ui_automation_ref: ${{ parameters.ui_automation_ref }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'windows-2022'
+          python_version: 3.7
+          job_name: "Windows"
+          # pass through all parameters
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
-      # # ------------------------
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'windows-2022'
-      #     python_version: 3.9
-      #     job_name: "Windows"
-      #     # pass through all parameters
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
-      #     ui_automation_ref: ${{ parameters.ui_automation_ref }}
+      # ------------------------
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'windows-2022'
+          python_version: 3.9
+          job_name: "Windows"
+          # pass through all parameters
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'macOS-12'
-      #     python_version: 3.9
-      #     job_name: "macOS"
-      #     # pass through all parameters.
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'macOS-12'
+          python_version: 3.9
+          job_name: "macOS"
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'ubuntu-22.04'
-      #     python_version: 3.9
-      #     job_name: "Linux"
-      #     # pass through all parameters.
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'ubuntu-22.04'
+          python_version: 3.9
+          job_name: "Linux"
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # # -------------------------
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'windows-2022'
-      #     python_version: 3.10
-      #     job_name: "Windows"
-      #     # pass through all parameters
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
-      #     ui_automation_ref: ${{ parameters.ui_automation_ref }}
+      # -------------------------
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'windows-2022'
+          python_version: 3.10
+          job_name: "Windows"
+          # pass through all parameters
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
+          ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'macOS-12'
-      #     python_version: 3.10
-      #     job_name: "macOS"
-      #     # pass through all parameters.
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'macOS-12'
+          python_version: 3.10
+          job_name: "macOS"
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
-      # - template: run-tests-with.yml
-      #   parameters:
-      #     image_name: 'ubuntu-22.04'
-      #     python_version: 3.10
-      #     job_name: "Linux"
-      #     # pass through all parameters.
-      #     extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-      #     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      #     additional_repositories: ${{ parameters.additional_repositories }}
-      #     tk_core_ref: ${{ parameters.tk_core_ref }}
-      #     post_tests_steps: ${{ parameters.post_tests_steps }}
-      #     has_unit_tests: ${{ parameters.has_unit_tests }}
+      - template: run-tests-with.yml
+        parameters:
+          image_name: 'ubuntu-22.04'
+          python_version: 3.10
+          job_name: "Linux"
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
 
       # -------------------------
       - template: run-tests-with.yml
