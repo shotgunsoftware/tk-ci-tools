@@ -98,7 +98,7 @@ jobs:
         echo ">>> Started Xvfb"
       displayName: Start Xvfb
     # Install libegl1 required for PySide6
-    - bash: apt install libegl1
+    - bash: sudo apt install libegl1
       displayName: Install libegl1
 
   # Repositories using our build pipeline outside of the
