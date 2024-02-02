@@ -11,9 +11,9 @@
 import sys
 
 try:
-    import PySide2  # noqa
+    from PySide2 import QtWidgets  # noqa
 except ImportError:
-    import PySide6  # noqa
+    from PySide6 import QtWidgets  # noqa
 
 
 def test_qt():
