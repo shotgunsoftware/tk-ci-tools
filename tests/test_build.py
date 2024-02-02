@@ -10,8 +10,10 @@
 
 import sys
 
-# Qt.py should have been installed by the build pipeline.
-from Qt import QtWidgets
+try:
+    import PySide2  # noqa
+except ImportError:
+    import PySide6  # noqa
 
 
 def test_qt():

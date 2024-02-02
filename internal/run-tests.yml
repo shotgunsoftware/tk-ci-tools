@@ -199,7 +199,7 @@ jobs:
           qt_wrapper: PySide6==6.6.1
           job_name: "Windows"
           # pass through all parameters
-          extra_test_dependencies: PyQt6-Qt6==6.6.1
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
@@ -214,7 +214,7 @@ jobs:
           qt_wrapper: PySide6==6.6.1
           job_name: "macOS"
           # pass through all parameters.
-          extra_test_dependencies: PyQt6-Qt6==6.6.1
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
@@ -228,7 +228,7 @@ jobs:
           python_version: 3.11
           job_name: "Linux"
           # pass through all parameters.
-          extra_test_dependencies: PyQt6-Qt6==6.6.1
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
           tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
           additional_repositories: ${{ parameters.additional_repositories }}
           tk_core_ref: ${{ parameters.tk_core_ref }}
