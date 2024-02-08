@@ -25,13 +25,13 @@ jobs:
   # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.11'
-    displayName: Use Python 3.11
+      versionSpec: '3.10'
+    displayName: Use Python 3.10
 
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - PySide6==6.6.1
+      - PySide2
       - pre-commit
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
 
@@ -44,5 +44,6 @@ jobs:
   - bash: pre-commit run --all
     displayName: Validate code
 
+  # Validate documentation with PySide2 and Python 3.10
   - bash: tk-docs-preview --build-only --verbose
     displayName: Validate documentation
