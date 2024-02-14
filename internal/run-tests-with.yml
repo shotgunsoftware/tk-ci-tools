@@ -70,7 +70,6 @@ jobs:
       - ${{ parameters.qt_wrapper }}
       - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
       - pytest-azurepipelines
-      - git+https://github.com/pytest-dev/pytest-nunit.git@refs/pull/73/merge  # If this PR is released, then we can remove this line. This supresses deprecation warnings
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
