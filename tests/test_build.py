@@ -10,18 +10,15 @@
 
 import sys
 
-try:
-    from PySide2 import QtWidgets  # noqa
-except ImportError:
-    from PySide6 import QtWidgets  # noqa
+from sgtk.platform.qt import QtGui
 
 
 def test_qt():
     """
     Ensure we can show a Qt dialog on Azure-Pipelines and interact with it.
     """
-    app = QtWidgets.QApplication(sys.argv)
-    button = QtWidgets.QPushButton("Hello World")
+    app = QtGui.QApplication(sys.argv)
+    button = QtGui.QPushButton("Hello World")
     button.show()
     app.processEvents()
     button.close()
