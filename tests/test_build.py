@@ -10,8 +10,11 @@
 
 import sys
 
-# Qt.py should have been installed by the build pipeline.
-from Qt import QtWidgets
+# We don't have access to sgtk. Import directly from the environment.
+try:
+    from PySide2 import QtWidgets  # noqa
+except ImportError:
+    from PySide6 import QtWidgets  # noqa
 
 
 def test_qt():

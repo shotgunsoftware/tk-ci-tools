@@ -97,6 +97,9 @@ jobs:
         /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         echo ">>> Started Xvfb"
       displayName: Start Xvfb
+    # Install libegl1 required for PySide6
+    - bash: sudo apt install libegl1
+      displayName: Install libegl1
 
   # Repositories using our build pipeline outside of the
   # shotgunsoftware organization should not be able to run our UI automation
