@@ -40,16 +40,9 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
-  # When set to true, the ui automation tools are cloned on the build agent.
-  # Note that the ui automation tools can only be cloned on repositories that
-  # are in the shotgunsoftware organization due to the need to private
-  # repo access.
-  has_ui_tests: false
   # When set to true, the agents for all platforms are set so tests can be executed
   # on all platforms.
   has_unit_tests: true
-  # MPAS-MA repo ref value to be installed.
-  ui_automation_ref: ""
 
 jobs:
 - job:
@@ -114,22 +107,6 @@ jobs:
   # in theory have a project named Toolkit and run these commands. In practice however,
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
-  - ${{ if and(eq(parameters.has_ui_tests, true), eq( variables['System.TeamProject'], 'Toolkit' )) }}:
-    - template: install-ssh-key.yml
-    - bash: |
-        ssh-keyscan github.com > ~/.ssh/known_hosts
-        git clone --depth 1 --single-branch git@github.com:$UI_AUTOMATION_REPO ../ui_automation
-      displayName: Cloning UI automation tools
-      env:
-        # repo.ui_automation can be found on Azure Pipelines Library
-        UI_AUTOMATION_REPO: $(repo.ui_automation)
-
-    - bash: |
-        git checkout ${{ parameters.ui_automation_ref }}
-        pip install .
-        pip install --force-reinstall comtypes==1.1.14
-      displayName: PIP install UI automation tools and comtypes 1.1.14
-      workingDirectory: ../ui_automation
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.

@@ -31,9 +31,6 @@ variables:
 jobs:
 - template: build-pipeline.yml
   parameters:
-    # This has the side effect that it ensures we can clone the UI automation
-    # repo with the SSH key
-    has_ui_tests: true
     # This will ensure we can clone other repositories on a branch
     # or directly on master.
     additional_repositories:
@@ -43,13 +40,6 @@ jobs:
     # This one shouldn't get cloned.
     - name: tk-ci-tools
     post_tests_steps:
-    # Ensures the automation library get cloned only on Windows.
-    # Our tests are written in a way that they are skipped if the automation
-    # framework is missing, so it's important that has_ui_tests triggers a clone
-    # only for builds we can run automation for.
-    - bash: |
-        python tests/test_ui_automation.py
-      displayName: Testing import of UI automation framework.
     - bash: |
         python tests/test_repo_release_cloning.py
       env:
