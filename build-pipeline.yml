@@ -32,7 +32,7 @@ parameters:
     type: string
     default: master
   # Allows to skip test execution.
-  # This parameter is deprecated. Please use has_unit_tests and has_ui_tests.
+  # This parameter is deprecated. Please use has_unit_tests.
   - name: skip_tests
     type: boolean
     default: false
@@ -40,10 +40,6 @@ parameters:
   - name: has_unit_tests
     type: boolean
     default: true
-  # Tells the build pipeline that there are ui automation tests to execute
-  - name: has_ui_tests
-    type: boolean
-    default: false
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -62,12 +58,6 @@ parameters:
   - name: release_repo_ref
     type: string
     default: master
-  # MPAS-MA repo ref value to be installed.
-  # We're using a github.com private sync with the latest working value in order to
-  # install that MA module version.
-  - name: ui_automation_ref
-    type: string
-    default: d621a86d52eb9d45704393a9d5cc02b30e836a8e
   # Tells the build pipeline that there are resources to validate
   - name: has_ui_resources
     type: boolean
@@ -96,7 +86,7 @@ jobs:
 # Note: once we've removed skip_tests from existing pipelines, we can remove the
 # the first if.
 - ${{ if eq(parameters.skip_tests, false) }}:
-  - ${{ if or(parameters.has_unit_tests, parameters.has_ui_tests) }}:
+  - ${{ if eq(parameters.has_unit_tests, true) }}:
     - template: "internal/run-tests.yml"
       parameters:
         # pass through all parameters
@@ -106,8 +96,6 @@ jobs:
         tk_core_ref: ${{ parameters.tk_core_ref }}
         post_tests_steps: ${{ parameters.post_tests_steps }}
         has_unit_tests: ${{ parameters.has_unit_tests }}
-        has_ui_tests: ${{ parameters.has_ui_tests }}
-        ui_automation_ref: ${{ parameters.ui_automation_ref }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
