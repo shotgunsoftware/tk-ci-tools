@@ -161,6 +161,9 @@ jobs:
           python -m coverage xml -i
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
+          echo
+          file./codecov
+          echo
           ./codecov
         displayName: Upload code coverage
 
