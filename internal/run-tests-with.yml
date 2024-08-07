@@ -162,7 +162,7 @@ jobs:
           curl -Os https://uploader.codecov.io/latest/macos/codecov
           chmod +x codecov
           echo
-          file./codecov
+          file ./codecov
           echo
           ./codecov
         displayName: Upload code coverage
