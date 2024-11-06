@@ -22,7 +22,7 @@ jobs:
 - job: release_toolkit_bundle
   displayName: Release Toolkit bundle
   pool:
-    vmImage: 'macos-12'
+    vmImage: 'macos-14'
   steps:
     - template: install-ssh-key.yml
 

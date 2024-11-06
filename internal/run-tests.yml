@@ -77,7 +77,7 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macos-12'
+          image_name: 'macos-14'
           python_version: 3.7
           job_name: "macOS"
           # pass through all parameters.
@@ -117,7 +117,7 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macOS-12'
+          image_name: 'macOS-14'
           python_version: 3.9
           job_name: "macOS"
           # pass through all parameters.
@@ -157,7 +157,7 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macOS-12'
+          image_name: 'macOS-14'
           python_version: 3.10
           job_name: "macOS"
           # pass through all parameters.
@@ -198,7 +198,7 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          image_name: 'macOS-12'
+          image_name: 'macOS-14'
           python_version: 3.11
           qt_wrapper: PySide6==6.6.1
           job_name: "macOS"
