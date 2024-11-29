@@ -33,7 +33,7 @@ jobs:
       packages:
       - PySide2
       - pre-commit
-      - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
   - template: clone-repositories.yml
     parameters:

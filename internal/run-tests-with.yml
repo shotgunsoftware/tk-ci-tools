@@ -61,7 +61,7 @@ jobs:
     parameters:
       packages:
       - ${{ parameters.qt_wrapper }}
-      - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - pytest-azurepipelines
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
@@ -73,6 +73,11 @@ jobs:
       # - Qt.py
       # - numpy
       - ${{ parameters.extra_test_dependencies }}
+
+  - script: |
+      pip --version
+      pip list
+    displayName: Check installed packages
 
   - template: clone-repositories.yml
     parameters:
