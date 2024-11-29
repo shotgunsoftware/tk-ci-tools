@@ -75,6 +75,7 @@ jobs:
       - ${{ parameters.extra_test_dependencies }}
 
   - script: |
+      pip --version
       pip list
     displayName: Check installed packages
 
