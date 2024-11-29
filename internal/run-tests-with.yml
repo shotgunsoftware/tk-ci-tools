@@ -74,6 +74,10 @@ jobs:
       # - numpy
       - ${{ parameters.extra_test_dependencies }}
 
+  - script: |
+      pip list
+    displayName: Check installed packages
+
   - template: clone-repositories.yml
     parameters:
       repositories:
