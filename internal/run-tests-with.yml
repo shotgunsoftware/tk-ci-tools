@@ -61,7 +61,7 @@ jobs:
     parameters:
       packages:
       - ${{ parameters.qt_wrapper }}
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+      - tk-toolchain @ https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - pytest-azurepipelines
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.

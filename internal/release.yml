@@ -44,7 +44,7 @@ jobs:
     - template: pip-install-packages.yml
       parameters:
         packages:
-        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+        - tk-toolchain @ https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
     # Updates the basic, default2 and flame configs
     - template: "update-configuration.yml"
