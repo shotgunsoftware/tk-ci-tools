@@ -41,6 +41,9 @@ jobs:
       - name: tk-core
         ref: ${{ parameters.tk_core_ref }}
 
+  - displayName: Update pre-commit hook versions
+    bash: pre-commit autoupdate
+
   - bash: pre-commit run --all
     displayName: Validate code
 
