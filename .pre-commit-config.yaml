@@ -1,4 +1,8 @@
 # Styles the code properly
+
+default_language_version:
+    python: python3
+
 # List of super useful formatters.
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -6,7 +10,6 @@ repos:
   hooks:
   # Ensures the code is syntaxically correct
   - id: check-ast
-    language_version: python3
   # Ensures a file name will resolve on all platform
   - id: check-case-conflict
   # Checks files with the execute bit set have shebangs
@@ -26,4 +29,3 @@ repos:
   rev: 23.7.0
   hooks:
   - id: black
-    language_version: python3
