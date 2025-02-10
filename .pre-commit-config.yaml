@@ -6,7 +6,7 @@ default_language_version:
 # List of super useful formatters.
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.2.3
+  rev: v5.0.0
   hooks:
   # Ensures the code is syntaxically correct
   - id: check-ast
@@ -25,7 +25,7 @@ repos:
   # Removes trailing whitespaces.
   - id: trailing-whitespace
 # Leave black at the bottom so all touchups are done before it is run.
-- repo: https://github.com/ambv/black
-  rev: 23.7.0
+- repo: https://github.com/psf/black
+  rev: 25.1.0
   hooks:
   - id: black
