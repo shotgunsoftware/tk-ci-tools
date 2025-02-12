@@ -41,6 +41,9 @@ You save the following as a starting point at the root of your respository in a 
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+default_language_version:
+    python: python3
+
 # Styles the code properly
 # Exclude the UI files, as they are auto-generated.
 exclude: "ui\/.*py$"
@@ -51,7 +54,6 @@ repos:
     hooks:
     # Ensures the code is syntaxically correct
     - id: check-ast
-      language_version: python3
     # Ensures a file name will resolve on all platform
     - id: check-case-conflict
     # Checks files with the execute bit set have shebangs
@@ -65,12 +67,10 @@ repos:
     # Removes trailing whitespaces.
     - id: trailing-whitespace
   # Leave black at the bottom so all touchups are done before it is run.
-  - repo: https://github.com/ambv/black
-    rev: 19.10b0
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
     hooks:
     - id: black
-      language_version: python3
-
 ```
 
 ## Azure Pipeline configuration
