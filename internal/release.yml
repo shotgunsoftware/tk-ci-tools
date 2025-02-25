@@ -29,8 +29,8 @@ jobs:
     # Switch to the right Python Version.
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: 3.7
-      displayName: Use Python 3.7
+        versionSpec: 3.11
+      displayName: Use Python 3.11
 
     # Pushes the bundle to the appstore.
     - template: release-to-appstore.yml
