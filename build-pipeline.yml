@@ -52,7 +52,7 @@ parameters:
   # for internal use by the team for testing and should not be modified otherwise.
   - name: release_repo_ref
     type: string
-    default: master
+    default: ticket/SG-37190_core
   # Tells the build pipeline that there are resources to validate
   - name: has_ui_resources
     type: boolean
