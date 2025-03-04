@@ -14,5 +14,5 @@ parameters:
 
 steps:
 - ${{ each package in parameters.packages }}:
-   - bash: pip install ${{ package }}
+   - bash: pip install --upgrade ${{ package }}
      displayName: Install Python package ${{ package }}
