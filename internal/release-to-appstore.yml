@@ -56,4 +56,5 @@ steps:
     sgtk_app_store_api_key: $(sg.app_store.script.key)
     AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
     AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
+    TOOLKITTY_GH_PAT: $(gh.toolkitty_pat)
   displayName: Deploy Toolkit bundle to AppStore
