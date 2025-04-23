@@ -15,4 +15,4 @@ parameters:
 steps:
 - bash: pip install --upgrade ${{ join(' ', parameters.packages) }}
   displayName: Install Python packages - ${{ join(' ', parameters.packages) }}
-#   condition: parameters.packages
+  condition: ne('${{ length(parameters.packages) }}', '0')
