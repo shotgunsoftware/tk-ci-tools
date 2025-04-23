@@ -13,6 +13,6 @@ parameters:
   packages: []
 
 steps:
-- bash: pip install --upgrade ${{ join(' ', parameters.packages) }}
-  displayName: Install Python packages - ${{ join(' ', parameters.packages) }}
-  condition: ne('${{ length(parameters.packages) }}', '0')
+- ${{ if ne(length(parameters.packages), 0) }}:
+   - bash: pip install --upgrade ${{ join(' ', parameters.packages) }}
+     displayName: Install Python packages - ${{ join(' ', parameters.packages) }}
