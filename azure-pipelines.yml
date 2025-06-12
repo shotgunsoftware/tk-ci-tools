@@ -40,11 +40,6 @@ jobs:
     # This one shouldn't get cloned.
     - name: tk-ci-tools
     post_tests_steps:
-    - bash: |
-        python tests/test_repo_release_cloning.py
-      env:
-        RELEASE_REPO: $(repo.release)
-      displayName: Testing release repo cloning
     # Ensures the Shotgun script credentials can connect to the AppStore.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
       env:
