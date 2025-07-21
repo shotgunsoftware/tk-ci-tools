@@ -128,6 +128,7 @@ jobs:
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
     env:
+      PYTHONWARNINGS: once # Force any warnings to show up
       QT_QPA_PLATFORM: offscreen
       DISPLAY: ':99.0'
       TK_DEBUG: 1
