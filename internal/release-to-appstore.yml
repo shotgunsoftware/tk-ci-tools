@@ -16,10 +16,10 @@ steps:
 # We don't need to call the internal script's prepare_repo.sh since we will be stating with a fresh environment each time
 # which is setup by Azure. So just clone the repo and install the requirements.
 - bash: |
-    ssh-keyscan github.com > ~/.ssh/known_hosts
-    git clone --depth 1 git@github.com:$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
+    git clone --depth 1 https://github.com/$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
     pip install -r ../release_scripts/app_store/requirements.txt
   env:
+    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
     RELEASE_REPO: $(repo.release)
   displayName: Prepare release script
 
@@ -56,5 +56,5 @@ steps:
     sgtk_app_store_api_key: $(sg.app_store.script.key)
     AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
     AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
-    TOOLKITTY_GH_PAT: $(gh.toolkitty_pat)
+    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
   displayName: Deploy Toolkit bundle to AppStore
