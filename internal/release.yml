@@ -18,11 +18,10 @@ parameters:
   release_repo_ref: master
 
 jobs:
-  # Launch a MacOS VM
 - job: release_toolkit_bundle
   displayName: Release Toolkit bundle
   pool:
-    vmImage: 'macos-14'
+    vmImage: ubuntu-latest
   steps:
     - template: install-ssh-key.yml
 
