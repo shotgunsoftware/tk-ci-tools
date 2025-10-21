@@ -37,9 +37,6 @@ jobs:
         release_repo_ref: ${{ parameters.release_repo_ref }}
 
     # We need tk-toolchain to use update-configurations.yml
-    # Note that we have to run this after release-to-appstore. Running that
-    # script forces a downgrade to six 1.10.0, which is older than what tk-toolchain
-    # expects, but most importantly 1.10.0 is missing functionality we need.
     - template: pip-install-packages.yml
       parameters:
         packages:
