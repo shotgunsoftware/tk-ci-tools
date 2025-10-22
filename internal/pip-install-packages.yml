@@ -13,6 +13,6 @@ parameters:
   packages: []
 
 steps:
-- ${{ each package in parameters.packages }}:
-   - bash: pip install ${{ package }}
-     displayName: Install Python package ${{ package }}
+- ${{ if parameters.packages }}:
+   - bash: pip install ${{ join(' ', parameters.packages) }}
+     displayName: Install Python packages - ${{ join(', ', parameters.packages) }}
