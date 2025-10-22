@@ -14,9 +14,11 @@ parameters:
   name: ""
 
 steps:
-# Run the update tool for the given bundle and tag.
-- bash: |
-    git config --global user.name "Toolkitty"
-    git config --global user.email toolkitty@autodesk.com
-    tk-config-update git@github.com:shotgunsoftware/${{ parameters.name }}.git $(Build.DefinitionName) $(Build.SourceBranchName) --push-changes
+- task: Bash@3
   displayName: Updating ${{ parameters.name }}
+  env:
+    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
+  inputs:
+    targetType: inline
+    script: |
+      tk-config-update https://github.com/shotgunsoftware/${{ parameters.name }}.git $(Build.DefinitionName) $(Build.SourceBranchName) --push-changes
