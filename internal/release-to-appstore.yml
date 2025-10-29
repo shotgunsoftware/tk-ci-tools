@@ -12,40 +12,50 @@ parameters:
     release_repo_ref: master
 
 steps:
-# Install the release scripts
-# We don't need to call the internal script's prepare_repo.sh since we will be stating with a fresh environment each time
-# which is setup by Azure. So just clone the repo and install the requirements.
-- bash: |
-    git clone --depth 1 https://github.com/$RELEASE_REPO --branch ${{ parameters.release_repo_ref }}  ../release_scripts
-    pip install -r ../release_scripts/app_store/requirements.txt
+- task: Bash@3
+  displayName: Install the release scripts
   env:
     GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
     RELEASE_REPO: $(repo.release)
+  inputs:
+    targetType: inline
+    script: |
+        git clone --depth 1 "https://github.com/${RELEASE_REPO}" --branch ${{ parameters.release_repo_ref }}  ../release_scripts
+
+- task: Bash@3
   displayName: Prepare release script
+  env:
+  inputs:
+    targetType: inline
+    script: |
+        pip install -r ../release_scripts/app_store/requirements.txt
+    # We don't need to call the internal script's prepare_repo.sh since we will be stating with a fresh environment each time
+    # which is setup by Azure. So just clone the repo and install the requirements.
 
-# Deploy the bundle to the Toolkit AppStore. The script expects
-# the bundle type as a parameter, so attempt to guess it.
-- bash: |
-    export BUNDLE_TYPE=`python -c '
-    import os
-    # Detects the bundle type by looking at the python file at the root of the repo.
-    repo = os.path.basename(os.getcwd())
-    if os.path.exists("app.py"):
-        print("app")
-    elif os.path.exists("framework.py"):
-        print("framework")
-    elif os.path.exists("engine.py"):
-        print("engine")
-    else:
-        print("config")
-    '`
-    if [ $(Build.DefinitionName) = tk-core ]
-    then
-        python ../release_scripts/app_store/core_to_app_store.py --tag $(Build.SourceBranchName)
-    else
-        python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type $BUNDLE_TYPE --tag $(Build.SourceBranchName)
-    fi
+- task: PythonScript@0
+  displayName: Detect bundle type
+  # By looking at the python file at the root of the repo
+  inputs:
+    scriptSource: inline
+    script: |
+        import os
+        if os.path.exists("app.py"):
+            bundle_type = "app"
+        elif os.path.exists("framework.py"):
+            bundle_type = "framework"
+        elif os.path.exists("engine.py"):
+            bundle_type = "engine"
+        else:
+            bundle_type = "config"
 
+        # Expose the variable to the Azure Pipeline environment
+        print(f"##vso[task.setvariable variable=BUNDLE_TYPE]{bundle_type}")
+
+
+- task: Bash@3
+  displayName: Deploy Toolkit bundle to AppStore
+  # Deploy the bundle to the Toolkit AppStore. The script expects
+  # the bundle type as a parameter, so attempt to guess it.
   env:
     # Just like the DownloadSecureFile, the environment variables here can only
     # be used from builds on shotgunsoftware, not from forks, so we do not have
@@ -56,5 +66,12 @@ steps:
     sgtk_app_store_api_key: $(sg.app_store.script.key)
     AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
     AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
-    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
-  displayName: Deploy Toolkit bundle to AppStore
+    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN) ## Won't work. This kind of token does not seems to have permission to the rest api
+  inputs:
+    targetType: inline
+    script: |
+        if [ $(Build.DefinitionName) = tk-core ]; then
+            python ../release_scripts/app_store/core_to_app_store.py --tag $(Build.SourceBranchName)
+        else
+            python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type "${BUNDLE_TYPE}" --tag $(Build.SourceBranchName)
+        fi
