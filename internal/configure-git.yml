@@ -19,7 +19,6 @@ steps:
   displayName: Generate GitHub App Token
   env:
     GH_APP_ID: $(gh.app.toolitty.app.id)
-    GH_APP_INSTALLATION_ID: $(gh.app.toolitty.app.installation.id)
     GH_APP_PRIVATE_KEY: $(gh.app.toolitty.app.private.key)
   inputs:
     scriptSource: inline
