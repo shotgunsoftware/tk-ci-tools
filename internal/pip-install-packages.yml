@@ -14,5 +14,5 @@ parameters:
 
 steps:
 - ${{ if parameters.packages }}:
-   - bash: pip install ${{ join(' ', parameters.packages) }}
+   - bash: pip install --upgrade ${{ join(' ', parameters.packages) }}
      displayName: Install Python packages - ${{ join(', ', parameters.packages) }}
