@@ -52,7 +52,7 @@ parameters:
 
 jobs:
 - job:
-  displayName: ${{ parameters.job_name }} Python ${{ parameters.python_version }}
+  displayName: ${{ parameters.job_name }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
