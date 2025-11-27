@@ -191,7 +191,8 @@ jobs:
         parameters:
           job_name: CY2023 - Linux
           image_name: ubuntu-22.04
-          qt_wrapper: PySide6~=6.5.8
+          qt_wrapper: PySide6~=6.8
+          # let's try 6.8 on CI...
           python_version: 3.11
 
           # pass through all parameters.
