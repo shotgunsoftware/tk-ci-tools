@@ -70,7 +70,7 @@ jobs:
           job_name: CY2022 - Windows
           image_name: windows-2022
           python_version: 3.9
-          qt_wrapper: PySide2==5.15.2.1
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -85,7 +85,7 @@ jobs:
           job_name: CY2022 - macOS
           image_name: macOS-14
           python_version: 3.9
-          qt_wrapper: PySide2==5.15.2.1
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -100,7 +100,7 @@ jobs:
           job_name: CY2022 - Linux
           image_name: ubuntu-22.04
           python_version: 3.9
-          qt_wrapper: PySide2==5.15.2.1
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -116,7 +116,7 @@ jobs:
           job_name: CY2023 - Windows
           image_name: windows-2022
           python_version: 3.10
-          qt_wrapper: PySide2==5.15.16
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -131,7 +131,7 @@ jobs:
           job_name: CY2023 - macOS
           image_name: macOS-14
           python_version: 3.10
-          qt_wrapper: PySide2==5.15.16
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -146,7 +146,7 @@ jobs:
           job_name: CY2023 - Linux
           image_name: ubuntu-22.04
           python_version: 3.10
-          qt_wrapper: PySide2==5.15.16
+          qt_wrapper: PySide2~=5.15
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -159,10 +159,10 @@ jobs:
       # -------------------------
       - template: run-tests-with.yml
         parameters:
-          job_name: CY2023 - Windows
+          job_name: CY2024 - Windows
           image_name: windows-2022
           python_version: 3.11
-          qt_wrapper: PySide6~=6.5.8
+          qt_wrapper: PySide6~=6.5
 
           # pass through all parameters
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -174,10 +174,10 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          job_name: CY2023 - macOS
+          job_name: CY2024 - macOS
           image_name: macOS-14
           python_version: 3.11
-          qt_wrapper: PySide6~=6.5.8
+          qt_wrapper: PySide6~=6.5
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
@@ -189,11 +189,27 @@ jobs:
 
       - template: run-tests-with.yml
         parameters:
-          job_name: CY2023 - Linux
+          job_name: CY2024 - Linux
           image_name: ubuntu-22.04
           qt_wrapper: PySide6~=6.8
           # let's try 6.8 on CI...
           python_version: 3.11
+
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
+
+
+      - template: run-tests-with.yml
+        parameters:
+          job_name: CY2026 - Linux
+          image_name: ubuntu-22.04
+          python_version: 3.13
+          qt_wrapper: PySide6~=6.8
 
           # pass through all parameters.
           extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
