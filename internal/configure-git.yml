@@ -74,10 +74,9 @@ steps:
     script: |
       git config --global user.name "${GH_APP_NAME}"
       git config --global user.email "${GH_APP_UID}+${GH_APP_SLUG}[bot]@users.noreply.github.com"
-
       git config --global credential.https://github.com/shotgunsoftware/.helper '!f() {
-        if [ "$1" = "get" ]; then
-            echo "username=x-access-token";
-            echo "password=${GH_ACCESS_TOKEN}";
-        fi;
+        [ "$1" = "get" ] || exit
+        [ -n "${GH_ACCESS_TOKEN}" ] || exit
+        echo "username=x-access-token"
+        echo "password=${GH_ACCESS_TOKEN}"
       }; f'
