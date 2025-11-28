@@ -66,6 +66,25 @@ parameters:
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
 
+
+      ##########################################################################
+      # VFX CY2022, Python 3.9, PySide2=~5.15
+
+      - template: run-tests-with.yml
+        parameters:
+          job_name: CY2021 - Linux
+          image_name: ubuntu-22.04
+          python_version: 3.7
+          qt_wrapper: PySide2~=5.15
+
+          # pass through all parameters.
+          extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+          tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+          additional_repositories: ${{ parameters.additional_repositories }}
+          tk_core_ref: ${{ parameters.tk_core_ref }}
+          post_tests_steps: ${{ parameters.post_tests_steps }}
+          has_unit_tests: ${{ parameters.has_unit_tests }}
+
       ##########################################################################
       # VFX CY2022, Python 3.9, PySide2=~5.15
 
