@@ -66,7 +66,7 @@ steps:
     sgtk_app_store_api_key: $(sg.app_store.script.key)
     AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
     AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
-    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN) ## Won't work. This kind of token does not seems to have permission to the rest api
+    TOOLKITTY_GH_PAT: $(GITHUB_ACCESS_TOKEN)
   inputs:
     targetType: inline
     script: |
