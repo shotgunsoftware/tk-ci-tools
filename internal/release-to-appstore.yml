@@ -24,7 +24,6 @@ steps:
 
 - task: Bash@3
   displayName: Prepare release script
-  env:
   inputs:
     targetType: inline
     script: |
