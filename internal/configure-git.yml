@@ -1,0 +1,82 @@
+# Copyright (c) 2025 Autodesk.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+steps:
+- task: Bash@3
+  displayName: Install Python dependencies
+  inputs:
+    targetType: inline
+    script: pip install -U cryptography requests PyJWT
+
+- task: PythonScript@0
+  displayName: Generate GitHub App Token
+  env:
+    GH_APP_ID: $(gh.app.toolitty.app.id)
+    GH_APP_PRIVATE_KEY: $(gh.app.toolitty.app.private.key)
+  inputs:
+    scriptSource: inline
+    script: |
+      import jwt
+      import os
+      import requests
+      import time
+
+      assert os.environ["GH_APP_ID"]
+      assert os.environ["GH_APP_PRIVATE_KEY"]
+
+      payload = {
+          "iat": int(time.time()),
+          "exp": int(time.time()) + 600,
+          "iss": os.environ["GH_APP_ID"],
+      }
+
+      jwt_token = jwt.encode(payload, os.environ["GH_APP_PRIVATE_KEY"], algorithm="RS256")
+
+      # Retrieve the App Installation ID for our organization
+      response = requests.get(
+        "https://api.github.com/app/installations",
+        headers={"Authorization": f"Bearer {jwt_token}"},
+      )
+
+      response.raise_for_status()
+      app_installation_id = next(
+          item["id"] for item in response.json()
+          if item["account"]["login"] == "shotgunsoftware"
+      )
+
+      # Get installation token
+      response = requests.post(
+        f"https://api.github.com/app/installations/{app_installation_id}/access_tokens",
+        headers={"Authorization": f"Bearer {jwt_token}"},
+      )
+
+      response.raise_for_status()
+      gh_auth_token = response.json()["token"]
+
+      # Add the secret to Azure Pipeline environment
+      print(f"##vso[task.setvariable variable=GITHUB_ACCESS_TOKEN;issecret=true]{gh_auth_token}")
+
+- task: Bash@3
+  displayName: Configure git local account
+  env:
+    GH_APP_NAME: $(gh.app.toolitty.app.name)
+    GH_APP_SLUG: $(gh.app.toolitty.app.slug)
+    GH_APP_UID: $(gh.app.toolitty.app.uid)
+  inputs:
+    targetType: inline
+    script: |
+      git config --global user.name "${GH_APP_NAME}"
+      git config --global user.email "${GH_APP_UID}+${GH_APP_SLUG}[bot]@users.noreply.github.com"
+      git config --global credential.https://github.com/shotgunsoftware/.helper '!f() {
+        [ "$1" = "get" ] || exit
+        [ -n "${GH_ACCESS_TOKEN}" ] || exit
+        echo "username=x-access-token"
+        echo "password=${GH_ACCESS_TOKEN}"
+      }; f'
