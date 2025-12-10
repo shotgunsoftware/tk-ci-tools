@@ -49,29 +49,3 @@ steps:
 
         # Expose the variable to the Azure Pipeline environment
         print(f"##vso[task.setvariable variable=BUNDLE_TYPE]{bundle_type}")
-
-
-- task: Bash@3
-  displayName: Deploy Toolkit bundle to AppStore
-  # Deploy the bundle to the Toolkit AppStore. The script expects
-  # the bundle type as a parameter, so attempt to guess it.
-  env:
-    # Just like the DownloadSecureFile, the environment variables here can only
-    # be used from builds on shotgunsoftware, not from forks, so we do not have
-    # to worry about our credentials leaking to clients, nor do we have to
-    # worry about clients pushing code to our appstore from their pull requests.
-    sgtk_app_store_api_server: $(sg.app_store.host)
-    sgtk_app_store_api_user: $(sg.app_store.script.name)
-    sgtk_app_store_api_key: $(sg.app_store.script.key)
-    AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
-    AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
-    GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
-    TOOLKITTY_GH_PAT: $(GITHUB_ACCESS_TOKEN)
-  inputs:
-    targetType: inline
-    script: |
-        if [ $(Build.DefinitionName) = tk-core ]; then
-            python ../release_scripts/app_store/core_to_app_store.py --tag $(Build.SourceBranchName)
-        else
-            python ../release_scripts/app_store/bundle_to_app_store.py --repository $(Build.DefinitionName) --bundle-type "${BUNDLE_TYPE}" --tag $(Build.SourceBranchName)
-        fi

@@ -35,15 +35,3 @@ jobs:
     - template: release-to-appstore.yml
       parameters:
         release_repo_ref: ${{ parameters.release_repo_ref }}
-
-    # We need tk-toolchain to use update-configurations.yml
-    - template: pip-install-packages.yml
-      parameters:
-        packages:
-        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-
-    # Updates the basic, default2 and flame configs
-    - template: "update-configuration.yml"
-      parameters:
-        name: tk-config-basic
-
