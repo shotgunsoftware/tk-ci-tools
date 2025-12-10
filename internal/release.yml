@@ -10,7 +10,7 @@
 
 parameters:
   # Version of tk-toolchain to use.
-  tk_toolchain_ref: master
+  tk_toolchain_ref: ticket/SG-40595-test-debugs
   # Version of the release repository to use.
   # This is meant for deployment to the Toolkit AppStore. This repository is private
   # to the Shotgun team and cannot be accessed by external organizations. This is meant
@@ -47,14 +47,3 @@ jobs:
       parameters:
         name: tk-config-basic
 
-    - template: "update-configuration.yml"
-      parameters:
-        name: tk-config-default2
-
-    - template: "update-configuration.yml"
-      parameters:
-        name: tk-config-flameplugin
-
-    - template: "update-configuration.yml"
-      parameters:
-        name: tk-config-rv
