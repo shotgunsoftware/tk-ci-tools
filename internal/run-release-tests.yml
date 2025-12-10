@@ -1,0 +1,54 @@
+# Copyright 2025 Autodesk, Inc.  All rights reserved.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+parameters:
+  release_repo_ref: "master"
+
+jobs:
+- job: run_release_tests
+  displayName: Run Release tests
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+    # Switch to the right Python Version.
+    - task: UsePythonVersion@0
+      displayName: Use Python 3.10
+      inputs:
+        versionSpec: 3.10
+
+    - template: configure-git.yml
+
+    - task: Bash@3
+      displayName: Install the release scripts
+      env:
+        GH_ACCESS_TOKEN: $(GITHUB_ACCESS_TOKEN)
+        RELEASE_REPO: $(repo.release)
+      inputs:
+        targetType: inline
+        script: |
+            git clone --depth 1 "https://github.com/${RELEASE_REPO}" --branch ${{ parameters.release_repo_ref }}  ../release_scripts
+
+    - task: Bash@3
+      displayName: Prepare release script
+      inputs:
+        targetType: inline
+        script: |
+            pip install -U -r ../release_scripts/app_store/requirements.txt -r ../release_scripts/app_store/tests/requirements.txt
+
+    - task: Bash@3
+      displayName: Run the tests
+      env:
+        AWS_ACCESS_KEY_ID: $(aws.toolkit.access.id)
+        AWS_SECRET_ACCESS_KEY: $(aws.toolkit.access.key)
+      inputs:
+        targetType: inline
+        workingDirectory: ../release_scripts/app_store
+        script: |
+            python -m pytest -v -s tests/test_s3_access.py
