@@ -10,7 +10,7 @@
 
 parameters:
   # Version of tk-toolchain to use.
-  tk_toolchain_ref: ticket/SG-40595-test-debugs
+  tk_toolchain_ref: master
   # Version of the release repository to use.
   # This is meant for deployment to the Toolkit AppStore. This repository is private
   # to the Shotgun team and cannot be accessed by external organizations. This is meant
