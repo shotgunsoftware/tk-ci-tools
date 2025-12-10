@@ -51,4 +51,4 @@ jobs:
         targetType: inline
         workingDirectory: ../release_scripts/app_store
         script: |
-            python -m pytest -v -s tests/test_s3_access.py
+            python -m pytest -v tests/test_s3_access.py
