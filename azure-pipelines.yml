@@ -61,3 +61,5 @@ jobs:
         TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
         TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       displayName: Testing CI human user credentials
+
+- template: internal/run-release-tests.yml
