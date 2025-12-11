@@ -29,13 +29,18 @@ jobs:
       script: |
         if [ -d "$(Build.SourcesDirectory)/resources" ]; then
           has_docs="true"
-          echo "Documentation folder found -> building documentation"
         else
           has_docs="false"
-          echo "Documentation folder not found -> skipping documentation build"
         fi
 
         echo "##vso[task.setvariable variable=has_docs]${has_docs}"
+
+  - task: Bash@3
+    condition: eq( variables['has_docs'], false )
+    displayName: Skip building documentation since does not exists
+    inputs:
+      targetType: inline
+      script: env
 
   - ${{ if eq( variables['has_docs'], true ) }}:
     - task: UsePythonVersion@0
