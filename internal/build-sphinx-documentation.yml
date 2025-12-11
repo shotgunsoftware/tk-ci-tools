@@ -22,27 +22,38 @@ jobs:
     vmImage: ubuntu-latest
 
   steps:
-  - task: UsePythonVersion@0
-    displayName: Use Python 3.10
-    inputs:
-      versionSpec: "3.10"
-
-  - template: pip-install-packages.yml
-    parameters:
-      packages:
-      - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-        - PySide2
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-
-  - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-    - template: clone-repositories.yml
-      parameters:
-        repositories:
-        - name: tk-core
-          ref: ${{ parameters.tk_core_ref }}
-
   - task: Bash@3
-    displayName: Build Shpinx Documentation
+    displayName: Detect if the documentation folder exists
     inputs:
       targetType: inline
-      script: tk-docs-preview --build-only --verbose
+      script: |
+        has_docs="false"
+        [ -d "$(Build.SourcesDirectory)/docs" ] && has_docs="true"
+
+        echo "##vso[task.setvariable variable=has_docs]${has_docs}"
+
+  - ${{ if eq( variables['has_docs'], true ) }}:
+    - task: UsePythonVersion@0
+      displayName: Use Python 3.10
+      inputs:
+        versionSpec: "3.10"
+
+    - template: pip-install-packages.yml
+      parameters:
+        packages:
+        - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+          - PySide2
+        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+
+    - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+      - template: clone-repositories.yml
+        parameters:
+          repositories:
+          - name: tk-core
+            ref: ${{ parameters.tk_core_ref }}
+
+    - task: Bash@3
+      displayName: Build Shpinx Documentation
+      inputs:
+        targetType: inline
+        script: tk-docs-preview --build-only --verbose
