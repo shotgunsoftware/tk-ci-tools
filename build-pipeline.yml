@@ -76,7 +76,7 @@ jobs:
     parameters:
       tk_ci_tools_ref: ${{ parameters.tk_ci_tools_ref }}
 
-- ${{ if startsWith( variables["Build.Repository.Name"], "tk-" ) }}:
+- ${{ if startsWith( variables['Build.Repository.Name'], 'tk-' ) }}:
   - template: "internal/build-sphinx-documentation.yml"
     parameters:
       tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
