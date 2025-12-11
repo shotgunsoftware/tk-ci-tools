@@ -76,12 +76,13 @@ jobs:
     parameters:
       tk_ci_tools_ref: ${{ parameters.tk_ci_tools_ref }}
 
-# - ${{ if startsWith( variables['Build.Repository.Name'], 'tk-' ) }}:
-- template: "internal/build-sphinx-documentation.yml"
-  parameters:
-    tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-    tk_core_ref: ${{ parameters.tk_core_ref }}
-  condition: startsWith( variables['Build.Repository.Name'], 'tk-' )
+- ${{ if exists( 'resources' ) }}:
+  - template: "internal/build-sphinx-documentation.yml"
+    parameters:
+      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+      tk_core_ref: ${{ parameters.tk_core_ref }}
+##  and not - ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
+
 
 - ${{ if eq(parameters.has_unit_tests, true) }}:
   - template: "internal/run-tests.yml"
