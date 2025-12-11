@@ -65,6 +65,23 @@ parameters:
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
 jobs:
+- job:
+  displayName: Detect folders
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - task: Bash@3
+    displayName: Build Shpinx Documentation
+    inputs:
+      targetType: inline
+      script: |
+        has_docs="false"
+        [ -d "$(Build.SourcesDirectory)/docs" ] && has_docs="true"
+
+        echo "##vso[task.setvariable variable=has_docs]${has_docs}"
+
+    ### TODO - we could do the same with tests .... and resources...
+
 - template: "internal/code-style-validation.yml"
   parameters:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
@@ -76,7 +93,7 @@ jobs:
     parameters:
       tk_ci_tools_ref: ${{ parameters.tk_ci_tools_ref }}
 
-- ${{ if not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) }}:
+- ${{ if and(eq(variables.has_docs, true), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) ) }}:
   - template: "internal/build-sphinx-documentation.yml"
     parameters:
       tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
