@@ -10,7 +10,7 @@
 
 parameters:
   # Git ref of tk-toolchain to use.
-  tk_toolchain_ref: master
+  tk_toolchain_ref: ticket/SG-41463
   # Git ref of tk-core to use.
   tk_core_ref: master
 
