@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  release_repo_ref: "ticket/SG-40356-add-s3-access-test"
+  release_repo_ref: "master"
 
 jobs:
 - job: run_release_tests
