@@ -30,11 +30,11 @@ jobs:
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - ${{ if startsWith( variables['Build.SourceBranch'], "tk-" ) }}:
+      - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
         - PySide2
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
-  - ${{ if startsWith( variables['Build.SourceBranch'], "tk-" ) }}: 
+  - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
     - template: clone-repositories.yml
       parameters:
         repositories:
