@@ -42,28 +42,31 @@ jobs:
       targetType: inline
       script: env
 
-  - ${{ if eq( variables['has_docs'], true ) }}:
-    - task: UsePythonVersion@0
-      displayName: Use Python 3.10
-      inputs:
-        versionSpec: "3.10"
+  - task: UsePythonVersion@0
+    condition: eq( variables['has_docs'], true )
+    displayName: Use Python 3.10
+    inputs:
+      versionSpec: "3.10"
 
-    - template: pip-install-packages.yml
+  - template: pip-install-packages.yml
+    condition: eq( variables['has_docs'], true )
+    parameters:
+      packages:
+      - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+        - PySide2
+      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+
+  - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+    - template: clone-repositories.yml
+      condition: eq( variables['has_docs'], true )
       parameters:
-        packages:
-        - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-          - PySide2
-        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+        repositories:
+        - name: tk-core
+          ref: ${{ parameters.tk_core_ref }}
 
-    - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-      - template: clone-repositories.yml
-        parameters:
-          repositories:
-          - name: tk-core
-            ref: ${{ parameters.tk_core_ref }}
-
-    - task: Bash@3
-      displayName: Build Shpinx Documentation
-      inputs:
-        targetType: inline
-        script: tk-docs-preview --build-only --verbose
+  - task: Bash@3
+    condition: eq( variables['has_docs'], true )
+    displayName: Build Shpinx Documentation
+    inputs:
+      targetType: inline
+      script: tk-docs-preview --build-only --verbose
