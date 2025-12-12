@@ -57,7 +57,7 @@ jobs:
   dependsOn: code_style_validation
   variables:
     has_docs: $[ dependencies.code_style_validation.outputs['passOutput.has_docs'] ]
-  condition: and( eq( $[ dependencies.code_style_validation.outputs['passOutput.has_docs'] ], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
+  condition: and( eq( dependencies.code_style_validation.outputs['passOutput.has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
   pool:
     vmImage: ubuntu-latest
 
