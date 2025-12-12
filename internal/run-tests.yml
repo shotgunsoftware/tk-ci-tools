@@ -85,7 +85,7 @@ jobs:
       - ${{ each python_version in parameters.python_versions }}:
         - template: run-tests-with.yml
           parameters:
-            job_name: ${{ parameters.job_name }} Python ${{ parameters.python_version }}
+            job_name: ${{ os_version.name }} Python ${{ python_version }}
             image_name: ${{ os_version.vm_image }}
             python_version: ${{ python_version }}
             # TODO qt_wrapper....
