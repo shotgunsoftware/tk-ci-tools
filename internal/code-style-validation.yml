@@ -15,31 +15,20 @@ parameters:
   tk_core_ref: master
 
 jobs:
-# Spin up a Linux VM for validating code.
 - job: code_style_validation
   displayName: Code Style Validation
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: ubuntu-latest
   steps:
-
-  # Use Python 3 for validating the code.
   - task: UsePythonVersion@0
+    displayName: Use Python 3.11
     inputs:
-      versionSpec: '3.10'
-    displayName: Use Python 3.10
+      versionSpec: "3.11"
 
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - PySide2
       - pre-commit
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-
-  - template: clone-repositories.yml
-    parameters:
-      repositories:
-      - name: tk-core
-        ref: ${{ parameters.tk_core_ref }}
 
   - bash: pre-commit autoupdate
     displayName: Update pre-commit hook versions
@@ -47,6 +36,56 @@ jobs:
   - bash: pre-commit run --all
     displayName: Validate code
 
-  # Validate documentation with PySide2 and Python 3.10
-  - bash: tk-docs-preview --build-only --verbose
-    displayName: Validate documentation
+  - script: |
+      build_sphinx_docs="true"
+      [ -d "$(Build.SourcesDirectory)/docs" ] || build_sphinx_docs="false"
+
+      echo "##vso[task.setvariable variable=build_sphinx_docs;isOutput=true]${build_sphinx_docs}"
+      echo "Will build the Sphinx documentation? ${build_sphinx_docs}"
+    name: detect_docs
+    displayName: Detect if the documentation folder exists
+
+- job: build_documentation
+  displayName: Build Sphinx Documentation
+  dependsOn: code_style_validation
+  variables:
+    build_sphinx_docs: $[ dependencies.code_style_validation.outputs['detect_docs.build_sphinx_docs'] ]
+
+  condition: |
+    and(
+      ne(variables['build_sphinx_docs'], false),
+      not(
+        startsWith( variables['Build.SourceBranch'], 'refs/tags')
+      )
+    )
+
+  pool:
+    vmImage: ubuntu-latest
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.10
+    inputs:
+      versionSpec: "3.10"
+
+  - template: pip-install-packages.yml
+    parameters:
+      packages:
+      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+      - ${{ if eq( variables['Build.DefinitionName'], 'sg-jira-bridge' ) }}:
+        - --requirement requirements.txt
+      - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
+        - PySide2
+
+  - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
+    - template: clone-repositories.yml
+      parameters:
+        repositories:
+        - name: tk-core
+          ref: ${{ parameters.tk_core_ref }}
+
+  - task: Bash@3
+    displayName: Build Sphinx Documentation
+    inputs:
+      targetType: inline
+      script: tk-docs-preview --build-only --verbose

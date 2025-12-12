@@ -14,5 +14,11 @@ parameters:
 
 steps:
 - ${{ if parameters.packages }}:
-   - bash: pip install ${{ join(' ', parameters.packages) }}
-     displayName: Install Python packages - ${{ join(', ', parameters.packages) }}
+  - task: Bash@3
+    displayName: Install Python packages - ${{ join(', ', parameters.packages) }}
+    inputs:
+      targetType: inline
+      script: |
+        pip install --upgrade pip
+        pip install --upgrade setuptools wheel
+        pip install --upgrade ${{ join(' ', parameters.packages) }}
