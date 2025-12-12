@@ -66,7 +66,8 @@ jobs:
     vmImage: ubuntu-latest
 
   steps:
-  - script: echo "My var: $(has_docs)"
+  - script: env | sort
+    displayName: Environment variables
   # - task: UsePythonVersion@0
   #   displayName: Use Python 3.10
   #   inputs:
