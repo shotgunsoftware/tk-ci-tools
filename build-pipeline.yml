@@ -76,14 +76,6 @@ jobs:
     parameters:
       tk_ci_tools_ref: ${{ parameters.tk_ci_tools_ref }}
 
-- ${{ if not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) }}:
-  # Build Sphinx Documentation only if we are not building a tag.
-  # For tags, docs will be built by the release pipeline.
-  - template: "internal/build-sphinx-documentation.yml"
-    parameters:
-      tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-      tk_core_ref: ${{ parameters.tk_core_ref }}
-
 - ${{ if eq(parameters.has_unit_tests, true) }}:
   - template: "internal/run-tests.yml"
     parameters:
