@@ -74,7 +74,7 @@ jobs:
     env:
       HAS_DOCS: $(has_docs)
       HAS_DOCS2: dependencies.code_style_validation.outputs['detect_docs.has_docs']
- 
+
   # - task: UsePythonVersion@0
   #   displayName: Use Python 3.10
   #   inputs:
