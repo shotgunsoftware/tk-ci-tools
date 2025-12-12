@@ -50,13 +50,14 @@ jobs:
         fi
 
         echo "##vso[task.setvariable variable=has_docs;isOutput=true]${has_docs}"
+        echo "Returning has_docs: ${has_docs}"
 
 - job: build_documentation
   displayName: Build Sphinx Documentation
   dependsOn: code_style_validation
   variables:
     has_docs: $[ dependencies.code_style_validation.outputs['passOutput.has_docs'] ]
-  condition: and( succeeded(), eq( variables['has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
+  condition: and( eq( $[ dependencies.code_style_validation.outputs['passOutput.has_docs'] ], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
   pool:
     vmImage: ubuntu-latest
 
