@@ -12,9 +12,9 @@ parameters:
   # Name of the virtual machine image to load.
   image_name: ""
   # Name of the Qt wrapper to pip install. Should be PySide or PySide2
-  qt_wrapper: PySide2==5.15.2.1
+  qt_wrapper: ''
   # Python version to use.
-  python_version: 3.7
+  python_version: ''
   # List of Python packages that need to be pip installed for testing.
   extra_test_dependencies: []
   # Pretty name for the job.
@@ -40,13 +40,10 @@ parameters:
   # - bash: do_something
   # - bash: do_something_else
   post_tests_steps: []
-  # When set to true, the agents for all platforms are set so tests can be executed
-  # on all platforms.
-  has_unit_tests: true
 
 jobs:
 - job:
-  displayName: ${{ parameters.job_name }} Python ${{ parameters.python_version }}
+  displayName: ${{ parameters.job_name }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
@@ -57,132 +54,132 @@ jobs:
       versionSpec: ${{ parameters.python_version }}
     displayName: Use Python ${{ parameters.python_version }}
 
-  - template: pip-install-packages.yml
-    parameters:
-      packages:
-      - ${{ parameters.qt_wrapper }}
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-      - pytest-azurepipelines
-      # Inserting a parameter that is a list into another list flattens
-      # the result instead of nesting it.
-      # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
-      # parameter will end up as
-      # - PySide2
-      # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
-      # - pytest-azurepipelines
-      # - Qt.py
-      # - numpy
-      - ${{ parameters.extra_test_dependencies }}
+  # - template: pip-install-packages.yml
+  #   parameters:
+  #     packages:
+  #     - ${{ parameters.qt_wrapper }}
+  #     - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+  #     - pytest-azurepipelines
+  #     # Inserting a parameter that is a list into another list flattens
+  #     # the result instead of nesting it.
+  #     # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
+  #     # parameter will end up as
+  #     # - PySide2
+  #     # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
+  #     # - pytest-azurepipelines
+  #     # - Qt.py
+  #     # - numpy
+  #     - ${{ parameters.extra_test_dependencies }}
 
-  - script: |
-      pip --version
-      pip list
-    displayName: Check installed packages
+  # - script: |
+  #     pip --version
+  #     pip list
+  #   displayName: Check installed packages
 
-  - template: clone-repositories.yml
-    parameters:
-      repositories:
-      - name: tk-core
-        ref: ${{ parameters.tk_core_ref }}
-      # Nested lists are flattened, as explained above in pip-install-packages.yml.
-      - ${{ parameters.additional_repositories }}
+  # - template: clone-repositories.yml
+  #   parameters:
+  #     repositories:
+  #     - name: tk-core
+  #       ref: ${{ parameters.tk_core_ref }}
+  #     # Nested lists are flattened, as explained above in pip-install-packages.yml.
+  #     - ${{ parameters.additional_repositories }}
 
-  # We can't use eq(Agent.OS, 'linux') here because template expansion is done
-  # before the job is assigned to an agent.
-  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
-    # Start xvfb on Linux so we can test with a GUI.
-    - bash: |
-        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        echo ">>> Started Xvfb"
-      displayName: Start Xvfb
+  # # We can't use eq(Agent.OS, 'linux') here because template expansion is done
+  # # before the job is assigned to an agent.
+  # - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+  #   # Start xvfb on Linux so we can test with a GUI.
+  #   - bash: |
+  #       /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  #       echo ">>> Started Xvfb"
+  #     displayName: Start Xvfb
 
-    - bash: sudo apt update
-      displayName: APT Update
+  #   - bash: sudo apt update
+  #     displayName: APT Update
 
-    # Install libegl1 required for PySide6
-    - bash: sudo apt install libegl1
-      displayName: Install libegl1
+  #   # Install libegl1 required for PySide6
+  #   - bash: sudo apt install libegl1
+  #     displayName: Install libegl1
 
-  # Repositories using our build pipeline outside of the
-  # shotgunsoftware organization should not be able to run our UI automation
-  # so do not clone the ui automation in that case.
-  #
-  # Therefore, we need to avoid including this template for repos that are
-  # not under the shotgunsoftware organization.
-  #
-  # FIXME: There is no way to tell if an Azure build is running under
-  # our organization or not. What we can do however is check the name
-  # of the Azure project from which this build is launched. This means a client could
-  # in theory have a project named Toolkit and run these commands. In practice however,
-  # all tests tasks require access to our secrets so they can't be used and the build will
-  # fail.
+  # # Repositories using our build pipeline outside of the
+  # # shotgunsoftware organization should not be able to run our UI automation
+  # # so do not clone the ui automation in that case.
+  # #
+  # # Therefore, we need to avoid including this template for repos that are
+  # # not under the shotgunsoftware organization.
+  # #
+  # # FIXME: There is no way to tell if an Azure build is running under
+  # # our organization or not. What we can do however is check the name
+  # # of the Azure project from which this build is launched. This means a client could
+  # # in theory have a project named Toolkit and run these commands. In practice however,
+  # # all tests tasks require access to our secrets so they can't be used and the build will
+  # # fail.
 
-  # Run the tests. The task will create a simple coverage file if one is missing.
-  # It will include all code except for the "tests" folder.
-  # Note that we're hardcoding the name of the coverage file. This is important
-  # as "coverage combine" will combine all coverage files that match .coverage.*.
-  - bash: |
-      (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv
-    # These environment variables need to be set so Linux runs can connect
-    # to xvfb and to have complete logging. Each test logging output will
-    # be captured by pytest and displayed on failure.
-    env:
-      QT_QPA_PLATFORM: offscreen
-      DISPLAY: ':99.0'
-      TK_DEBUG: 1
-      CI: 1
-      # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
-      # slowing down automation. Using Mockgun is still the best way to have speedy tests.
-      TK_TOOLCHAIN_HOST: $(sg.ci.host)
-      TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
-      TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
-      SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
-    displayName: Run tests
+  # # Run the tests. The task will create a simple coverage file if one is missing.
+  # # It will include all code except for the "tests" folder.
+  # # Note that we're hardcoding the name of the coverage file. This is important
+  # # as "coverage combine" will combine all coverage files that match .coverage.*.
+  # - bash: |
+  #     (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
+  #     COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv
+  #   # These environment variables need to be set so Linux runs can connect
+  #   # to xvfb and to have complete logging. Each test logging output will
+  #   # be captured by pytest and displayed on failure.
+  #   env:
+  #     QT_QPA_PLATFORM: offscreen
+  #     DISPLAY: ':99.0'
+  #     TK_DEBUG: 1
+  #     CI: 1
+  #     # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
+  #     # slowing down automation. Using Mockgun is still the best way to have speedy tests.
+  #     TK_TOOLCHAIN_HOST: $(sg.ci.host)
+  #     TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
+  #     TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
+  #     SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
+  #   displayName: Run tests
 
-  # The post_test_steps list will be flattened into this list of steps.
-  - ${{ parameters.post_tests_steps }}
+  # # The post_test_steps list will be flattened into this list of steps.
+  # - ${{ parameters.post_tests_steps }}
 
-  # We're done, we can now upload code coverage, but first, we'll have to
-  # combine the results.
+  # # We're done, we can now upload code coverage, but first, we'll have to
+  # # combine the results.
 
-  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+  # - ${{ if contains(parameters.image_name, 'ubuntu') }}:
 
-      - bash: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov
-        displayName: Upload code coverage
-
-
-  - ${{ if contains(parameters.image_name, 'macos') }}:
-
-      - bash: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          curl -Os https://uploader.codecov.io/v0.7.3/macos/codecov
-          chmod +x codecov
-          ./codecov
-        displayName: Upload code coverage
+  #     - bash: |
+  #         python -m coverage combine
+  #         # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+  #         # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+  #         # genearte would generate errors otherwise since these are not actual source files
+  #         python -m coverage xml -i
+  #         curl -Os https://uploader.codecov.io/latest/linux/codecov
+  #         chmod +x codecov
+  #         ./codecov
+  #       displayName: Upload code coverage
 
 
-  - ${{ if contains(parameters.image_name, 'windows') }}:
+  # - ${{ if contains(parameters.image_name, 'macos') }}:
 
-      - powershell: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
-          .\codecov.exe
-        displayName: Upload code coverage
+  #     - bash: |
+  #         python -m coverage combine
+  #         # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+  #         # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+  #         # genearte would generate errors otherwise since these are not actual source files
+  #         python -m coverage xml -i
+  #         curl -Os https://uploader.codecov.io/v0.7.3/macos/codecov
+  #         chmod +x codecov
+  #         ./codecov
+  #       displayName: Upload code coverage
+
+
+  # - ${{ if contains(parameters.image_name, 'windows') }}:
+
+  #     - powershell: |
+  #         python -m coverage combine
+  #         # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+  #         # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+  #         # genearte would generate errors otherwise since these are not actual source files
+  #         python -m coverage xml -i
+  #         $ProgressPreference = 'SilentlyContinue'
+  #         Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
+  #         .\codecov.exe
+  #       displayName: Upload code coverage
