@@ -67,7 +67,7 @@ jobs:
           parameters:
             job_name: ${{ os_version.name }} Python ${{ platform.python_version }}
             image_name: ${{ os_version.vm_image }}
-            python_version: ${{ python_version }}
+            python_version: ${{ platform.python_version }}
             qt_wrapper: ${{ platform.qt_wrapper }}
 
             # pass through all parameters
