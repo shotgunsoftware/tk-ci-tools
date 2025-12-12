@@ -61,32 +61,33 @@ jobs:
   #
   variables:
     has_docs: $[ dependencies.code_style_validation.outputs['detect_docs.has_docs'] ]
-  condition: and( eq( dependencies.code_style_validation.outputs['detect_docs.has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
+  #condition: and( eq( dependencies.code_style_validation.outputs['detect_docs.has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
   pool:
     vmImage: ubuntu-latest
 
   steps:
-  - task: UsePythonVersion@0
-    displayName: Use Python 3.10
-    inputs:
-      versionSpec: "3.10"
+  - script: echo "My var: $(has_docs)"
+  # - task: UsePythonVersion@0
+  #   displayName: Use Python 3.10
+  #   inputs:
+  #     versionSpec: "3.10"
 
-  - template: pip-install-packages.yml
-    parameters:
-      packages:
-      - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-        - PySide2
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+  # - template: pip-install-packages.yml
+  #   parameters:
+  #     packages:
+  #     - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+  #       - PySide2
+  #     - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
-  - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
-    - template: clone-repositories.yml
-      parameters:
-        repositories:
-        - name: tk-core
-          ref: ${{ parameters.tk_core_ref }}
+  # - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+  #   - template: clone-repositories.yml
+  #     parameters:
+  #       repositories:
+  #       - name: tk-core
+  #         ref: ${{ parameters.tk_core_ref }}
 
-  - task: Bash@3
-    displayName: Build Shpinx Documentation
-    inputs:
-      targetType: inline
-      script: tk-docs-preview --build-only --verbose
+  # - task: Bash@3
+  #   displayName: Build Shpinx Documentation
+  #   inputs:
+  #     targetType: inline
+  #     script: tk-docs-preview --build-only --verbose
