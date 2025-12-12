@@ -68,9 +68,11 @@ jobs:
   - template: pip-install-packages.yml
     parameters:
       packages:
+      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
+      - ${{ if eq( variables['Build.SourceBranch'], 'sg-jira-bridge' ) }}:
+        - --requirement requirements.txt
       - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
         - PySide2
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
   - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
     - template: clone-repositories.yml
