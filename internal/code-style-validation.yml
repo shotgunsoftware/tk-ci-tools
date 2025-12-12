@@ -54,7 +54,7 @@ jobs:
 - job: build_documentation
   displayName: Build Sphinx Documentation
   dependsOn: code_style_validation
-  condition: and (succeeded(), eq( variables['has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') )
+  condition: and( succeeded(), eq( variables['has_docs'], true ), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
   pool:
     vmImage: ubuntu-latest
 
