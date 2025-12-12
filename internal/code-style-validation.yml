@@ -46,6 +46,7 @@ jobs:
 
       echo "##vso[task.setvariable variable=has_docs;isOutput=true]${has_docs}"
       echo "Will build the Sphinx documentation? ${has_docs}"
+      env | sort
     name: detect_docs
     displayName: Detect if the documentation folder exists
 
@@ -54,11 +55,15 @@ jobs:
   dependsOn: code_style_validation
   variables:
     has_docs: $[ dependencies.code_style_validation.outputs['detect_docs.has_docs'] ]
+
   condition: |
     and(
       ne(variables['has_docs'], false),
-      not( startsWith( variables['Build.SourceBranch'], 'refs/tags') )
+      not(
+        startsWith( variables['Build.SourceBranch'], 'refs/tags')
+      ),
     )
+
   pool:
     vmImage: ubuntu-latest
 
