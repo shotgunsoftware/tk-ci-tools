@@ -66,8 +66,15 @@ jobs:
     vmImage: ubuntu-latest
 
   steps:
-  - script: env | sort
-    displayName: Environment variables
+  - task: Bash@3
+    displayName: TESTS
+    inputs:
+      targetType: inline
+      script: env | sort
+    env:
+      HAS_DOCS: $(has_docs)
+      HAS_DOCS2: dependencies.code_style_validation.outputs['detect_docs.has_docs']
+ 
   # - task: UsePythonVersion@0
   #   displayName: Use Python 3.10
   #   inputs:
