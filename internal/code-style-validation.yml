@@ -20,7 +20,6 @@ jobs:
   displayName: Code Style Validation
   pool:
     vmImage: ubuntu-latest
-
   steps:
   - task: UsePythonVersion@0
     displayName: Use Python 3.11
@@ -55,7 +54,11 @@ jobs:
   dependsOn: code_style_validation
   variables:
     has_docs: $[ dependencies.code_style_validation.outputs['detect_docs.has_docs'] ]
-  condition: and( eq(variables['has_docs'], true), not( startsWith( variables['Build.SourceBranch'], 'refs/tags') ) )
+  condition: |
+    and(
+      ne(variables['has_docs'], false),
+      not( startsWith( variables['Build.SourceBranch'], 'refs/tags') )
+    )
   pool:
     vmImage: ubuntu-latest
 
@@ -69,12 +72,12 @@ jobs:
     parameters:
       packages:
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-      - ${{ if eq( variables['Build.SourceBranch'], 'sg-jira-bridge' ) }}:
+      - ${{ if eq( variables['Build.Repository.Name'], 'sg-jira-bridge' ) }}:
         - --requirement requirements.txt
-      - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+      - ${{ if startsWith( variables['Build.Repository.Name'], 'tk-' ) }}:
         - PySide2
 
-  - ${{ if startsWith( variables['Build.SourceBranch'], 'tk-' ) }}:
+  - ${{ if startsWith( variables['Build.Repository.Name'], 'tk-' ) }}:
     - template: clone-repositories.yml
       parameters:
         repositories:
