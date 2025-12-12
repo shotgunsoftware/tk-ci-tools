@@ -15,7 +15,6 @@ parameters:
   tk_core_ref: master
 
 jobs:
-# Spin up a Linux VM for validating code.
 - job: code_style_validation
   displayName: Code Style Validation
   pool:
@@ -38,15 +37,11 @@ jobs:
     displayName: Validate code
 
   - script: |
-      if [ -d "$(Build.SourcesDirectory)/docs" ]; then
-        has_docs="true"
-      else
-        has_docs="false"
-      fi
+      build_sphinx_docs="true"
+      [ -d "$(Build.SourcesDirectory)/docs" ] || build_sphinx_docs="false"
 
-      echo "##vso[task.setvariable variable=has_docs;isOutput=true]${has_docs}"
-      echo "Will build the Sphinx documentation? ${has_docs}"
-      env | sort
+      echo "##vso[task.setvariable variable=build_sphinx_docs;isOutput=true]${build_sphinx_docs}"
+      echo "Will build the Sphinx documentation? ${build_sphinx_docs}"
     name: detect_docs
     displayName: Detect if the documentation folder exists
 
@@ -54,11 +49,11 @@ jobs:
   displayName: Build Sphinx Documentation
   dependsOn: code_style_validation
   variables:
-    has_docs: $[ dependencies.code_style_validation.outputs['detect_docs.has_docs'] ]
+    build_sphinx_docs: $[ dependencies.code_style_validation.outputs['detect_docs.build_sphinx_docs'] ]
 
   condition: |
     and(
-      ne(variables['has_docs'], false),
+      ne(variables['build_sphinx_docs'], false),
       not(
         startsWith( variables['Build.SourceBranch'], 'refs/tags')
       )
