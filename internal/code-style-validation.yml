@@ -61,7 +61,7 @@ jobs:
       ne(variables['has_docs'], false),
       not(
         startsWith( variables['Build.SourceBranch'], 'refs/tags')
-      ),
+      )
     )
 
   pool:
