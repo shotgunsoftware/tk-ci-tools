@@ -16,7 +16,7 @@ parameters:
   # Version of tk-toolchain to use.
   - name: tk_toolchain_ref
     type: string
-    default: ticket/SG-41463
+    default: master
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
