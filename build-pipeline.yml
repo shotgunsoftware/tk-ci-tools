@@ -26,7 +26,9 @@ parameters:
   #   ref: <branch-or-tag>
   - name: additional_repositories
     type: object
-    default: []
+    default:
+    - name: tk-shell
+      ref: ticket/SG-39031-outdated-references-pyside-qt4
   # Git ref of tk-core to use.
   - name: tk_core_ref
     type: string
