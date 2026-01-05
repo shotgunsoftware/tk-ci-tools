@@ -57,7 +57,6 @@ parameters:
 
     - name: macOS
       vm_image: macOS-14
-      # TODO: why don't we not use the "-latest" images here like we do everywhere else? (python-api, sg-jira-bridge, ...)
 
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
@@ -65,7 +64,7 @@ jobs:
       - ${{ each platform in parameters.vfx_reference_platform_versions }}:
         - template: run-tests-with.yml
           parameters:
-            job_name: ${{ os_version.name }} Python ${{ platform.python_version }}
+            os_name: ${{ os_version.name }}
             image_name: ${{ os_version.vm_image }}
             python_version: ${{ platform.python_version }}
             qt_wrapper: ${{ platform.qt_wrapper }}

@@ -17,8 +17,8 @@ parameters:
   python_version: ''
   # List of Python packages that need to be pip installed for testing.
   extra_test_dependencies: []
-  # Pretty name for the job.
-  job_name: ""
+  # Pretty name for the OS.
+  os_name: ""
   # Git ref of tk-toolchain to use.
   tk_toolchain_ref: master
   # List of repositories to clone alongside this repository.
@@ -43,7 +43,7 @@ parameters:
 
 jobs:
 - job:
-  displayName: ${{ parameters.job_name }}
+  displayName: ${{ parameters.os_name }} Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
