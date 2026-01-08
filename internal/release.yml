@@ -29,6 +29,11 @@ jobs:
         versionSpec: 3.10
       displayName: Use Python 3.10
 
+    - task: PythonScript@0
+      displayName: Validate Git tag version format
+      inputs:
+        scriptPath: internal/validate_version_format.py
+
     - template: configure-git.yml
 
     # Pushes the bundle to the appstore.
