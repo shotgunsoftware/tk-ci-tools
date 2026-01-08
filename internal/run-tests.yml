@@ -46,8 +46,10 @@ parameters:
 
     - name: VFX CY2024
       python_version: '3.11'
-      ## qt_wrapper: PySide6 # Not using 6.5 (because why??) or even 6.6 (because SG-38086 ???)
-      qt_wrapper: PySide6~=6.5.2
+      qt_wrapper: PySide6~=6.6.3
+      # Not using the real VFX Qt version: 6.5.
+      # Because ~6.5.2 has problem with core ci
+      # Also 6.6.1 has a random bug (SG-38086).
 
     - name: VFX CY2026
       python_version: '3.13'
