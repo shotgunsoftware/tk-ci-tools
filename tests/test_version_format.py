@@ -11,10 +11,13 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "internal",
-))
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        "internal",
+    ),
+)
 
 import validate_version_format
 
@@ -24,6 +27,7 @@ def test_valid():
     assert validate_version_format.validate("v12.34.56")
     assert validate_version_format.validate("v12.34.56-rc1")
     assert validate_version_format.validate("v12.34.56-beta1")
+
 
 def test_invalid():
     assert not validate_version_format.validate("")
