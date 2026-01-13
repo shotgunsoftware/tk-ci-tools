@@ -15,6 +15,7 @@ parameters:
   qt_wrapper: ''
   # Python version to use.
   python_version: ''
+  codecov_download_url: ''
   # List of Python packages that need to be pip installed for testing.
   extra_test_dependencies: []
   # Pretty name for the OS.
@@ -123,12 +124,12 @@ jobs:
         echo ".coveragerc was found."
       else
         cat > .coveragerc <<EOF
-        [run]
-        source=.
-        omit=tests/*
-        [report]
-        exclude_lines = raise NotImplementedError
-        EOF
+      [run]
+      source=.
+      omit=tests/*
+      [report]
+      exclude_lines = raise NotImplementedError
+      EOF
         echo "Generated .coveragerc"
       fi
 
@@ -202,7 +203,7 @@ jobs:
     inputs:
       targetType: inline
       script: |
-        curl -Os "${{ variables.codecov_download_url }}"
+        curl -Os "${{ parameters.codecov_download_url }}"
         chmod +x codecov
         ./codecov  \
           --file coverage.xml \
