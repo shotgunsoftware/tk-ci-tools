@@ -148,7 +148,7 @@ jobs:
       TK_DEBUG: 1
       CI: 1
 
-      COVERAGE_FILE: .coverage.tests
+      COVERAGE_FILE: '.coverage.tests'
       # Note that we're hardcoding the name of the coverage file. This is important
       # as "coverage combine" will combine all coverage files that match .coverage.*.
       # The parameters.post_tests_steps might also produce coeverage files
