@@ -1,5 +1,6 @@
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.10%20%7C%203.9-blue.svg)](https://www.python.org/)
 [![Build Status](https://dev.azure.com/shotgun-ecosystem/Toolkit/_apis/build/status/tk-ci-tools?branchName=master)](https://dev.azure.com/shotgun-ecosystem/Toolkit/_build/latest?definitionId=39&branchName=master)
+[![Coverage Status](https://codecov.io/gh/shotgunsoftware/tk-ci-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/shotgunsoftware/tk-ci-tools)
 
 # tk-ci-tools
 
