@@ -59,7 +59,9 @@ jobs:
       packages:
       - ${{ parameters.qt_wrapper }}
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-      - pytest-azurepipelines
+      - pytest
+      - pytest-cov
+      - pytest-nunit
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
@@ -116,11 +118,27 @@ jobs:
 
   # Run the tests. The task will create a simple coverage file if one is missing.
   # It will include all code except for the "tests" folder.
-  # Note that we're hardcoding the name of the coverage file. This is important
-  # as "coverage combine" will combine all coverage files that match .coverage.*.
   - bash: |
-      (test -e .coveragerc && echo ".coveragerc was found." ) || ((python -c "print('[run]\nsource=.\nomit=\n    tests/*\n[report]\n\nexclude_lines =\n    raise NotImplementedError')" > .coveragerc) && echo "Generated .coveragerc")
-      COVERAGE_FILE=.coverage.tests python -m pytest tests --cov --cov-report xml -vv
+      if [ -e .coveragerc ]; then
+        echo ".coveragerc was found."
+      else
+        cat > .coveragerc <<EOF
+        [run]
+        source=.
+        omit=tests/*
+        [report]
+        exclude_lines = raise NotImplementedError
+        EOF
+        echo "Generated .coveragerc"
+      fi
+
+      python -m pytest \
+        tests \
+        --cov \
+        --cov-report xml \
+        --nunit-xml=test-results.xml \
+        --verbose \
+
     # These environment variables need to be set so Linux runs can connect
     # to xvfb and to have complete logging. Each test logging output will
     # be captured by pytest and displayed on failure.
@@ -129,6 +147,11 @@ jobs:
       DISPLAY: ':99.0'
       TK_DEBUG: 1
       CI: 1
+
+      COVERAGE_FILE=.coverage.tests
+      # Note that we're hardcoding the name of the coverage file. This is important
+      # as "coverage combine" will combine all coverage files that match .coverage.*.
+
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
       TK_TOOLCHAIN_HOST: $(sg.ci.host)
@@ -140,46 +163,47 @@ jobs:
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
 
-  # We're done, we can now upload code coverage, but first, we'll have to
+  # We're done testing.. Before we can upload code coverage, we'll have to
   # combine the results.
+  - task: Bash@3
+    displayName: Combine code coverage results
+    inputs:
+      targetType: inline
+      script: |
+        python -m coverage combine
 
-  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+        python -m coverage xml -i
+      # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
+      # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
+      # genearte would generate errors otherwise since these are not actual source files
 
-      - bash: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov
-        displayName: Upload code coverage
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: test-results.xml
+      testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
+      failTaskOnFailureToPublishResults: true
+      failTaskOnMissingResultsFile: true
+    condition: succeededOrFailed()
 
+  - task: PublishCodeCoverageResults@2
+    displayName: Publish code coverage
+    inputs:
+      summaryFileLocation: coverage.xml
+      failIfCoverageEmpty: true
 
-  - ${{ if contains(parameters.image_name, 'macos') }}:
-
-      - bash: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          curl -Os https://uploader.codecov.io/v0.7.3/macos/codecov
-          chmod +x codecov
-          ./codecov
-        displayName: Upload code coverage
-
-
-  - ${{ if contains(parameters.image_name, 'windows') }}:
-
-      - powershell: |
-          python -m coverage combine
-          # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
-          # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
-          # genearte would generate errors otherwise since these are not actual source files
-          python -m coverage xml -i
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -Outfile codecov.exe
-          .\codecov.exe
-        displayName: Upload code coverage
+  # Upload the code coverage result to codecov.io using the binary uploader.
+  # Use flags to identify coverage from each OS/Python combination for proper merging.
+  #
+  - task: Bash@3
+    displayName: Uploading coverage to Codecov.io
+    inputs:
+      targetType: inline
+      script: |
+        curl -Os "${{ variables.codecov_download_url }}"
+        chmod +x codecov
+        ./codecov  \
+          --file coverage.xml \
+          --flags ${{ parameters.os_name }} \
+          --flags Python-${{ parameters.python_version }} \
