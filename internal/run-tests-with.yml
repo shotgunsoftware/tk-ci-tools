@@ -149,8 +149,6 @@ jobs:
       CI: 1
 
       COVERAGE_FILE=.coverage.tests
-      # Note that we're hardcoding the name of the coverage file. This is important
-      # as "coverage combine" will combine all coverage files that match .coverage.*.
 
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
@@ -159,6 +157,8 @@ jobs:
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
     displayName: Run tests
+    # Note that we're hardcoding the name of the coverage file. This is important
+    # as "coverage combine" will combine all coverage files that match .coverage.*.
 
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
