@@ -185,7 +185,6 @@ jobs:
       script: |
         python -m pytest tests \
           --cov \
-          --cov-report xml:coverage.xml \
           --durations=0 \
           --nunit-xml=test-results.xml \
           --verbose \
@@ -193,7 +192,10 @@ jobs:
       # Tell Pytest that we're running in a CI environment
       CI: 1
 
-      TK_DEBUG: 1
+      COVERAGE_FILE: '.coverage.tests'
+      # Note that we're hardcoding the name of the coverage file. This is important
+      # as "coverage combine" will combine all coverage files that match .coverage.*.
+      # The parameters.post_tests_steps might also produce coeverage files
 
       ${{ if eq(parameters.os_name, 'Linux') }}:
         # These environment variables need to be set so Linux runs can connect
@@ -202,10 +204,7 @@ jobs:
         QT_QPA_PLATFORM: offscreen
         DISPLAY: ':99.0'
 
-      # COVERAGE_FILE: '.coverage.tests' ## TODO!!!!
-      # Note that we're hardcoding the name of the coverage file. This is important
-      # as "coverage combine" will combine all coverage files that match .coverage.*.
-      # The parameters.post_tests_steps might also produce coeverage files
+      TK_DEBUG: 1
 
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
@@ -227,10 +226,16 @@ jobs:
         set -e
         python -m coverage combine
 
-        python -m coverage xml -i
+        python -m coverage xml -i -o coverage.xml
       # We need to pass in -i because we had some weird coverage entries for our frameworks and apps (tk-core is not affected)
       # We have an <path-to-the-repo>/(builtin) and <path-to-the-repo>/pyscript entries in the coverage for which the xml
       # genearte would generate errors otherwise since these are not actual source files
+
+  # Explicit call to PublishTestResults@2 and PublishCodeCoverageResults@2 here
+  # instead of relying on pytest-azurepipelines because pytest-azurepipelines
+  # does not seem to be maintained anymore and is still using earlier versions
+  # of the PublishTestResults and PublishCodeCoverageResults Azure Pipelines
+  # jobs.
 
   - task: PublishTestResults@2
     displayName: Publish test results
