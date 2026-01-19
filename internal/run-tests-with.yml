@@ -9,51 +9,83 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # Name of the virtual machine image to load.
-  image_name: ""
-  # Name of the Qt wrapper to pip install. Should be PySide or PySide2
-  qt_wrapper: ''
-  # Python version to use.
-  python_version: ''
-  codecov_download_url: ''
-  # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
-  # Pretty name for the OS.
-  os_name: ""
-  # Git ref of tk-toolchain to use.
-  tk_toolchain_ref: master
-  # List of repositories to clone alongside this repository.
-  # To clone the tk-framework-shotgunutils's master branch
-  # and a specific tk-framework-qtwidget ref, you would
-  # set this parameter to the following:
-  # - name: tk-framework-shotgunutils
-  # - name: tk-framework-qtwidgets
-  #   ref: <branch-or-tag>
-  additional_repositories: []
-  # Git ref of tk-core to use.
-  tk_core_ref: master
-  # Post test steps
-  # This is a list of Azure Pipeline steps that will be inserted
-  # right after the tests were run.
-  # If you wanted to run a non-standard suite of test as an extra
-  # you would specify post_tests_steps as:
-  # post_tests_steps:
-  # - bash: do_something
-  # - bash: do_something_else
-  post_tests_steps: []
+  # Using the most formal way of defining parameters so we don't define a
+  # default value for mandatory parameters. This way, CI will fail if we forget
+  # to pass it when invoking the template.
+
+  # Mandatory parameters first
+
+  - name: codecov_download_url
+    type: string
+
+  - name: image_name
+    type: string
+    # Name of the virtual machine image to load.
+
+  - name: os_name
+    type: string
+    # Pretty name for the OS.
+
+  - name: python_version
+    type: string
+    # Python version to use.
+
+  - name: qt_wrapper
+    type: string
+    # Name of the Qt wrapper to pip install. Should be PySide or PySide2
+
+  # Then optional parameters
+
+  - name: additional_repositories
+    type: object
+    default: []
+    # List of repositories to clone alongside this repository.
+    # To clone the tk-framework-shotgunutils's master branch
+    # and a specific tk-framework-qtwidget ref, you would
+    # set this parameter to the following:
+    # - name: tk-framework-shotgunutils
+    # - name: tk-framework-qtwidgets
+    #   ref: <branch-or-tag>
+
+  - name: extra_test_dependencies
+    type: object
+    default: []
+    # List of Python packages that need to be pip installed for testing.
+
+  - name: post_tests_steps
+    type: object
+    default: []
+    # Post test steps
+    # This is a list of Azure Pipeline steps that will be inserted
+    # right after the tests were run.
+    # If you wanted to run a non-standard suite of test as an extra
+    # you would specify post_tests_steps as:
+    # post_tests_steps:
+    # - bash: do_something
+    # - bash: do_something_else
+
+  - name: tk_core_ref
+    type: string
+    default: master
+    # Git ref of tk-core to use.
+
+  - name: tk_toolchain_ref
+    type: string
+    default: master
+    # Git ref of tk-toolchain to use.
 
 jobs:
 - job:
-  displayName: ${{ parameters.os_name }} Python ${{ parameters.python_version }}
+  displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.image_name }}
   steps:
 
   # Switch to the right Python Version.
   - task: UsePythonVersion@0
+    displayName: Use Python ${{ parameters.python_version }}
     inputs:
       versionSpec: ${{ parameters.python_version }}
-    displayName: Use Python ${{ parameters.python_version }}
 
   - template: pip-install-packages.yml
     parameters:
@@ -74,10 +106,13 @@ jobs:
       # - numpy
       - ${{ parameters.extra_test_dependencies }}
 
-  - script: |
-      pip --version
-      pip list
+  - task: Bash@3
     displayName: Check installed packages
+    inputs:
+      targetType: inline
+      script: |
+        pip --version
+        pip list
 
   - template: clone-repositories.yml
     parameters:
@@ -89,7 +124,7 @@ jobs:
 
   # We can't use eq(Agent.OS, 'linux') here because template expansion is done
   # before the job is assigned to an agent.
-  - ${{ if contains(parameters.image_name, 'ubuntu') }}:
+  - ${{ if contains(parameters.os_name, 'Linux') }}:
     # Start xvfb on Linux so we can test with a GUI.
     - bash: |
         /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -117,39 +152,57 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
 
-  # Run the tests. The task will create a simple coverage file if one is missing.
-  # It will include all code except for the "tests" folder.
-  - bash: |
-      if [ -e .coveragerc ]; then
-        echo ".coveragerc was found."
-      else
+  - task: Bash@3
+    displayName: Create a simple coverage file if missing
+    # Run the tests. The task will create a simple coverage file if one is missing.
+    # It will include all code except for the "tests" folder.
+    inputs:
+      targetType: inline
+      script: |
+        set -e
+
+        if [ -e .coveragerc ]; then
+          echo ".coveragerc was found."
+          exit 0
+        fi
+
         cat > .coveragerc <<EOF
-      [run]
-      source=.
-      omit=tests/*
-      [report]
-      exclude_lines = raise NotImplementedError
-      EOF
+        [run]
+        source=.
+        omit=tests/*
+        [report]
+        exclude_lines = raise NotImplementedError
+        EOF
+
         echo "Generated .coveragerc"
-      fi
 
-      python -m pytest \
-        tests \
-        --cov \
-        --cov-report xml \
-        --nunit-xml=test-results.xml \
-        --verbose \
-
-    # These environment variables need to be set so Linux runs can connect
-    # to xvfb and to have complete logging. Each test logging output will
-    # be captured by pytest and displayed on failure.
+  - task: Bash@3
+    displayName: Run tests
+    # Run the tests. The task will create a simple coverage file if one is missing.
+    # It will include all code except for the "tests" folder.
+    inputs:
+      targetType: inline
+      script: |
+        python -m pytest tests \
+          --cov \
+          --cov-report xml:coverage.xml \
+          --durations=0 \
+          --nunit-xml=test-results.xml \
+          --verbose \
     env:
-      QT_QPA_PLATFORM: offscreen
-      DISPLAY: ':99.0'
-      TK_DEBUG: 1
+      # Tell Pytest that we're running in a CI environment
       CI: 1
 
-      COVERAGE_FILE: '.coverage.tests'
+      TK_DEBUG: 1
+
+      ${{ if eq(parameters.os_name, 'Linux') }}:
+        # These environment variables need to be set so Linux runs can connect
+        # to xvfb and to have complete logging. Each test logging output will
+        # be captured by pytest and displayed on failure.
+        QT_QPA_PLATFORM: offscreen
+        DISPLAY: ':99.0'
+
+      # COVERAGE_FILE: '.coverage.tests' ## TODO!!!!
       # Note that we're hardcoding the name of the coverage file. This is important
       # as "coverage combine" will combine all coverage files that match .coverage.*.
       # The parameters.post_tests_steps might also produce coeverage files
@@ -160,7 +213,6 @@ jobs:
       TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
-    displayName: Run tests
 
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
@@ -172,6 +224,7 @@ jobs:
     inputs:
       targetType: inline
       script: |
+        set -e
         python -m coverage combine
 
         python -m coverage xml -i
@@ -182,11 +235,11 @@ jobs:
   - task: PublishTestResults@2
     displayName: Publish test results
     inputs:
-      testResultsFormat: NUnit
-      testResultsFiles: test-results.xml
-      testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
       failTaskOnFailureToPublishResults: true
       failTaskOnMissingResultsFile: true
+      testResultsFiles: test-results.xml
+      testResultsFormat: NUnit
+      testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
     condition: succeededOrFailed()
 
   - task: PublishCodeCoverageResults@2
@@ -195,17 +248,19 @@ jobs:
       summaryFileLocation: coverage.xml
       failIfCoverageEmpty: true
 
-  # Upload the code coverage result to codecov.io using the binary uploader.
-  # Use flags to identify coverage from each OS/Python combination for proper merging.
-  #
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
+    # Upload the code coverage result to codecov.io using the binary uploader.
+    # Use flags to identify coverage from each OS/Python combination for proper
+    # merging.
     inputs:
       targetType: inline
       script: |
+        set -e
         curl -Os "${{ parameters.codecov_download_url }}"
         chmod +x codecov
         ./codecov  \
           --file coverage.xml \
           --flags ${{ parameters.os_name }} \
-          --flags Python-${{ parameters.python_version }} \
+          --flags "Python-${{ parameters.python_version }}" \
+          --name "Tested on ${{ parameters.os_name }} with Python ${{ parameters.python_version }}" \
