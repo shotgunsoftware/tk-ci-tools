@@ -92,8 +92,8 @@ jobs:
       packages:
       - ${{ parameters.qt_wrapper }}
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-      - coverage
       - pytest
+      - pytest-cov
       - pytest-nunit
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
@@ -169,7 +169,7 @@ jobs:
         cat > .coveragerc <<EOF
         [run]
         source=.
-        omit=tests/*, *shibokensupport/*
+        omit=tests/*
         [report]
         exclude_lines = raise NotImplementedError
         EOF
@@ -183,21 +183,20 @@ jobs:
     inputs:
       targetType: inline
       script: |
-        python -m coverage \
-          run \
-          --data-file=.coverage.main \
-          -m pytest \
-              tests \
-              --durations=0 \
-              --nunit-xml=test-results-main.xml \
-              --verbose \
-    # Note that we're hardcoding the name of the coverage file. This is important
-    # as "coverage combine" will combine all coverage files that match .coverage.*.
-    # The parameters.post_tests_steps might also produce coeverage files
-
+        python -m pytest \
+          tests \
+          --cov \
+          --durations=0 \
+          --nunit-xml=test-results-main.xml \
+          --verbose \
     env:
       # Tell Pytest that we're running in a CI environment
       CI: 1
+
+      # Note that we're hardcoding the name of the coverage file. This is important
+      # as "coverage combine" will combine all coverage files that match .coverage.*.
+      # The parameters.post_tests_steps might also produce coeverage files
+      COVERAGE_FILE: '.coverage.main'
 
       ${{ if eq(parameters.os_name, 'Linux') }}:
         # These environment variables need to be set so Linux runs can connect
