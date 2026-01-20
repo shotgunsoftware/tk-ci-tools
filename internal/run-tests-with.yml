@@ -186,7 +186,8 @@ jobs:
         python -m coverage \
           run \
           --data-file=.coverage.main \
-            pytest tests \
+          -m pytest \
+              tests \
               --durations=0 \
               --nunit-xml=test-results-main.xml \
               --verbose \
