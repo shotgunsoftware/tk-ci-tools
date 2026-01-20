@@ -244,7 +244,7 @@ jobs:
     inputs:
       failTaskOnFailureToPublishResults: true
       failTaskOnMissingResultsFile: true
-      testResultsFiles: test-results.xml
+      testResultsFiles: test-results*.xml
       testResultsFormat: NUnit
       testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
     condition: succeededOrFailed()
