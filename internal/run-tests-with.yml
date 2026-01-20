@@ -169,7 +169,7 @@ jobs:
         cat > .coveragerc <<EOF
         [run]
         source=.
-        omit=tests/*
+        omit=tests/*, *shibokensupport/*
         [report]
         exclude_lines = raise NotImplementedError
         EOF
