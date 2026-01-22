@@ -73,11 +73,11 @@ jobs:
       - ${{ each platform in parameters.vfx_reference_platform_versions }}:
         - template: run-tests-with.yml
           parameters:
-            os_name: ${{ os_version.name }}
-            image_name: ${{ os_version.vm_image }}
             codecov_download_url: ${{ os_version.codecov_download_url }}
+            os_name: ${{ os_version.name }}
             python_version: ${{ platform.python_version }}
             qt_wrapper: ${{ platform.qt_wrapper }}
+            vm_image: ${{ os_version.vm_image }}
 
             # pass through all parameters
             extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
