@@ -51,12 +51,21 @@ parameters:
   os_versions:
     - name: Windows
       vm_image: windows-2022
+      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
 
     - name: Linux
       vm_image: ubuntu-22.04
+      codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
     - name: macOS
       vm_image: macOS-14
+      codecov_download_url: https://uploader.codecov.io/v0.7.3/macos/codecov
+      # macOS & codecov note:
+      # In Nov 2024 (SG-36700), we pinned macOS to codecov v0.7.3 because the
+      # macOS-14 Azure Pipelines agent is Intel (x86_64), but Codecov started
+      # shipping arm64-only binaries.
+      # When we will change the macOs image to a arm64 arch, we can use the
+      # "latest" version again.
 
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
@@ -64,10 +73,11 @@ jobs:
       - ${{ each platform in parameters.vfx_reference_platform_versions }}:
         - template: run-tests-with.yml
           parameters:
+            codecov_download_url: ${{ os_version.codecov_download_url }}
             os_name: ${{ os_version.name }}
-            image_name: ${{ os_version.vm_image }}
             python_version: ${{ platform.python_version }}
             qt_wrapper: ${{ platform.qt_wrapper }}
+            vm_image: ${{ os_version.vm_image }}
 
             # pass through all parameters
             extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
