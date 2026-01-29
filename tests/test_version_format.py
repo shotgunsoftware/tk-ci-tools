@@ -45,25 +45,30 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
     """
     Pytest fixture that extracts the validation script from YAML and
     imports it as a module using a temporary file.
-    The temporary file is automatically cleaned up after tests complete.
+    The temporary directory and file are automatically cleaned up after tests complete.
+    Uses current directory instead of system temp to avoid Windows permission issues.
     """
     # Extract the script content by display name
     script_content = extract_script_from_yaml("Validate Git tag version format")
 
-    # Create a temporary file that will be automatically deleted when the with block exits
-    with tempfile.NamedTemporaryFile(
-        mode="w",
-        suffix=".py",
-        prefix="validate_version_format_",
-        delete=True,
-    ) as temp_file:
-        temp_file.write(script_content)
-        temp_file.flush()  # Ensure content is written to disk
-        temp_file_path = temp_file.name
+    # Create a temporary directory in the current folder
+    current_dir = os.path.dirname(__file__)
 
-        # Get the directory and module name
-        temp_dir = os.path.dirname(temp_file_path)
-        module_name = os.path.basename(temp_file_path)[:-3]  # Remove .py extension
+    # Use TemporaryDirectory for automatic cleanup
+    with tempfile.TemporaryDirectory(
+        prefix=".temp_test_scripts_",
+        dir=current_dir,
+    ) as temp_dir:
+        # Create the script file in the temporary directory
+        script_filename = "validate_version_format.py"
+        temp_file_path = os.path.join(temp_dir, script_filename)
+
+        # Write the script to the temporary file
+        with open(temp_file_path, "w") as f:
+            f.write(script_content)
+
+        # Get the module name
+        module_name = script_filename[:-3]  # Remove .py extension
 
         if temp_dir not in sys.path:
             sys.path.insert(0, temp_dir)
@@ -71,6 +76,7 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
         try:
             # Import the module dynamically
             import importlib.util
+
             spec = importlib.util.spec_from_file_location(module_name, temp_file_path)
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
@@ -82,7 +88,7 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
             # Remove from sys.modules
             if module_name in sys.modules:
                 del sys.modules[module_name]
-        # File is automatically deleted when exiting the with block
+        # Directory and all contents automatically deleted when exiting the with block
 
 
 def extract_script_from_yaml(display_name: str) -> str:
@@ -122,16 +128,22 @@ def extract_script_from_yaml(display_name: str) -> str:
         steps = job.get("steps", [])
         for step in steps:
             # Check if this is a PythonScript@0 task with matching displayName
-            if (
-                isinstance(step, dict)
-                and step.get("task") == "PythonScript@0"
-                and step.get("displayName") == display_name
-            ):
-                inputs = step.get("inputs", {})
-                script_content = inputs.get("script")
+            if not isinstance(step, dict):
+                continue
 
-                if script_content:
-                    return script_content
+            if step.get("task") != "PythonScript@0":
+                continue
+
+            if step.get("displayName") != display_name:
+                continue
+
+            inputs = step.get("inputs", {})
+            script_content = inputs.get("script")
+
+            if not script_content:
+                continue
+
+            return script_content
 
     raise RuntimeError(
         f"Could not find PythonScript@0 task with displayName='{display_name}' "
