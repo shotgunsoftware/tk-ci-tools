@@ -37,8 +37,6 @@ jobs:
     - name: tk-multi-testing
       ref: azure_test_branch
     - name: tk-framework-qtwidgets
-    # This one shouldn't get cloned.
-    - name: tk-ci-tools
     post_tests_steps:
     # Ensures the Shotgun script credentials can connect to the AppStore.
     - bash: PYTHONPATH=../tk-core/python python tests/test_credentials.py
