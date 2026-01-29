@@ -45,8 +45,9 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
     """
     Pytest fixture that extracts the validation script from YAML and
     imports it as a module using a temporary file.
-    The temporary directory and file are automatically cleaned up after tests complete.
-    Uses current directory instead of system temp to avoid Windows permission issues.
+    The temporary directory and file are automatically cleaned up after
+    tests complete. Uses current directory instead of system temp to
+    avoid Windows permission issues.
     """
     # Extract the script content by display name
     script_content = extract_script_from_yaml("Validate Git tag version format")
@@ -77,7 +78,9 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
             # Import the module dynamically
             import importlib.util
 
-            spec = importlib.util.spec_from_file_location(module_name, temp_file_path)
+            spec = importlib.util.spec_from_file_location(
+                module_name, temp_file_path
+            )
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
@@ -88,7 +91,8 @@ def validate_version_format() -> typing.Generator[types.ModuleType, None, None]:
             # Remove from sys.modules
             if module_name in sys.modules:
                 del sys.modules[module_name]
-        # Directory and all contents automatically deleted when exiting the with block
+        # Directory and all contents automatically deleted when exiting
+        # the with block
 
 
 def extract_script_from_yaml(display_name: str) -> str:
