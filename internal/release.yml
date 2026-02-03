@@ -29,6 +29,32 @@ jobs:
         versionSpec: 3.10
       displayName: Use Python 3.10
 
+    # Validate Git tag version format using inline Python script
+    # This is the source of truth for the validation logic
+    - task: PythonScript@0
+      displayName: Validate Git tag version format
+      inputs:
+        scriptSource: inline
+        script: |
+          import os
+          import re
+
+          def validate(version: str) -> bool:
+              return (
+                  re.match(
+                      r"^v\d+\.\d+\.\d+(-[\w\d-]+)?$",
+                      version,
+                  )
+                  is not None
+              )
+
+          if __name__ == "__main__":
+              git_ref = os.environ["BUILD_SOURCEBRANCH"]
+              assert git_ref.startswith("refs/tags/"), f"Expected tag ref, got: {git_ref}"
+              version = git_ref[10:]
+              assert validate(version), f"Invalid version format: {version}"
+              print(f"✓ Valid version format: {version}")
+
     - template: configure-git.yml
 
     # Pushes the bundle to the appstore.

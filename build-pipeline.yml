@@ -89,7 +89,7 @@ jobs:
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
-- ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags') }}:
+- ${{ if startsWith( variables['Build.SourceBranch'], 'refs/tags/') }}:
   # Repositories using our build pipeline outside of the
   # shotgunsoftware organization can be tagged, but they can't
   # use our deploy scripts as they do not have the necessary
