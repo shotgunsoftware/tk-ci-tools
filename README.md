@@ -1,4 +1,4 @@
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.10%20%7C%203.9-blue.svg)](https://www.python.org/)
+[![Supported Python versions: 3.9, 3.10, 3.11, 3.13](https://img.shields.io/badge/Python-3.9_|_3.10_|_3.11_|_3.13-blue?logo=python&logoColor=f5f5f5)](https://www.python.org/ "Supported Python versions")
 [![Build Status](https://dev.azure.com/shotgun-ecosystem/Toolkit/_apis/build/status/tk-ci-tools?branchName=master)](https://dev.azure.com/shotgun-ecosystem/Toolkit/_build/latest?definitionId=39&branchName=master)
 
 # tk-ci-tools
