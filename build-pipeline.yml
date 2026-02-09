@@ -30,7 +30,7 @@ parameters:
   # Git ref of tk-core to use.
   - name: tk_core_ref
     type: string
-    default: master
+    default: ticket/SG-38851-try-fixup-seg-fault
   # Tells the build pipeline that the repository has unit tests to execute
   - name: has_unit_tests
     type: boolean

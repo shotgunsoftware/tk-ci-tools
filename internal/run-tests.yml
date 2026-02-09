@@ -22,7 +22,7 @@ parameters:
   #   ref: <branch-or-tag>
   additional_repositories: []
   # Git ref of tk-core to use.
-  tk_core_ref: master
+  tk_core_ref: ticket/SG-38851-try-fixup-seg-fault
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
