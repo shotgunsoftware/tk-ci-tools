@@ -184,6 +184,7 @@ jobs:
       script: |
         python -m pytest \
           tests \
+          -s \
           --cov \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
