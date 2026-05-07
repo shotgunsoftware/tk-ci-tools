@@ -187,7 +187,7 @@ jobs:
           --cov \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
-          --verbose \
+          --verbose
     env:
       CI: 1
       # Tell Pytest that we're running in a CI environment
