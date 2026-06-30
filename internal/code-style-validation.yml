@@ -37,7 +37,7 @@ jobs:
     displayName: Validate code
 
   - bash: git diff
-    displayName: Show formatting diff
+    displayName: "VIOLATIONS: Files that need reformatting (run pre-commit locally to fix)"
     condition: failed()
 
   - script: |
