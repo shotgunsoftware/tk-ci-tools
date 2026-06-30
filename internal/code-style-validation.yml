@@ -36,6 +36,10 @@ jobs:
   - bash: pre-commit run --all
     displayName: Validate code
 
+  - bash: git diff
+    displayName: Show formatting diff
+    condition: failed()
+
   - script: |
       build_sphinx_docs="true"
       [ -d "$(Build.SourcesDirectory)/docs" ] || build_sphinx_docs="false"
