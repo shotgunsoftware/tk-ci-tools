@@ -11,7 +11,8 @@
 parameters:
   # Name of the repository to update. Repository is assumed to be under the shotgunsoftware
   # organization on Github.com
-  name: ""
+  - name: name
+    type: string
 
 steps:
 - task: Bash@3

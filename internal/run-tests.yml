@@ -10,9 +10,13 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  - name: extra_test_dependencies
+    type: object
+
   # Git ref of tk-toolchain to use.
-  tk_toolchain_ref: master
+  - name: tk_toolchain_ref
+    type: string
+
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
@@ -20,9 +24,13 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  additional_repositories: []
+  - name: additional_repositories
+    type: object
+
   # Git ref of tk-core to use.
-  tk_core_ref: master
+  - name: tk_core_ref
+    type: string
+
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -31,11 +39,18 @@ parameters:
   # post_tests_steps:
   # - bash: do_something
   # - bash: do_something_else
-  post_tests_steps: []
-  # If set to true, the build agent will run unit tests.
-  has_unit_tests: true
+  - name: post_tests_steps
+    type: object
+    default: []
 
-  vfx_reference_platform_versions:
+  # If set to true, the build agent will run unit tests.
+  - name: has_unit_tests
+    type: boolean
+    default: true
+
+  - name: vfx_reference_platform_versions
+    type: object
+    default:
     - name: VFX CY2022
       python_version: '3.9'
       qt_wrapper: PySide2==5.15.2.1
@@ -55,7 +70,9 @@ parameters:
       python_version: '3.13'
       qt_wrapper: PySide6~=6.8.3
 
-  os_versions:
+  - name: os_versions
+    type: object
+    default:
     - name: Windows
       vm_image: windows-2022
       codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
