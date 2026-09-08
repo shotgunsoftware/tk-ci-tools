@@ -13,10 +13,12 @@ parameters:
   - name: extra_test_dependencies
     type: object
     default: []
+
   # Version of tk-toolchain to use.
   - name: tk_toolchain_ref
     type: string
     default: master
+
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
@@ -27,14 +29,17 @@ parameters:
   - name: additional_repositories
     type: object
     default: []
+
   # Git ref of tk-core to use.
   - name: tk_core_ref
     type: string
     default: master
+
   # Tells the build pipeline that the repository has unit tests to execute
   - name: has_unit_tests
     type: boolean
     default: true
+
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -46,6 +51,7 @@ parameters:
   - name: post_tests_steps
     type: object
     default: []
+
   # Version of the release repository to use.
   # This is meant for deployment to the Toolkit AppStore. This repository is private
   # to the Shotgun team and cannot be accessed by external organizations. This is meant
@@ -53,10 +59,12 @@ parameters:
   - name: release_repo_ref
     type: string
     default: master
+
   # Tells the build pipeline that there are resources to validate
   - name: has_ui_resources
     type: boolean
     default: true
+
   # Git ref of tk-ci-tools to use.
   - name: tk_ci_tools_ref
     type: string
