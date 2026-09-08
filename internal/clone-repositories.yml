@@ -24,3 +24,7 @@ steps:
      displayName: Clone ${{ repo.name }}(${{ coalesce(repo.ref, 'master') }})
      # Allows us to easily skip when cloning tk-core inside the tk-core repo.
      condition: ne(variables['Build.DefinitionName'], '${{ repo.name }}')
+
+- ${{ each repo in parameters.repositories }}:
+   - bash: git -C ../${{ repo.name }} lfs ls-files
+     displayName: TEST
