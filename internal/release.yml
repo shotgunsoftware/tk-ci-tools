@@ -23,6 +23,12 @@ jobs:
   pool:
     vmImage: ubuntu-latest
   steps:
+    - checkout: self
+      displayName: Git Checkout
+      lfs: true
+      # Explicit checkout step in order to retrieve LFS entities. Otherwise, Azure
+      # Pipelines does not retrieve LFS
+
     # Switch to the right Python Version.
     - task: UsePythonVersion@0
       inputs:
