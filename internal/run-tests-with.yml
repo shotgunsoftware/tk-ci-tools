@@ -98,7 +98,6 @@ jobs:
       packages:
       - ${{ parameters.qt_wrapper }}
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
-      - pytest
       - pytest-cov
       - pytest-nunit
       # Inserting a parameter that is a list into another list flattens
