@@ -10,7 +10,8 @@
 
 parameters:
   # List of Python packages to install.
-  packages: []
+  - name: packages
+    type: object
 
 steps:
 - ${{ if parameters.packages }}:

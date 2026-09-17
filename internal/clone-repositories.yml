@@ -16,7 +16,8 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  repositories: []
+  - name: repositories
+    type: object
 
 steps:
 - ${{ each repo in parameters.repositories }}:
