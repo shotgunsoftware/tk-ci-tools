@@ -74,9 +74,9 @@ jobs:
     # Pipelines does not retrieve LFS
 
   - task: UsePythonVersion@0
-    displayName: Use Python 3.10
+    displayName: Use Python 3.11
     inputs:
-      versionSpec: "3.10"
+      versionSpec: "3.11"
 
   - template: pip-install-packages.yml
     parameters:
@@ -84,8 +84,6 @@ jobs:
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - ${{ if eq( variables['Build.DefinitionName'], 'sg-jira-bridge' ) }}:
         - --requirement requirements.txt
-      - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
-        - PySide2
 
   - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
     - template: clone-repositories.yml
