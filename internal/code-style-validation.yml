@@ -84,8 +84,6 @@ jobs:
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - ${{ if eq( variables['Build.DefinitionName'], 'sg-jira-bridge' ) }}:
         - --requirement requirements.txt
-      - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
-        - PySide2
 
   - ${{ if startsWith( variables['Build.DefinitionName'], 'tk-' ) }}:
     - template: clone-repositories.yml
