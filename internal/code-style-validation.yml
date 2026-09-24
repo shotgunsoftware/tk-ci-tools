@@ -13,6 +13,8 @@ parameters:
   tk_toolchain_ref: master
   # Git ref of tk-core to use.
   tk_core_ref: master
+  # Validate that LICENSE matches the canonical Toolkit license.
+  validate_license: true
 
 jobs:
 - job: code_style_validation
@@ -48,6 +50,23 @@ jobs:
       echo "Will build the Sphinx documentation? ${build_sphinx_docs}"
     name: detect_docs
     displayName: Detect if the documentation folder exists
+
+  - ${{ if and( eq(parameters.validate_license, true), startsWith( variables['Build.DefinitionName'], 'tk-' ) ) }}:
+    - bash: |
+        expected="665becfd6e5a3d357eb8db04f93bfdc950e1b86b8c796f23d5b3bca320a3892a"
+        if [ ! -f LICENSE ]; then
+          echo "##vso[task.logissue type=error]LICENSE file is missing."
+          exit 1
+        fi
+        actual=$(sha256sum LICENSE | cut -d " " -f 1)
+        echo "Expected SHA-256: $expected"
+        echo "Actual SHA-256:   $actual"
+        if [ "$actual" != "$expected" ]; then
+          echo "##vso[task.logissue type=error]LICENSE does not match the canonical Toolkit license. Copy it from https://github.com/shotgunsoftware/tk-core/blob/master/LICENSE"
+          exit 1
+        fi
+      displayName: Validate LICENSE file
+      condition: succeededOrFailed()
 
 - job: build_documentation
   displayName: Build Sphinx Documentation
