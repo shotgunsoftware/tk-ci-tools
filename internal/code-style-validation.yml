@@ -62,7 +62,7 @@ jobs:
         echo "Expected SHA-256: $expected"
         echo "Actual SHA-256:   $actual"
         if [ "$actual" != "$expected" ]; then
-          echo "##vso[task.logissue type=error]LICENSE does not match the canonical Toolkit license. Copy it from https://github.com/shotgunsoftware/tk-core/blob/master/LICENSE"
+          echo "##vso[task.logissue type=error]LICENSE does not match the canonical Toolkit license."
           exit 1
         fi
       displayName: Validate LICENSE file
