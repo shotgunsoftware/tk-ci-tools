@@ -92,6 +92,14 @@ jobs:
         - name: tk-core
           ref: ${{ parameters.tk_core_ref }}
 
+  - bash: sudo apt update
+    displayName: APT Update
+
+  # Install libegl1 required for PySide6. Without it, Qt fails to import and
+  # autodoc cannot import modules that subclass Qt classes.
+  - bash: sudo apt install -y libegl1
+    displayName: Install libegl1
+
   - task: Bash@3
     displayName: Build Sphinx Documentation
     inputs:
