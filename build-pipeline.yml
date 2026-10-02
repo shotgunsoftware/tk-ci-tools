@@ -61,6 +61,10 @@ parameters:
   - name: tk_ci_tools_ref
     type: string
     default: master
+  # Validate that LICENSE matches the canonical Toolkit license.
+  - name: validate_license
+    type: boolean
+    default: true
 
 # This build pipeline will validate the code style and our test suite on
 # multiple platforms.
@@ -69,6 +73,7 @@ jobs:
   parameters:
     tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
     tk_core_ref: ${{ parameters.tk_core_ref }}
+    validate_license: ${{ parameters.validate_license }}
 
 # Check PNG profiles
 - ${{ if eq(parameters.has_ui_resources, true) }}:
