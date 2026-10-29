@@ -80,3 +80,7 @@ steps:
         echo "username=x-access-token"
         echo "password=${GH_ACCESS_TOKEN}"
       }; f'
+      # The helper above only applies to https://github.com/shotgunsoftware/. Git
+      # LFS leaves the path out of its credential requests unless useHttpPath is
+      # set, so the helper would never answer and pushing with LFS would fail.
+      git config --global credential.https://github.com/shotgunsoftware/.useHttpPath true
