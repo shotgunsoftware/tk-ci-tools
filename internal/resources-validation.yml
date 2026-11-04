@@ -26,22 +26,50 @@ jobs:
         fi
       displayName: 'Check for resources'
 
+    # Reimplements the 'known incorrect sRGB profile' check removed in libpng 1.6.47,
+    # which pngcrush relied on. Inlined so it doesn't depend on tk_ci_tools_ref.
+    - script: |
+        cat > "$(Agent.TempDirectory)/check_png_profile.py" <<'EOF'
+        import struct
+        import sys
+        import zlib
+
+        # (adler32, crc32, length) of the profiles libpng flagged as broken.
+        KNOWN_INCORRECT_PROFILES = {
+            (0x0398F3FC, 0xF29E526D, 3144),  # HP-Microsoft sRGB v2 media-relative
+            (0xF784F3FB, 0x182EA552, 3144),  # HP-Microsoft sRGB v2 perceptual
+        }
+
+        path = sys.argv[1]
+        with open(path, "rb") as f:
+            data = f.read()
+
+        pos = 8
+        while pos + 8 <= len(data):
+            length, chunk_type = struct.unpack(">I4s", data[pos : pos + 8])
+            if chunk_type == b"IDAT":
+                break
+            if chunk_type == b"iCCP":
+                body = data[pos + 8 : pos + 8 + length]
+                try:
+                    profile = zlib.decompress(body.partition(b"\x00")[2][1:])
+                except zlib.error as e:
+                    print("%s: iCCP: corrupt profile: %s" % (path, e))
+                    break
+                key = (zlib.adler32(profile), zlib.crc32(profile), len(profile))
+                if key in KNOWN_INCORRECT_PROFILES:
+                    print("%s: iCCP: known incorrect sRGB profile" % path)
+                break
+            pos += 12 + length
+        EOF
+      displayName: 'Write PNG profile checker'
+      condition: eq(variables['resourcesExist'], 'true')
+
     # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
     - bash: |
         git clone --depth 1 --branch ${{ parameters.tk_ci_tools_ref }} https://github.com/shotgunsoftware/tk-ci-tools ../tk-ci-tools
       displayName: 'Clone tk-ci-tools'
       condition: and(eq(variables['resourcesExist'], 'true'), ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'))
-
-    - script: |
-        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
-        if [ "$repo_name" = 'tk-ci-tools' ]; then
-          ci_tools_path="."
-        else
-          ci_tools_path="../tk-ci-tools"
-        fi
-        cp "$ci_tools_path/internal/check_png_profile.py" "$(Agent.TempDirectory)/"
-      displayName: 'Copy PNG profile checker'
-      condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
         # Set the path to the tk-ci-tools repo, which is either the current directory

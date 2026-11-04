@@ -15,9 +15,9 @@ import subprocess
 import sys
 import zlib
 
-CHECKER = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "internal", "check_png_profile.py"
-)
+import pytest
+import yaml
+
 TEST_IMAGES_DIR = os.path.join(os.path.dirname(__file__), "test_images")
 GOOD_PROFILE_PNG = os.path.join(TEST_IMAGES_DIR, "good_profile.png")
 WRONG_PROFILE_PNG = os.path.join(TEST_IMAGES_DIR, "wrong_profile.png")
@@ -26,38 +26,74 @@ WRONG_PROFILE_PNG = os.path.join(TEST_IMAGES_DIR, "wrong_profile.png")
 ICC_INTENT_OFFSET = 67
 
 
-def test_corrupt_profile(tmp_path: pathlib.Path) -> None:
+def test_corrupt_profile(checker: str, tmp_path: pathlib.Path) -> None:
     """A truncated iCCP stream is reported as corrupt."""
     path = tmp_path / "corrupt.png"
     path.write_bytes(
         replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00garbage")
     )
-    assert "iCCP: corrupt profile" in run_checker(path)
+    assert "iCCP: corrupt profile" in run_checker(checker, path)
 
 
-def test_good_profile() -> None:
+def test_good_profile(checker: str) -> None:
     """good_profile.png has no iCCP chunk and passes."""
-    assert run_checker(GOOD_PROFILE_PNG) == ""
+    assert run_checker(checker, GOOD_PROFILE_PNG) == ""
 
 
-def test_known_incorrect_media_relative() -> None:
+def test_known_incorrect_media_relative(checker: str) -> None:
     """wrong_profile.png embeds the HP-Microsoft sRGB v2 media-relative profile."""
-    output = run_checker(WRONG_PROFILE_PNG)
+    output = run_checker(checker, WRONG_PROFILE_PNG)
     assert "iCCP: known incorrect sRGB profile" in output
 
 
-def test_known_incorrect_perceptual(tmp_path: pathlib.Path) -> None:
+def test_known_incorrect_perceptual(checker: str, tmp_path: pathlib.Path) -> None:
     """The HP-Microsoft sRGB v2 perceptual variant only differs by its intent."""
     path = tmp_path / "perceptual.png"
     path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 0))
-    assert "iCCP: known incorrect sRGB profile" in run_checker(path)
+    assert "iCCP: known incorrect sRGB profile" in run_checker(checker, path)
 
 
-def test_unknown_profile(tmp_path: pathlib.Path) -> None:
+def test_unknown_profile(checker: str, tmp_path: pathlib.Path) -> None:
     """A valid profile that is not in the known-incorrect list passes."""
     path = tmp_path / "unknown.png"
     path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 2))
-    assert run_checker(path) == ""
+    assert run_checker(checker, path) == ""
+
+
+@pytest.fixture(scope="module")
+def checker(tmp_path_factory: pytest.TempPathFactory) -> str:
+    """Write the PNG profile checker extracted from the pipeline YAML to disk."""
+    path = tmp_path_factory.mktemp("checker") / "check_png_profile.py"
+    path.write_text(extract_checker_from_yaml())
+    return str(path)
+
+
+def extract_checker_from_yaml() -> str:
+    """
+    Extract the heredoc Python script from the 'Write PNG profile checker' step
+    so we test the exact code that runs in CI.
+    """
+    yaml_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        "internal",
+        "resources-validation.yml",
+    )
+    with open(yaml_path, "r") as f:
+        yaml_content = yaml.safe_load(f)
+
+    for job in yaml_content.get("jobs", []):
+        for step in job.get("steps", []):
+            if step.get("displayName") != "Write PNG profile checker":
+                continue
+            script = step["script"]
+            start = script.index("<<'EOF'\n") + len("<<'EOF'\n")
+            end = script.index("\nEOF", start)
+            return script[start:end]
+
+    raise RuntimeError(
+        "Could not find the 'Write PNG profile checker' step in "
+        "resources-validation.yml"
+    )
 
 
 def find_iccp_chunk(data: bytes) -> tuple:
@@ -87,9 +123,9 @@ def replace_iccp_chunk(data: bytes, body: bytes) -> bytes:
     return data[:start] + new_chunk + data[end:]
 
 
-def run_checker(path) -> str:
+def run_checker(checker: str, path) -> str:
     result = subprocess.run(
-        [sys.executable, CHECKER, str(path)],
+        [sys.executable, checker, str(path)],
         capture_output=True,
         check=True,
         text=True,
