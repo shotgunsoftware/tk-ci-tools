@@ -70,6 +70,7 @@ jobs:
                 break
             pos += 12 + length
         EOF
+        echo "PNG profile checker saved to $(Agent.TempDirectory)/check_png_profile.py"
       displayName: 'Write PNG profile checker'
       condition: eq(variables['resourcesExist'], 'true')
 
