@@ -26,17 +26,22 @@ jobs:
         fi
       displayName: 'Check for resources'
 
-    - script: |
-        sudo apt update
-        sudo apt install -y pngcrush
-      displayName: 'Install Dependencies'
-      condition: eq(variables['resourcesExist'], 'true')
-
     # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
     - bash: |
         git clone --depth 1 --branch ${{ parameters.tk_ci_tools_ref }} https://github.com/shotgunsoftware/tk-ci-tools ../tk-ci-tools
       displayName: 'Clone tk-ci-tools'
       condition: and(eq(variables['resourcesExist'], 'true'), ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'))
+
+    - script: |
+        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
+        if [ "$repo_name" = 'tk-ci-tools' ]; then
+          ci_tools_path="."
+        else
+          ci_tools_path="../tk-ci-tools"
+        fi
+        cp "$ci_tools_path/internal/check_png_profile.py" "$(Agent.TempDirectory)/"
+      displayName: 'Copy PNG profile checker'
+      condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
         # Set the path to the tk-ci-tools repo, which is either the current directory
@@ -53,9 +58,9 @@ jobs:
           filepath=$1
           filename=$(basename $filepath)
           expected_fail=$2
-          output=$(pngcrush -n -q "$filepath" 2>&1)
+          output=$(python3 "$(Agent.TempDirectory)/check_png_profile.py" "$filepath" 2>&1)
           echo "$output"
-          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
+          if [[ "$output" == *"iCCP:"* ]]; then
             if $expected_fail; then
                 echo "Success: $filename is invalid as expected"
             else
@@ -64,7 +69,7 @@ jobs:
             fi
           else
             if $expected_fail; then
-                echo "Error: $filename validation expected to fail passed, please check if pngcrush's error output used for profile validation ('pngcrush: iCCP') has changed."
+                echo "Error: $filename validation expected to fail passed, please check the PNG profile checker."
                 exit 1
             else
                 echo "Success: $filename is valid as expected"
@@ -78,17 +83,15 @@ jobs:
       condition: eq(variables['resourcesExist'], 'true')
 
     - script: |
-        # Display pngcrush version.
-        pngcrush -version
         # Initialize error counter and error messages
         errors=0
         error_messages=""
 
-        # Run pngcrush command on PNG files and check for errors
+        # Run the profile checker on PNG files and check for errors
         for file in $(find . -type f -name "*.png"); do
-          output=$(pngcrush -n -q "$file" 2>&1)
+          output=$(python3 "$(Agent.TempDirectory)/check_png_profile.py" "$file" 2>&1)
           echo "$output"
-          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
+          if [[ "$output" == *"iCCP:"* ]]; then
               errors=$((errors + 1))
               error_messages+="$output\n"
           fi
@@ -100,6 +103,6 @@ jobs:
           echo -e "$error_messages"
           exit $(($errors > 254 ? 254 : $errors))
         fi
-      displayName: 'Process PNG files using pngcrush'
+      displayName: 'Process PNG files'
       workingDirectory: $(Build.SourcesDirectory)/resources
       condition: eq(variables['resourcesExist'], 'true')
