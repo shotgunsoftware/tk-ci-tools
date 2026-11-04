@@ -41,15 +41,21 @@ def test_good_profile(checker: str) -> None:
 
 
 def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
-    """A profile inflating to 64 MB can't match a known one and passes."""
+    """A profile inflating past libpng's 8 MB limit is reported."""
     compressor = zlib.compressobj()
     chunk = b"\x00" * (1 << 20)
     compressed = b"".join(compressor.compress(chunk) for _ in range(64))
     compressed += compressor.flush()
     path = tmp_path / "huge.png"
-    path.write_bytes(
-        replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00" + compressed)
-    )
+    path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
+    assert "iCCP: profile exceeds 8000000 bytes" in run_checker(checker, path)
+
+
+def test_large_profile(checker: str, tmp_path: pathlib.Path) -> None:
+    """A valid profile larger than the known ones passes."""
+    compressed = zlib.compress(bytes(range(256)) * 400)
+    path = tmp_path / "large.png"
+    path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
     assert run_checker(checker, path) == ""
 
 
@@ -59,6 +65,15 @@ def test_truncated_profile(checker: str, tmp_path: pathlib.Path) -> None:
     _, _, body = find_iccp_chunk(data)
     path = tmp_path / "truncated.png"
     path.write_bytes(replace_iccp_chunk(data, body[: len(body) // 2]))
+    assert "iCCP: corrupt profile: truncated stream" in run_checker(checker, path)
+
+
+def test_truncated_oversized_profile(checker: str, tmp_path: pathlib.Path) -> None:
+    """A profile larger than the known ones missing its zlib checksum is corrupt."""
+    # Drop the trailing adler32 so the stream inflates fully but never ends.
+    compressed = zlib.compress(bytes(range(256)) * 16)[:-4]
+    path = tmp_path / "truncated_oversized.png"
+    path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
     assert "iCCP: corrupt profile: truncated stream" in run_checker(checker, path)
 
 
@@ -153,6 +168,11 @@ def run_checker(checker: str, path) -> str:
         text=True,
     )
     return result.stdout.strip()
+
+
+def with_compressed_profile(data: bytes, compressed: bytes) -> bytes:
+    """:returns: The PNG data with the iCCP profile stream replaced."""
+    return replace_iccp_chunk(data, b"name\x00\x00" + compressed)
 
 
 def with_profile_intent(data: bytes, intent: int) -> bytes:
