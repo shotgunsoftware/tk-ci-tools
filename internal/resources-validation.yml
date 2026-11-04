@@ -39,6 +39,8 @@ jobs:
             (0x0398F3FC, 0xF29E526D, 3144),  # HP-Microsoft sRGB v2 media-relative
             (0xF784F3FB, 0x182EA552, 3144),  # HP-Microsoft sRGB v2 perceptual
         }
+        # Longer profiles can't match, so never inflate past this (zip bombs).
+        MAX_PROFILE_LENGTH = max(length for _, _, length in KNOWN_INCORRECT_PROFILES)
 
         path = sys.argv[1]
         with open(path, "rb") as f:
@@ -51,10 +53,16 @@ jobs:
                 break
             if chunk_type == b"iCCP":
                 body = data[pos + 8 : pos + 8 + length]
+                decompressor = zlib.decompressobj()
                 try:
-                    profile = zlib.decompress(body.partition(b"\x00")[2][1:])
+                    profile = decompressor.decompress(
+                        body.partition(b"\x00")[2][1:], MAX_PROFILE_LENGTH + 1
+                    )
                 except zlib.error as e:
                     print("%s: iCCP: corrupt profile: %s" % (path, e))
+                    break
+                if len(profile) <= MAX_PROFILE_LENGTH and not decompressor.eof:
+                    print("%s: iCCP: corrupt profile: truncated stream" % path)
                     break
                 key = (zlib.adler32(profile), zlib.crc32(profile), len(profile))
                 if key in KNOWN_INCORRECT_PROFILES:

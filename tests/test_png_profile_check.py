@@ -40,6 +40,28 @@ def test_good_profile(checker: str) -> None:
     assert run_checker(checker, GOOD_PROFILE_PNG) == ""
 
 
+def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
+    """A profile inflating to 64 MB can't match a known one and passes."""
+    compressor = zlib.compressobj()
+    chunk = b"\x00" * (1 << 20)
+    compressed = b"".join(compressor.compress(chunk) for _ in range(64))
+    compressed += compressor.flush()
+    path = tmp_path / "huge.png"
+    path.write_bytes(
+        replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00" + compressed)
+    )
+    assert run_checker(checker, path) == ""
+
+
+def test_truncated_profile(checker: str, tmp_path: pathlib.Path) -> None:
+    """A profile stream cut short is reported as corrupt."""
+    data = read_png(WRONG_PROFILE_PNG)
+    _, _, body = find_iccp_chunk(data)
+    path = tmp_path / "truncated.png"
+    path.write_bytes(replace_iccp_chunk(data, body[: len(body) // 2]))
+    assert "iCCP: corrupt profile: truncated stream" in run_checker(checker, path)
+
+
 def test_known_incorrect_media_relative(checker: str) -> None:
     """wrong_profile.png embeds the HP-Microsoft sRGB v2 media-relative profile."""
     output = run_checker(checker, WRONG_PROFILE_PNG)
