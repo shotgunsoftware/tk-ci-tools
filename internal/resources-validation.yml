@@ -26,80 +26,120 @@ jobs:
         fi
       displayName: 'Check for resources'
 
-    - script: |
-        sudo apt update
-        sudo apt install -y pngcrush
-      displayName: 'Install Dependencies'
-      condition: eq(variables['resourcesExist'], 'true')
-
     # Allows us to easily skip when cloning tk-ci-tools inside the tk-ci-tools repo.
     - bash: |
         git clone --depth 1 --branch ${{ parameters.tk_ci_tools_ref }} https://github.com/shotgunsoftware/tk-ci-tools ../tk-ci-tools
       displayName: 'Clone tk-ci-tools'
       condition: and(eq(variables['resourcesExist'], 'true'), ne(variables['Build.Repository.Name'], 'shotgunsoftware/tk-ci-tools'))
 
-    - script: |
-        # Set the path to the tk-ci-tools repo, which is either the current directory
-        # if the job is running in the ci-tools repository, or the tk-ci-tools directory otherwise
-        repo_name=$(basename "${{ variables['Build.Repository.Name'] }}")
-        if [ "$repo_name" = 'tk-ci-tools' ]; then
-          ci_tools_path="."
-        else
-          ci_tools_path="../tk-ci-tools"
-        fi
-        echo "ci_tools_path=$ci_tools_path"
-
-        function validate_png {
-          filepath=$1
-          filename=$(basename $filepath)
-          expected_fail=$2
-          output=$(pngcrush -n -q "$filepath" 2>&1)
-          echo "$output"
-          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
-            if $expected_fail; then
-                echo "Success: $filename is invalid as expected"
-            else
-                echo "Error: $filename validation expected to succeed failed, please consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles."
-                exit 1
-            fi
-          else
-            if $expected_fail; then
-                echo "Error: $filename validation expected to fail passed, please check if pngcrush's error output used for profile validation ('pngcrush: iCCP') has changed."
-                exit 1
-            else
-                echo "Success: $filename is valid as expected"
-            fi
-          fi
-        }
-
-        validate_png "$ci_tools_path/tests/test_images/good_profile.png" false
-        validate_png "$ci_tools_path/tests/test_images/wrong_profile.png" true
-      displayName: 'Validate Test Images'
+    # Reimplements the 'known incorrect sRGB profile' check removed in libpng 1.6.47,
+    # which pngcrush relied on.
+    - task: PythonScript@0
+      displayName: Validate PNG profiles
       condition: eq(variables['resourcesExist'], 'true')
+      inputs:
+        scriptSource: inline
+        script: |
+          import os
+          import struct
+          import sys
+          import zlib
 
-    - script: |
-        # Display pngcrush version.
-        pngcrush -version
-        # Initialize error counter and error messages
-        errors=0
-        error_messages=""
+          PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+          # (adler32, crc32, length) of the profiles libpng flagged as broken.
+          KNOWN_INCORRECT_PROFILES = {
+              (0x0398F3FC, 0xF29E526D, 3144),  # HP-Microsoft sRGB v2 media-relative
+              (0xF784F3FB, 0x182EA552, 3144),  # HP-Microsoft sRGB v2 perceptual
+          }
+          # Longer profiles can't match, so only keep this many decompressed bytes.
+          MAX_PROFILE_LENGTH = max(length for _, _, length in KNOWN_INCORRECT_PROFILES)
+          # libpng's default PNG_USER_CHUNK_MALLOC_MAX, guards against zip bombs.
+          MAX_INFLATE_LENGTH = 8000000
 
-        # Run pngcrush command on PNG files and check for errors
-        for file in $(find . -type f -name "*.png"); do
-          output=$(pngcrush -n -q "$file" 2>&1)
-          echo "$output"
-          if [[ "$output" == *"pngcrush: iCCP"* ]]; then
-              errors=$((errors + 1))
-              error_messages+="$output\n"
-          fi
-        done
 
-        # If there were any errors, print custom message and error messages
-        if [ $errors -gt 0 ]; then
-          echo -e "\nThe following PNG files have profile errors. Consider using an optimizing PNG image tool like mogrify to fix or strip the incorrect profiles:\n"
-          echo -e "$error_messages"
-          exit $(($errors > 254 ? 254 : $errors))
-        fi
-      displayName: 'Process PNG files using pngcrush'
-      workingDirectory: $(Build.SourcesDirectory)/resources
-      condition: eq(variables['resourcesExist'], 'true')
+          def check_profile(body):
+              """Return an error message for an iCCP chunk body, or None if it is fine."""
+              decompressor = zlib.decompressobj()
+              try:
+                  profile = decompressor.decompress(
+                      body.partition(b"\x00")[2][1:], MAX_PROFILE_LENGTH + 1
+                  )
+                  # Drain the rest in bounded chunks to validate the whole stream.
+                  total = len(profile)
+                  while not decompressor.eof and total <= MAX_INFLATE_LENGTH:
+                      chunk = decompressor.decompress(decompressor.unconsumed_tail, 65536)
+                      if not chunk and not decompressor.unconsumed_tail:
+                          break
+                      total += len(chunk)
+              except zlib.error as e:
+                  return "iCCP: corrupt profile: %s" % e
+              if total > MAX_INFLATE_LENGTH:
+                  return "iCCP: profile exceeds %d bytes" % MAX_INFLATE_LENGTH
+              if not decompressor.eof:
+                  return "iCCP: corrupt profile: truncated stream"
+              key = (zlib.adler32(profile), zlib.crc32(profile), len(profile))
+              if key in KNOWN_INCORRECT_PROFILES:
+                  return "iCCP: known incorrect sRGB profile"
+              return None
+
+
+          def check_png(path):
+              """Return an error message for a PNG file, or None if it is fine."""
+              with open(path, "rb") as f:
+                  data = f.read()
+              if not data.startswith(PNG_SIGNATURE):
+                  return "not a PNG file"
+              pos = len(PNG_SIGNATURE)
+              while pos + 8 <= len(data):
+                  length, chunk_type = struct.unpack(">I4s", data[pos : pos + 8])
+                  if chunk_type == b"IDAT":
+                      break
+                  if chunk_type == b"iCCP":
+                      return check_profile(data[pos + 8 : pos + 8 + length])
+                  pos += 12 + length
+              return None
+
+
+          def find_pngs(directory):
+              for root, dirs, files in os.walk(directory):
+                  dirs.sort()
+                  for name in sorted(files):
+                      if name.lower().endswith(".png"):
+                          yield os.path.join(root, name)
+
+
+          def main():
+              sources = os.environ["BUILD_SOURCESDIRECTORY"]
+              if os.path.basename(os.environ["BUILD_REPOSITORY_NAME"]) == "tk-ci-tools":
+                  ci_tools = sources
+              else:
+                  ci_tools = os.path.join(sources, "..", "tk-ci-tools")
+              images = os.path.join(ci_tools, "tests", "test_images")
+
+              # Make sure the checker still tells a good profile from a wrong one.
+              good = os.path.join(images, "good_profile.png")
+              error = check_png(good)
+              if error:
+                  sys.exit("%s expected to be valid but got: %s" % (good, error))
+              wrong = os.path.join(images, "wrong_profile.png")
+              if not check_png(wrong):
+                  sys.exit("%s expected to be invalid but passed" % wrong)
+              print("Test images validated as expected.")
+
+              errors = []
+              for png in find_pngs(os.path.join(sources, "resources")):
+                  error = check_png(png)
+                  if error:
+                      errors.append("%s: %s" % (png, error))
+              if errors:
+                  print("\n".join(errors))
+                  sys.exit(
+                      "\n%d PNG file(s) have profile errors. Consider using an "
+                      "optimizing PNG image tool like mogrify to fix or strip the "
+                      "incorrect profiles." % len(errors)
+                  )
+              print("All PNG profiles are valid.")
+
+
+          if __name__ == "__main__":
+              main()
