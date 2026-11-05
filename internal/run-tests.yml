@@ -61,7 +61,8 @@ parameters:
       codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
 
     - name: Linux
-      vm_image: ubuntu-latest
+      vm_image: ubuntu-24.04
+      # ububtu-latest doesn't support python 3.9 anymore
       codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
     - name: macOS
