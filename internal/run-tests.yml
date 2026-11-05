@@ -56,14 +56,14 @@ parameters:
       qt_wrapper: PySide6~=6.8.3
 
   os_versions:
-    - name: Windows
-      vm_image: windows-latest
-      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
+    # - name: Windows
+    #   vm_image: windows-latest
+    #   codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
 
-    - name: Linux
-      vm_image: ubuntu-24.04
-      # ubuntu-latest doesn't support Python 3.9 anymore
-      codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
+    # - name: Linux
+    #   vm_image: ubuntu-24.04
+    #   # ubuntu-latest doesn't support Python 3.9 anymore
+    #   codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
     - name: macOS
       vm_image: macOS-latest
