@@ -10,6 +10,7 @@
 
 import os
 import pathlib
+import shutil
 import struct
 import subprocess
 import sys
@@ -32,12 +33,12 @@ def test_corrupt_profile(checker: str, tmp_path: pathlib.Path) -> None:
     path.write_bytes(
         replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00garbage")
     )
-    assert "iCCP: corrupt profile" in run_checker(checker, path)
+    assert_fails(run_checker(checker, path), "iCCP: corrupt profile")
 
 
 def test_good_profile(checker: str) -> None:
     """good_profile.png has no iCCP chunk and passes."""
-    assert run_checker(checker, GOOD_PROFILE_PNG) == ""
+    assert_passes(run_checker(checker, GOOD_PROFILE_PNG))
 
 
 def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
@@ -48,7 +49,7 @@ def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
     compressed += compressor.flush()
     path = tmp_path / "huge.png"
     path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert "iCCP: profile exceeds 8000000 bytes" in run_checker(checker, path)
+    assert_fails(run_checker(checker, path), "iCCP: profile exceeds 8000000 bytes")
 
 
 def test_large_profile(checker: str, tmp_path: pathlib.Path) -> None:
@@ -56,7 +57,7 @@ def test_large_profile(checker: str, tmp_path: pathlib.Path) -> None:
     compressed = zlib.compress(bytes(range(256)) * 400)
     path = tmp_path / "large.png"
     path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert run_checker(checker, path) == ""
+    assert_passes(run_checker(checker, path))
 
 
 def test_truncated_profile(checker: str, tmp_path: pathlib.Path) -> None:
@@ -65,7 +66,7 @@ def test_truncated_profile(checker: str, tmp_path: pathlib.Path) -> None:
     _, _, body = find_iccp_chunk(data)
     path = tmp_path / "truncated.png"
     path.write_bytes(replace_iccp_chunk(data, body[: len(body) // 2]))
-    assert "iCCP: corrupt profile: truncated stream" in run_checker(checker, path)
+    assert_fails(run_checker(checker, path), "iCCP: corrupt profile: truncated stream")
 
 
 def test_truncated_oversized_profile(checker: str, tmp_path: pathlib.Path) -> None:
@@ -74,27 +75,69 @@ def test_truncated_oversized_profile(checker: str, tmp_path: pathlib.Path) -> No
     compressed = zlib.compress(bytes(range(256)) * 16)[:-4]
     path = tmp_path / "truncated_oversized.png"
     path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert "iCCP: corrupt profile: truncated stream" in run_checker(checker, path)
+    assert_fails(run_checker(checker, path), "iCCP: corrupt profile: truncated stream")
 
 
 def test_known_incorrect_media_relative(checker: str) -> None:
     """wrong_profile.png embeds the HP-Microsoft sRGB v2 media-relative profile."""
-    output = run_checker(checker, WRONG_PROFILE_PNG)
-    assert "iCCP: known incorrect sRGB profile" in output
+    assert_fails(
+        run_checker(checker, WRONG_PROFILE_PNG), "iCCP: known incorrect sRGB profile"
+    )
 
 
 def test_known_incorrect_perceptual(checker: str, tmp_path: pathlib.Path) -> None:
     """The HP-Microsoft sRGB v2 perceptual variant only differs by its intent."""
     path = tmp_path / "perceptual.png"
     path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 0))
-    assert "iCCP: known incorrect sRGB profile" in run_checker(checker, path)
+    assert_fails(run_checker(checker, path), "iCCP: known incorrect sRGB profile")
 
 
 def test_unknown_profile(checker: str, tmp_path: pathlib.Path) -> None:
     """A valid profile that is not in the known-incorrect list passes."""
     path = tmp_path / "unknown.png"
     path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 2))
-    assert run_checker(checker, path) == ""
+    assert_passes(run_checker(checker, path))
+
+
+def test_not_a_png(checker: str, tmp_path: pathlib.Path) -> None:
+    """A file that is not a PNG is reported."""
+    path = tmp_path / "fake.png"
+    path.write_bytes(b"not a png")
+    assert_fails(run_checker(checker, path), "not a PNG file")
+
+
+def test_directory(checker: str, tmp_path: pathlib.Path) -> None:
+    """Directories are searched recursively and every bad PNG is counted."""
+    (tmp_path / "nested").mkdir()
+    shutil.copy(GOOD_PROFILE_PNG, tmp_path / "good.png")
+    shutil.copy(WRONG_PROFILE_PNG, tmp_path / "wrong.png")
+    shutil.copy(WRONG_PROFILE_PNG, tmp_path / "nested" / "wrong.PNG")
+    result = run_checker(checker, tmp_path)
+    assert_fails(result, "2 PNG file(s) have profile errors")
+    assert "good.png" not in result.stdout
+
+
+def test_directory_without_pngs(checker: str, tmp_path: pathlib.Path) -> None:
+    """A directory without PNG files passes."""
+    assert_passes(run_checker(checker, tmp_path))
+
+
+def test_expect_invalid(checker: str) -> None:
+    """--expect-invalid succeeds on an invalid PNG and fails on a valid one."""
+    result = run_checker(checker, "--expect-invalid", WRONG_PROFILE_PNG)
+    assert result.returncode == 0
+    assert "is invalid as expected" in result.stdout
+
+    result = run_checker(checker, "--expect-invalid", GOOD_PROFILE_PNG)
+    assert result.returncode == 1
+    assert "expected to be invalid but passed" in result.stdout
+
+
+def test_crash_exit_code(checker: str, tmp_path: pathlib.Path) -> None:
+    """A crash exits with 2 so it can't be mistaken for an invalid PNG."""
+    for args in ((str(tmp_path / "missing.png"),), ("--expect-invalid",), ()):
+        result = run_checker(checker, *args)
+        assert result.returncode == 2, args
 
 
 @pytest.fixture(scope="module")
@@ -160,14 +203,22 @@ def replace_iccp_chunk(data: bytes, body: bytes) -> bytes:
     return data[:start] + new_chunk + data[end:]
 
 
-def run_checker(checker: str, path) -> str:
-    result = subprocess.run(
-        [sys.executable, checker, str(path)],
+def assert_fails(result: subprocess.CompletedProcess, message: str) -> None:
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert message in result.stdout
+
+
+def assert_passes(result: subprocess.CompletedProcess) -> None:
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+
+
+def run_checker(checker: str, *args) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, checker, *[str(arg) for arg in args]],
         capture_output=True,
-        check=True,
         text=True,
     )
-    return result.stdout.strip()
 
 
 def with_compressed_profile(data: bytes, compressed: bytes) -> bytes:
