@@ -23,9 +23,9 @@ jobs:
     vmImage: ubuntu-latest
   steps:
   - task: UsePythonVersion@0
-    displayName: Use Python 3.11
+    displayName: Use Python 3.13
     inputs:
-      versionSpec: "3.11"
+      versionSpec: "3.13"
 
   - template: pip-install-packages.yml
     parameters:
@@ -93,6 +93,7 @@ jobs:
     # Pipelines does not retrieve LFS
 
   - task: UsePythonVersion@0
+    # Fix 3.11 because this is the version Rundeck is using currently
     displayName: Use Python 3.11
     inputs:
       versionSpec: "3.11"
