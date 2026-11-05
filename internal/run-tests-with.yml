@@ -120,6 +120,18 @@ jobs:
         pip --version
         pip list
 
+  - ${{ if eq(parameters.os_name, 'macOS') }}:
+    - task: Bash@3
+      displayName: Show macOS architecture
+      inputs:
+        targetType: inline
+        script: |
+          uname -m
+          sysctl -n machdep.cpu.brand_string
+          sysctl -n sysctl.proc_translated || true
+          sw_vers
+          python -c "import platform; print(platform.machine(), platform.platform())"
+
   - template: clone-repositories.yml
     parameters:
       repositories:
