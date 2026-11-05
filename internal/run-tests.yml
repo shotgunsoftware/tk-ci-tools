@@ -62,7 +62,7 @@ parameters:
 
     - name: Linux
       vm_image: ubuntu-24.04
-      # ububtu-latest doesn't support python 3.9 anymore
+      # ubuntu-latest doesn't support Python 3.9 anymore
       codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
     - name: macOS
