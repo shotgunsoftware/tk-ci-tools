@@ -210,6 +210,11 @@ jobs:
         QT_QPA_PLATFORM: offscreen
         DISPLAY: ':99.0'
 
+      ${{ if eq(parameters.os_name, 'macOS') }}:
+        # Hosted macOS agents have no usable GUI session; the cocoa plugin
+        # segfaults when creating widgets, so render offscreen.
+        QT_QPA_PLATFORM: offscreen
+
       TK_DEBUG: 1
 
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
