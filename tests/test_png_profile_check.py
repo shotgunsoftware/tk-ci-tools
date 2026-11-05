@@ -8,12 +8,13 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+import importlib.util
 import os
 import pathlib
 import shutil
 import struct
-import subprocess
-import sys
+import types
+import typing
 import zlib
 
 import pytest
@@ -27,21 +28,41 @@ WRONG_PROFILE_PNG = os.path.join(TEST_IMAGES_DIR, "wrong_profile.png")
 ICC_INTENT_OFFSET = 67
 
 
-def test_corrupt_profile(checker: str, tmp_path: pathlib.Path) -> None:
-    """A truncated iCCP stream is reported as corrupt."""
-    path = tmp_path / "corrupt.png"
-    path.write_bytes(
-        replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00garbage")
-    )
-    assert_fails(run_checker(checker, path), "iCCP: corrupt profile")
-
-
-def test_good_profile(checker: str) -> None:
+def test_good_profile(checker: types.ModuleType) -> None:
     """good_profile.png has no iCCP chunk and passes."""
-    assert_passes(run_checker(checker, GOOD_PROFILE_PNG))
+    assert checker.check_png(GOOD_PROFILE_PNG) is None
 
 
-def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
+def test_known_incorrect_media_relative(checker: types.ModuleType) -> None:
+    """wrong_profile.png embeds the HP-Microsoft sRGB v2 media-relative profile."""
+    assert checker.check_png(WRONG_PROFILE_PNG) == "iCCP: known incorrect sRGB profile"
+
+
+def test_known_incorrect_perceptual(
+    checker: types.ModuleType, tmp_path: pathlib.Path
+) -> None:
+    """The HP-Microsoft sRGB v2 perceptual variant only differs by its intent."""
+    path = tmp_path / "perceptual.png"
+    path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 0))
+    assert checker.check_png(str(path)) == "iCCP: known incorrect sRGB profile"
+
+
+def test_unknown_profile(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
+    """A valid profile that is not in the known-incorrect list passes."""
+    path = tmp_path / "unknown.png"
+    path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 2))
+    assert checker.check_png(str(path)) is None
+
+
+def test_large_profile(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
+    """A valid profile larger than the known ones passes."""
+    compressed = zlib.compress(bytes(range(256)) * 400)
+    path = tmp_path / "large.png"
+    path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
+    assert checker.check_png(str(path)) is None
+
+
+def test_huge_profile(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
     """A profile inflating past libpng's 8 MB limit is reported."""
     compressor = zlib.compressobj()
     chunk = b"\x00" * (1 << 20)
@@ -49,109 +70,153 @@ def test_huge_profile(checker: str, tmp_path: pathlib.Path) -> None:
     compressed += compressor.flush()
     path = tmp_path / "huge.png"
     path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert_fails(run_checker(checker, path), "iCCP: profile exceeds 8000000 bytes")
+    assert checker.check_png(str(path)) == "iCCP: profile exceeds 8000000 bytes"
 
 
-def test_large_profile(checker: str, tmp_path: pathlib.Path) -> None:
-    """A valid profile larger than the known ones passes."""
-    compressed = zlib.compress(bytes(range(256)) * 400)
-    path = tmp_path / "large.png"
-    path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert_passes(run_checker(checker, path))
+def test_corrupt_profile(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
+    """Garbage instead of a zlib stream is reported as corrupt."""
+    path = tmp_path / "corrupt.png"
+    path.write_bytes(
+        replace_iccp_chunk(read_png(WRONG_PROFILE_PNG), b"name\x00\x00garbage")
+    )
+    assert checker.check_png(str(path)).startswith("iCCP: corrupt profile")
 
 
-def test_truncated_profile(checker: str, tmp_path: pathlib.Path) -> None:
+def test_truncated_profile(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
     """A profile stream cut short is reported as corrupt."""
     data = read_png(WRONG_PROFILE_PNG)
     _, _, body = find_iccp_chunk(data)
     path = tmp_path / "truncated.png"
     path.write_bytes(replace_iccp_chunk(data, body[: len(body) // 2]))
-    assert_fails(run_checker(checker, path), "iCCP: corrupt profile: truncated stream")
+    assert checker.check_png(str(path)) == "iCCP: corrupt profile: truncated stream"
 
 
-def test_truncated_oversized_profile(checker: str, tmp_path: pathlib.Path) -> None:
+def test_truncated_oversized_profile(
+    checker: types.ModuleType, tmp_path: pathlib.Path
+) -> None:
     """A profile larger than the known ones missing its zlib checksum is corrupt."""
     # Drop the trailing adler32 so the stream inflates fully but never ends.
     compressed = zlib.compress(bytes(range(256)) * 16)[:-4]
     path = tmp_path / "truncated_oversized.png"
     path.write_bytes(with_compressed_profile(read_png(WRONG_PROFILE_PNG), compressed))
-    assert_fails(run_checker(checker, path), "iCCP: corrupt profile: truncated stream")
+    assert checker.check_png(str(path)) == "iCCP: corrupt profile: truncated stream"
 
 
-def test_known_incorrect_media_relative(checker: str) -> None:
-    """wrong_profile.png embeds the HP-Microsoft sRGB v2 media-relative profile."""
-    assert_fails(
-        run_checker(checker, WRONG_PROFILE_PNG), "iCCP: known incorrect sRGB profile"
-    )
-
-
-def test_known_incorrect_perceptual(checker: str, tmp_path: pathlib.Path) -> None:
-    """The HP-Microsoft sRGB v2 perceptual variant only differs by its intent."""
-    path = tmp_path / "perceptual.png"
-    path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 0))
-    assert_fails(run_checker(checker, path), "iCCP: known incorrect sRGB profile")
-
-
-def test_unknown_profile(checker: str, tmp_path: pathlib.Path) -> None:
-    """A valid profile that is not in the known-incorrect list passes."""
-    path = tmp_path / "unknown.png"
-    path.write_bytes(with_profile_intent(read_png(WRONG_PROFILE_PNG), 2))
-    assert_passes(run_checker(checker, path))
-
-
-def test_not_a_png(checker: str, tmp_path: pathlib.Path) -> None:
+def test_not_a_png(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
     """A file that is not a PNG is reported."""
     path = tmp_path / "fake.png"
     path.write_bytes(b"not a png")
-    assert_fails(run_checker(checker, path), "not a PNG file")
+    assert checker.check_png(str(path)) == "not a PNG file"
 
 
-def test_directory(checker: str, tmp_path: pathlib.Path) -> None:
-    """Directories are searched recursively and every bad PNG is counted."""
+def test_find_pngs(checker: types.ModuleType, tmp_path: pathlib.Path) -> None:
+    """PNG files are found recursively, whatever the extension case."""
     (tmp_path / "nested").mkdir()
-    shutil.copy(GOOD_PROFILE_PNG, tmp_path / "good.png")
-    shutil.copy(WRONG_PROFILE_PNG, tmp_path / "wrong.png")
-    shutil.copy(WRONG_PROFILE_PNG, tmp_path / "nested" / "wrong.PNG")
-    result = run_checker(checker, tmp_path)
-    assert_fails(result, "2 PNG file(s) have profile errors")
-    assert "good.png" not in result.stdout
+    for name in ("a.png", "nested/b.PNG", "c.txt"):
+        (tmp_path / name).write_bytes(b"")
+    found = [os.path.relpath(p, tmp_path) for p in checker.find_pngs(str(tmp_path))]
+    assert found == ["a.png", os.path.join("nested", "b.PNG")]
 
 
-def test_directory_without_pngs(checker: str, tmp_path: pathlib.Path) -> None:
-    """A directory without PNG files passes."""
-    assert_passes(run_checker(checker, tmp_path))
+def test_main_valid_resources(
+    checker: types.ModuleType, agent: pathlib.Path, capsys: pytest.CaptureFixture
+) -> None:
+    """The job passes when the resources have no incorrect profiles."""
+    shutil.copy(GOOD_PROFILE_PNG, agent / "sources" / "resources" / "icon.png")
+    checker.main()
+    assert "All PNG profiles are valid." in capsys.readouterr().out
 
 
-def test_expect_invalid(checker: str) -> None:
-    """--expect-invalid succeeds on an invalid PNG and fails on a valid one."""
-    result = run_checker(checker, "--expect-invalid", WRONG_PROFILE_PNG)
-    assert result.returncode == 0
-    assert "is invalid as expected" in result.stdout
-
-    result = run_checker(checker, "--expect-invalid", GOOD_PROFILE_PNG)
-    assert result.returncode == 1
-    assert "expected to be invalid but passed" in result.stdout
+def test_main_no_resources(checker: types.ModuleType, agent: pathlib.Path) -> None:
+    """A resources folder without PNG files passes."""
+    checker.main()
 
 
-def test_crash_exit_code(checker: str, tmp_path: pathlib.Path) -> None:
-    """A crash exits with 2 so it can't be mistaken for an invalid PNG."""
-    for args in ((str(tmp_path / "missing.png"),), ("--expect-invalid",), ()):
-        result = run_checker(checker, *args)
-        assert result.returncode == 2, args
+def test_main_incorrect_resources(
+    checker: types.ModuleType, agent: pathlib.Path, capsys: pytest.CaptureFixture
+) -> None:
+    """Every incorrect PNG in the resources is reported and fails the job."""
+    resources = agent / "sources" / "resources"
+    (resources / "nested").mkdir()
+    shutil.copy(GOOD_PROFILE_PNG, resources / "good.png")
+    shutil.copy(WRONG_PROFILE_PNG, resources / "wrong.png")
+    shutil.copy(WRONG_PROFILE_PNG, resources / "nested" / "wrong.PNG")
+    with pytest.raises(SystemExit) as exc_info:
+        checker.main()
+    assert "2 PNG file(s) have profile errors" in str(exc_info.value)
+    output = capsys.readouterr().out
+    assert "wrong.png: iCCP: known incorrect sRGB profile" in output
+    assert "good.png" not in output
+
+
+def test_main_self_test_valid_image_fails(
+    checker: types.ModuleType, agent: pathlib.Path
+) -> None:
+    """The job fails if the checker flags the good test image."""
+    images = agent / "tk-ci-tools" / "tests" / "test_images"
+    shutil.copy(WRONG_PROFILE_PNG, images / "good_profile.png")
+    with pytest.raises(SystemExit) as exc_info:
+        checker.main()
+    assert "good_profile.png expected to be valid" in str(exc_info.value)
+
+
+def test_main_self_test_invalid_image_fails(
+    checker: types.ModuleType, agent: pathlib.Path
+) -> None:
+    """The job fails if the checker misses the wrong test image."""
+    images = agent / "tk-ci-tools" / "tests" / "test_images"
+    shutil.copy(GOOD_PROFILE_PNG, images / "wrong_profile.png")
+    with pytest.raises(SystemExit) as exc_info:
+        checker.main()
+    assert "wrong_profile.png expected to be invalid" in str(exc_info.value)
+
+
+def test_main_in_tk_ci_tools(
+    checker: types.ModuleType,
+    agent: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """In tk-ci-tools itself the test images come from the sources directory."""
+    sources = agent / "tk-ci-tools"
+    (sources / "resources").mkdir()
+    monkeypatch.setenv("BUILD_SOURCESDIRECTORY", str(sources))
+    monkeypatch.setenv("BUILD_REPOSITORY_NAME", "shotgunsoftware/tk-ci-tools")
+    checker.main()
+
+
+@pytest.fixture
+def agent(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> pathlib.Path:
+    """
+    Lay out the directories of a pipeline run on another repository: the sources
+    with a resources folder next to a tk-ci-tools clone with the test images.
+    """
+    (tmp_path / "sources" / "resources").mkdir(parents=True)
+    images = tmp_path / "tk-ci-tools" / "tests" / "test_images"
+    images.mkdir(parents=True)
+    shutil.copy(GOOD_PROFILE_PNG, images)
+    shutil.copy(WRONG_PROFILE_PNG, images)
+    monkeypatch.setenv("BUILD_SOURCESDIRECTORY", str(tmp_path / "sources"))
+    monkeypatch.setenv("BUILD_REPOSITORY_NAME", "shotgunsoftware/tk-multi-testing")
+    return tmp_path
 
 
 @pytest.fixture(scope="module")
-def checker(tmp_path_factory: pytest.TempPathFactory) -> str:
-    """Write the PNG profile checker extracted from the pipeline YAML to disk."""
+def checker(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> typing.Generator[types.ModuleType, None, None]:
+    """Import the PNG profile checker extracted from the pipeline YAML."""
     path = tmp_path_factory.mktemp("checker") / "check_png_profile.py"
-    path.write_text(extract_checker_from_yaml())
-    return str(path)
+    path.write_text(extract_script_from_yaml("Validate PNG profiles"))
+    spec = importlib.util.spec_from_file_location("check_png_profile", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    yield module
 
 
-def extract_checker_from_yaml() -> str:
+def extract_script_from_yaml(display_name: str) -> str:
     """
-    Extract the heredoc Python script from the 'Write PNG profile checker' step
-    so we test the exact code that runs in CI.
+    Extract the inline Python script of a PythonScript@0 task from
+    resources-validation.yml so we test the exact code that runs in CI.
     """
     yaml_path = os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
@@ -163,16 +228,14 @@ def extract_checker_from_yaml() -> str:
 
     for job in yaml_content.get("jobs", []):
         for step in job.get("steps", []):
-            if step.get("displayName") != "Write PNG profile checker":
-                continue
-            script = step["script"]
-            start = script.index("<<'EOF'\n") + len("<<'EOF'\n")
-            end = script.index("\nEOF", start)
-            return script[start:end]
+            if step.get("task") == "PythonScript@0" and (
+                step.get("displayName") == display_name
+            ):
+                return step["inputs"]["script"]
 
     raise RuntimeError(
-        "Could not find the 'Write PNG profile checker' step in "
-        "resources-validation.yml"
+        f"Could not find PythonScript@0 task with displayName='{display_name}' "
+        f"in resources-validation.yml"
     )
 
 
@@ -201,24 +264,6 @@ def replace_iccp_chunk(data: bytes, body: bytes) -> bytes:
         + struct.pack(">I", zlib.crc32(chunk) & 0xFFFFFFFF)
     )
     return data[:start] + new_chunk + data[end:]
-
-
-def assert_fails(result: subprocess.CompletedProcess, message: str) -> None:
-    assert result.returncode == 1, result.stdout + result.stderr
-    assert message in result.stdout
-
-
-def assert_passes(result: subprocess.CompletedProcess) -> None:
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert result.stdout == ""
-
-
-def run_checker(checker: str, *args) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, checker, *[str(arg) for arg in args]],
-        capture_output=True,
-        text=True,
-    )
 
 
 def with_compressed_profile(data: bytes, compressed: bytes) -> bytes:
