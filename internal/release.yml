@@ -64,9 +64,9 @@ jobs:
     - template: configure-git.yml
 
     # Pushes the bundle to the appstore.
-    - template: release-to-appstore.yml
-      parameters:
-        release_repo_ref: ${{ parameters.release_repo_ref }}
+    # - template: release-to-appstore.yml
+    #   parameters:
+    #     release_repo_ref: ${{ parameters.release_repo_ref }}
 
     # We need tk-toolchain to use update-configurations.yml
     - template: pip-install-packages.yml
