@@ -120,21 +120,23 @@ The `build-pipeline.yml` template has a few parameters. You can find out more ab
 
 ### Choosing the Python versions and operating systems to test
 
-By default, tests run on Linux, macOS and Windows with the Python and Qt versions of the VFX Reference Platform. Each OS uses its `-latest` runner image. An older image is used only for a Python version that is not available on the `-latest` image.
+By default, tests run on Linux, macOS and Windows with the Python and Qt versions of the VFX Reference Platform. Each OS uses its `-latest` runner image, unless a Python version is not available on it. See `platform_versions` in [internal/run-tests.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/internal/run-tests.yml) for the default values.
 
-To test with other Python versions, pass your own `python_versions` list. For example, to test Python 3.12 without Qt and skip macOS:
+To test with other platforms, override `platform_versions`. For example, to test Python 3.12 on Linux and Windows only:
 
 ```yaml
 jobs:
 - template: build-pipeline.yml@templates
   parameters:
-    python_versions:
-    - python_version: '3.12'
-      vm_images:
-        macOS: skip
+    run_tests_extra_parameters:
+      platform_versions:
+      - name: Python 3.12
+        python_version: '3.12'
+        qt_wrapper: PySide6~=6.8.3
+        vm_images:
+          Linux: ubuntu-latest
+          Windows: windows-latest
 ```
-
-See the `python_versions` and `os_versions` parameters in [build-pipeline.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/build-pipeline.yml) for the format and the default values.
 
 ### Create a build in Azure Pipelines
 

@@ -35,59 +35,21 @@ parameters:
   - name: has_unit_tests
     type: boolean
     default: true
-  # Python versions to run the tests with. The defaults follow the VFX
-  # Reference Platform. Each entry has:
-  # - python_version: always quoted, since 3.10 unquoted is 3.1.
-  # - qt_wrapper: optional, the Qt wrapper to pip install.
-  # - vm_images: optional, the runner image to use instead of the OS default
-  #   for this Python version. Use "skip" to not test that OS at all.
-  # To test with your own Python versions, pass the whole list, e.g.:
-  # python_versions:
-  # - python_version: '3.12'
-  #   vm_images:
-  #     macOS: skip
-  - name: python_versions
+  # Optional overrides of the default test behavior defined in
+  # internal/run-tests.yml. Supported keys:
+  # - platform_versions: the platforms to test with, replacing the default
+  #   VFX Reference Platform list. For example:
+  #   run_tests_extra_parameters:
+  #     platform_versions:
+  #     - name: Python 3.12
+  #       python_version: '3.12'
+  #       qt_wrapper: PySide6~=6.8.3
+  #       vm_images:
+  #         Linux: ubuntu-latest
+  #         Windows: windows-latest
+  - name: run_tests_extra_parameters
     type: object
-    default:
-    # VFX CY2022
-    - python_version: '3.9'
-      qt_wrapper: PySide2==5.15.2.1
-      vm_images:
-        # ubuntu-latest (Ubuntu 26.04) does not provide Python 3.9.
-        Linux: ubuntu-24.04
-    # VFX CY2023
-    - python_version: '3.10'
-      qt_wrapper: PySide2==5.15.2.1
-    # VFX CY2024
-    # Not using the real VFX Qt version: 6.5.
-    # Because ~6.5.2 has problem with core ci
-    # Also 6.6.1 has a random bug (SG-38086).
-    - python_version: '3.11'
-      qt_wrapper: PySide6~=6.6.3
-    # VFX CY2026
-    - python_version: '3.13'
-      qt_wrapper: PySide6~=6.8.3
-  # Operating systems to run the tests on, with their default runner image.
-  # Keep -latest images here and pin older images in python_versions only
-  # where needed.
-  - name: os_versions
-    type: object
-    default:
-    - name: Linux
-      vm_image: ubuntu-latest
-      codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
-    - name: macOS
-      vm_image: macOS-latest
-      codecov_download_url: https://uploader.codecov.io/v0.7.3/macos/codecov
-      # macOS & codecov note:
-      # In Nov 2024 (SG-36700), we pinned macOS to codecov v0.7.3 because the
-      # macOS-14 Azure Pipelines agent is Intel (x86_64), but Codecov started
-      # shipping arm64-only binaries.
-      # When we will change the macOs image to a arm64 arch, we can use the
-      # "latest" version again.
-    - name: Windows
-      vm_image: windows-latest
-      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
+    default: {}
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -144,8 +106,8 @@ jobs:
       tk_core_ref: ${{ parameters.tk_core_ref }}
       post_tests_steps: ${{ parameters.post_tests_steps }}
       has_unit_tests: ${{ parameters.has_unit_tests }}
-      python_versions: ${{ parameters.python_versions }}
-      os_versions: ${{ parameters.os_versions }}
+      ${{ if parameters.run_tests_extra_parameters.platform_versions }}:
+        platform_versions: ${{ parameters.run_tests_extra_parameters.platform_versions }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
