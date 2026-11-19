@@ -38,15 +38,16 @@ parameters:
   # Optional overrides of the default test behavior defined in
   # internal/run-tests.yml. Supported keys:
   # - platform_versions: the platforms to test with, replacing the default
-  #   VFX Reference Platform list. For example:
+  #   VFX Reference Platform list. Each platform runs on Linux, macOS and
+  #   Windows with their -latest image. List an OS in os_versions only to use
+  #   another image or to skip it. For example:
   #   run_tests_extra_parameters:
   #     platform_versions:
   #     - name: Python 3.12
   #       python_version: '3.12'
   #       qt_wrapper: PySide6~=6.8.3
-  #       vm_images:
-  #         Linux: ubuntu-latest
-  #         Windows: windows-latest
+  #       os_versions:
+  #         macOS: skip
   - name: run_tests_extra_parameters
     type: object
     default: {}

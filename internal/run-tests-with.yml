@@ -13,7 +13,8 @@ parameters:
   # default value for mandatory parameters. This way, CI will fail if we forget
   # to pass it when invoking the template.
 
-  # Mandatory parameters first
+  # All parameters are mandatory: run-tests.yml provides them all, including
+  # the default values.
 
   - name: codecov_download_url
     type: string
@@ -34,11 +35,8 @@ parameters:
     type: string
     # Name of the virtual machine image to load
 
-  # Then optional parameters
-
   - name: additional_repositories
     type: object
-    default: []
     # List of repositories to clone alongside this repository.
     # To clone the tk-framework-shotgunutils's master branch
     # and a specific tk-framework-qtwidget ref, you would
@@ -49,12 +47,10 @@ parameters:
 
   - name: extra_test_dependencies
     type: object
-    default: []
     # List of Python packages that need to be pip installed for testing.
 
   - name: post_tests_steps
     type: object
-    default: []
     # Post test steps
     # This is a list of Azure Pipeline steps that will be inserted
     # right after the tests were run.
@@ -66,12 +62,10 @@ parameters:
 
   - name: tk_core_ref
     type: string
-    default: master
     # Git ref of tk-core to use.
 
   - name: tk_toolchain_ref
     type: string
-    default: master
     # Git ref of tk-toolchain to use.
 
 jobs:
