@@ -26,15 +26,17 @@ parameters:
     type: string
     # Python version to use.
 
-  - name: qt_wrapper
-    type: string
-    # Name of the Qt wrapper to pip install. Should be PySide or PySide2
-
   - name: vm_image
     type: string
     # Name of the virtual machine image to load
 
   # Then optional parameters
+
+  - name: qt_wrapper
+    type: string
+    default: ''
+    # Qt wrapper to pip install, e.g. PySide6~=6.8.3. Nothing is installed
+    # when empty.
 
   - name: additional_repositories
     type: object
@@ -87,6 +89,14 @@ jobs:
     # Explicit checkout step in order to retrieve LFS entities. Otherwise, Azure
     # Pipelines does not retrieve LFS
 
+  # Images like ubuntu-latest move to a new OS version without notice. Log
+  # which one this job got so image changes are easy to spot.
+  - bash: |
+      echo "Requested image: ${{ parameters.vm_image }}"
+      echo "Image OS: ${ImageOS}"
+      echo "Image version: ${ImageVersion}"
+    displayName: Show runner image
+
   # Switch to the right Python Version.
   - task: UsePythonVersion@0
     displayName: Use Python ${{ parameters.python_version }}
@@ -96,7 +106,8 @@ jobs:
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - ${{ parameters.qt_wrapper }}
+      - ${{ if ne(parameters.qt_wrapper, '') }}:
+        - ${{ parameters.qt_wrapper }}
       - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - pytest
       - pytest-cov
