@@ -142,6 +142,8 @@ jobs:
           macOS: skip
 ```
 
+Repositories that are not Toolkit components can also set `use_tk_core: false` in `run_tests_extra_parameters`. tk-core is then not cloned, and the tk-toolchain pytest plugin is turned off, so the tests don't load tk-core or the packages it bundles, like `shotgun_api3`.
+
 ### Create a build in Azure Pipelines
 
 Once you've added your `azure-pipelines.yml` file to your repository, it's time to add the repository to the Azure Pipelines web service.

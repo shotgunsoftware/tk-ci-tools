@@ -68,6 +68,13 @@ parameters:
     type: string
     # Git ref of tk-toolchain to use.
 
+  - name: use_tk_core
+    type: boolean
+    # Clone tk-core and let the tk-toolchain pytest plugin load it, so tests
+    # can import sgtk. Turn it off for repositories that are not Toolkit
+    # components, since tk-core also puts its own bundled packages, like
+    # shotgun_api3, first on sys.path.
+
 jobs:
 - job:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
@@ -117,8 +124,9 @@ jobs:
   - template: clone-repositories.yml
     parameters:
       repositories:
-      - name: tk-core
-        ref: ${{ parameters.tk_core_ref }}
+      - ${{ if eq(parameters.use_tk_core, true) }}:
+        - name: tk-core
+          ref: ${{ parameters.tk_core_ref }}
       # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
@@ -205,6 +213,10 @@ jobs:
         DISPLAY: ':99.0'
 
       TK_DEBUG: 1
+
+      ${{ if eq(parameters.use_tk_core, false) }}:
+        # Turn off the tk-toolchain pytest plugin so tk-core is not loaded.
+        PYTEST_ADDOPTS: -p no:pytest_tank_test
 
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.

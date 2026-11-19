@@ -35,6 +35,10 @@ parameters:
   # If set to true, the build agent will run unit tests.
   has_unit_tests: true
 
+  # Clone tk-core and load it in the tests, so they can import sgtk. Turn it
+  # off for repositories that are not Toolkit components.
+  use_tk_core: true
+
   # Platforms to test with: a Python version and the Qt wrapper to install.
   # Each platform is tested on every OS of os_versions, with the OS default
   # image. To use another image for an OS, or not test on it, list only that
@@ -105,3 +109,4 @@ jobs:
               additional_repositories: ${{ parameters.additional_repositories }}
               tk_core_ref: ${{ parameters.tk_core_ref }}
               post_tests_steps: ${{ parameters.post_tests_steps }}
+              use_tk_core: ${{ parameters.use_tk_core }}
