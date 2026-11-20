@@ -80,6 +80,11 @@ jobs:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.vm_image }}
+  ${{ if eq(parameters.use_tk_core, false) }}:
+    variables:
+      # Turn off the tk-toolchain pytest plugin so tk-core is not loaded, in
+      # the main test step and in post_tests_steps.
+      PYTEST_ADDOPTS: -p no:pytest_tank_test
   steps:
 
   - checkout: self
@@ -213,10 +218,6 @@ jobs:
         DISPLAY: ':99.0'
 
       TK_DEBUG: 1
-
-      ${{ if eq(parameters.use_tk_core, false) }}:
-        # Turn off the tk-toolchain pytest plugin so tk-core is not loaded.
-        PYTEST_ADDOPTS: -p no:pytest_tank_test
 
       # Allows to connect to a real Shotgun site during a test. Use sparingly to avoid
       # slowing down automation. Using Mockgun is still the best way to have speedy tests.
