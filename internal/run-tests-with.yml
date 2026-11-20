@@ -78,7 +78,7 @@ jobs:
     vmImage: ${{ parameters.vm_image }}
   variables:
   # Provides CODECOV_TOKEN, the Codecov global upload token.
-  - group: codecov
+  - group: codecov.io
   steps:
 
   - checkout: self
