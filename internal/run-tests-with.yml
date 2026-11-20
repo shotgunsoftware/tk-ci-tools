@@ -15,9 +15,6 @@ parameters:
 
   # Mandatory parameters first
 
-  - name: codecov_download_url
-    type: string
-
   - name: os_name
     type: string
     # Pretty name for the OS.
@@ -79,6 +76,9 @@ jobs:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.vm_image }}
+  variables:
+  # Provides CODECOV_TOKEN, the Codecov global upload token.
+  - group: codecov.io
   steps:
 
   - checkout: self
@@ -101,6 +101,9 @@ jobs:
       - pytest
       - pytest-cov
       - pytest-nunit
+      # Uploads the coverage to codecov.io. pip picks the last release that
+      # supports the Python version, e.g. 11.3.1 for Python 3.9.
+      - codecov-cli
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
@@ -261,17 +264,41 @@ jobs:
 
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
-    # Upload the code coverage result to codecov.io using the binary uploader.
+    # Upload the code coverage result to codecov.io using the Codecov CLI.
     # Use flags to identify coverage from each OS/Python combination for proper
     # merging.
     inputs:
       targetType: inline
       script: |
         set -e
-        curl --remote-name --silent "${{ parameters.codecov_download_url }}"
-        chmod +x codecov
-        ./codecov  \
+
+        branch_args=()
+        if [ -n "${SYSTEM_PULLREQUEST_SOURCEBRANCH}" ]; then
+          # Pull request builds check out refs/pull/<number>/merge, so give
+          # Codecov the name of the pull request branch.
+          branch="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
+
+          if [ "${SYSTEM_PULLREQUEST_ISFORK}" = "True" ]; then
+            # Azure does not give secrets to builds of pull requests from
+            # forks. Codecov accepts uploads without a token for branches
+            # named <fork-owner>:<branch>.
+            fork_owner=$(echo "${SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI}" | sed -E 's#^https://github.com/([^/]+)/.*$#\1#')
+            branch="${fork_owner:-fork}:${branch}"
+            unset CODECOV_TOKEN
+          fi
+
+          branch_args=(--branch "${branch}")
+        fi
+
+        codecovcli upload-process \
+          --disable-search \
           --file coverage.xml \
-          --flags ${{ parameters.os_name }} \
-          --flags "Python-${{ parameters.python_version }}" \
+          --flag "${{ parameters.os_name }}" \
+          --flag "Python-${{ parameters.python_version }}" \
           --name "Tested on ${{ parameters.os_name }} with Python ${{ parameters.python_version }}" \
+          "${branch_args[@]}"
+    env:
+      # Secret variables must be mapped explicitly. In fork builds, the
+      # secret is not set and this is the literal "$(CODECOV_TOKEN)" string,
+      # hence the unset above.
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
