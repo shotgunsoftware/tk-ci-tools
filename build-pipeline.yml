@@ -35,6 +35,30 @@ parameters:
   - name: has_unit_tests
     type: boolean
     default: true
+  # Optional overrides of the default test behavior defined in
+  # internal/run-tests.yml. Supported keys:
+  # - platform_versions: the platforms to test with, replacing the default
+  #   VFX Reference Platform list. Each platform runs on Linux, macOS and
+  #   Windows with their -latest image. List an OS in os_versions only to use
+  #   another image or to skip it. For example:
+  #   run_tests_extra_parameters:
+  #     platform_versions:
+  #     - name: Python 3.12
+  #       python_version: '3.12'
+  #       qt_wrapper: PySide6~=6.8.3
+  #       os_versions:
+  #         macOS: skip
+  # - use_tk_core: false to not clone and load tk-core in the tests, for
+  #   repositories that are not Toolkit components. For example:
+  #   run_tests_extra_parameters:
+  #     use_tk_core: false
+  # - has_coverage: false to not measure, publish or upload the code coverage,
+  #   for repositories whose tests don't exercise their own code. For example:
+  #   run_tests_extra_parameters:
+  #     has_coverage: false
+  - name: run_tests_extra_parameters
+    type: object
+    default: {}
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -91,6 +115,10 @@ jobs:
       tk_core_ref: ${{ parameters.tk_core_ref }}
       post_tests_steps: ${{ parameters.post_tests_steps }}
       has_unit_tests: ${{ parameters.has_unit_tests }}
+      # Only pass the supported overrides, run-tests.yml has the defaults.
+      ${{ each parameter in parameters.run_tests_extra_parameters }}:
+        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage') }}:
+          ${{ parameter.key }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
