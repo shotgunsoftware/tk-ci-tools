@@ -75,6 +75,12 @@ parameters:
     # components, since tk-core also puts its own bundled packages, like
     # shotgun_api3, first on sys.path.
 
+  - name: has_coverage
+    type: boolean
+    # Measure the code coverage, publish it to Azure Pipelines and upload it to
+    # Codecov. Turn it off for repositories whose tests don't exercise the
+    # code of the repository itself.
+
 jobs:
 - job:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
@@ -167,6 +173,7 @@ jobs:
 
   - task: Bash@3
     displayName: Create a simple coverage file if missing
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     # Run the tests. The task will create a simple coverage file if one is missing.
     # It will include all code except for the "tests" folder.
     inputs:
@@ -197,13 +204,16 @@ jobs:
       script: |
         python -m pytest \
           tests \
-          --cov \
+          $PYTEST_COV_ARGS \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
           --verbose
     env:
       CI: 1
       # Tell Pytest that we're running in a CI environment
+
+      ${{ if eq(parameters.has_coverage, true) }}:
+        PYTEST_COV_ARGS: --cov
 
       COVERAGE_FILE: '.coverage.main'
       # Note that we're hardcoding the name of the coverage file. This is important
@@ -233,6 +243,7 @@ jobs:
   # combine the results.
   - task: Bash@3
     displayName: Combine code coverage results
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     inputs:
       targetType: inline
       script: |
@@ -262,12 +273,14 @@ jobs:
 
   - task: PublishCodeCoverageResults@2
     displayName: Publish code coverage
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     inputs:
       summaryFileLocation: coverage.xml
       failIfCoverageEmpty: true
 
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     # Upload the code coverage result to codecov.io using the binary uploader.
     # Use flags to identify coverage from each OS/Python combination for proper
     # merging.

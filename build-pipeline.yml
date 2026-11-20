@@ -52,6 +52,10 @@ parameters:
   #   repositories that are not Toolkit components. For example:
   #   run_tests_extra_parameters:
   #     use_tk_core: false
+  # - has_coverage: false to not measure, publish or upload the code coverage,
+  #   for repositories whose tests don't exercise their own code. For example:
+  #   run_tests_extra_parameters:
+  #     has_coverage: false
   - name: run_tests_extra_parameters
     type: object
     default: {}
@@ -113,7 +117,7 @@ jobs:
       has_unit_tests: ${{ parameters.has_unit_tests }}
       # Only pass the supported overrides, run-tests.yml has the defaults.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core') }}:
+        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy

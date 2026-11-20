@@ -144,6 +144,8 @@ jobs:
 
 Repositories that are not Toolkit components can also set `use_tk_core: false` in `run_tests_extra_parameters`. tk-core is then not cloned, and the tk-toolchain pytest plugin is turned off, so the tests don't load tk-core or the packages it bundles, like `shotgun_api3`.
 
+Repositories whose tests don't exercise their own code, like tk-ci-tools itself, can set `has_coverage: false` in `run_tests_extra_parameters`. The tests then run without measuring the code coverage, and the steps that combine, publish and upload it to Codecov are skipped.
+
 ### Create a build in Azure Pipelines
 
 Once you've added your `azure-pipelines.yml` file to your repository, it's time to add the repository to the Azure Pipelines web service.

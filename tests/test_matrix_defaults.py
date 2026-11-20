@@ -55,3 +55,8 @@ def test_os_versions(run_tests_parameters: typing.Dict[str, typing.Any]) -> None
     for os_version in run_tests_parameters["os_versions"]:
         assert os_version["image"].endswith("-latest"), os_version["name"]
         assert os_version["codecov_download_url"].startswith("https://")
+
+
+def test_coverage_is_on_by_default(run_tests_parameters) -> None:
+    """Toolkit repositories keep measuring and uploading their coverage."""
+    assert run_tests_parameters["has_coverage"] is True
