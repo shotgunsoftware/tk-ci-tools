@@ -35,10 +35,40 @@ parameters:
   # If set to true, the build agent will run unit tests.
   has_unit_tests: true
 
-  vfx_reference_platform_versions:
+  # Clone tk-core and load it in the tests, so they can import sgtk. Turn it
+  # off for repositories that are not Toolkit components.
+  use_tk_core: true
+
+  # Measure the code coverage, publish it to Azure Pipelines and upload it to
+  # Codecov. Turn it off for repositories whose tests don't exercise the code of
+  # the repository itself.
+  has_coverage: true
+
+  # Steps run right before the tests, in every test job.
+  pre_tests_steps: []
+
+  # Extra environment variables for the tests. Map secrets here, e.g.
+  # SG_API_KEY: $(my_secret). The job variables $(tk_ci_os_name) and
+  # $(tk_ci_python_version) can be used in the values.
+  tests_env: {}
+
+  # Extra arguments for pytest, e.g. [--reruns, '1'].
+  pytest_extra_args: []
+
+  # Platforms to test with: a Python version and the Qt wrapper to install.
+  # Each platform is tested on every OS of os_versions, with the OS default
+  # image. To use another image for an OS, or not test on it, list only that
+  # OS in the platform's os_versions:
+  #   os_versions:
+  #     Linux: ubuntu-24.04
+  #     macOS: skip
+  platform_versions:
     - name: VFX CY2022
       python_version: '3.9'
       qt_wrapper: PySide2==5.15.2.1
+      os_versions:
+        # ubuntu-latest (Ubuntu 26.04) does not provide Python 3.9
+        Linux: ubuntu-24.04
 
     - name: VFX CY2023
       python_version: '3.10'
@@ -55,18 +85,14 @@ parameters:
       python_version: '3.13'
       qt_wrapper: PySide6~=6.8.3
 
+  # Operating systems to test on, with their default runner image.
   os_versions:
-    - name: Windows
-      vm_image: windows-latest
-      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
-
     - name: Linux
-      vm_image: ubuntu-24.04
-      # ubuntu-latest doesn't support Python 3.9 anymore
+      image: ubuntu-latest
       codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
     - name: macOS
-      vm_image: macOS-latest
+      image: macOS-latest
       codecov_download_url: https://uploader.codecov.io/v0.7.3/macos/codecov
       # macOS & codecov note:
       # In Nov 2024 (SG-36700), we pinned macOS to codecov v0.7.3 because the
@@ -75,21 +101,32 @@ parameters:
       # When we will change the macOs image to a arm64 arch, we can use the
       # "latest" version again.
 
+    - name: Windows
+      image: windows-latest
+      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
+
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
-    - ${{ each os_version in parameters.os_versions }}:
-      - ${{ each platform in parameters.vfx_reference_platform_versions }}:
-        - template: run-tests-with.yml
-          parameters:
-            codecov_download_url: ${{ os_version.codecov_download_url }}
-            os_name: ${{ os_version.name }}
-            python_version: ${{ platform.python_version }}
-            qt_wrapper: ${{ platform.qt_wrapper }}
-            vm_image: ${{ os_version.vm_image }}
+    - ${{ each platform in parameters.platform_versions }}:
+      - ${{ each os_version in parameters.os_versions }}:
+        # Use the platform's image for this OS if it has one, else the OS default.
+        - ${{ if ne(coalesce(platform.os_versions[os_version.name], os_version.image), 'skip') }}:
+          - template: run-tests-with.yml
+            parameters:
+              codecov_download_url: ${{ os_version.codecov_download_url }}
+              os_name: ${{ os_version.name }}
+              python_version: ${{ platform.python_version }}
+              qt_wrapper: ${{ platform.qt_wrapper }}
+              vm_image: ${{ coalesce(platform.os_versions[os_version.name], os_version.image) }}
 
-            # pass through all parameters
-            extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
-            tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
-            additional_repositories: ${{ parameters.additional_repositories }}
-            tk_core_ref: ${{ parameters.tk_core_ref }}
-            post_tests_steps: ${{ parameters.post_tests_steps }}
+              # pass through all parameters
+              extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+              tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
+              additional_repositories: ${{ parameters.additional_repositories }}
+              tk_core_ref: ${{ parameters.tk_core_ref }}
+              post_tests_steps: ${{ parameters.post_tests_steps }}
+              use_tk_core: ${{ parameters.use_tk_core }}
+              has_coverage: ${{ parameters.has_coverage }}
+              pre_tests_steps: ${{ parameters.pre_tests_steps }}
+              tests_env: ${{ parameters.tests_env }}
+              pytest_extra_args: ${{ parameters.pytest_extra_args }}

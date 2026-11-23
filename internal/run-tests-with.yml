@@ -13,7 +13,8 @@ parameters:
   # default value for mandatory parameters. This way, CI will fail if we forget
   # to pass it when invoking the template.
 
-  # Mandatory parameters first
+  # All parameters are mandatory: run-tests.yml provides them all, including
+  # the default values.
 
   - name: codecov_download_url
     type: string
@@ -34,11 +35,8 @@ parameters:
     type: string
     # Name of the virtual machine image to load
 
-  # Then optional parameters
-
   - name: additional_repositories
     type: object
-    default: []
     # List of repositories to clone alongside this repository.
     # To clone the tk-framework-shotgunutils's master branch
     # and a specific tk-framework-qtwidget ref, you would
@@ -49,12 +47,10 @@ parameters:
 
   - name: extra_test_dependencies
     type: object
-    default: []
     # List of Python packages that need to be pip installed for testing.
 
   - name: post_tests_steps
     type: object
-    default: []
     # Post test steps
     # This is a list of Azure Pipeline steps that will be inserted
     # right after the tests were run.
@@ -66,19 +62,56 @@ parameters:
 
   - name: tk_core_ref
     type: string
-    default: master
     # Git ref of tk-core to use.
 
   - name: tk_toolchain_ref
     type: string
-    default: master
     # Git ref of tk-toolchain to use.
+
+  - name: use_tk_core
+    type: boolean
+    # Clone tk-core and let the tk-toolchain pytest plugin load it, so tests
+    # can import sgtk. Turn it off for repositories that are not Toolkit
+    # components, since tk-core also puts its own bundled packages, like
+    # shotgun_api3, first on sys.path.
+
+  - name: has_coverage
+    type: boolean
+    # Measure the code coverage, publish it to Azure Pipelines and upload it to
+    # Codecov. Turn it off for repositories whose tests don't exercise the
+    # code of the repository itself.
+
+  - name: pre_tests_steps
+    type: object
+    # List of Azure Pipeline steps inserted right before the tests are run.
+
+  - name: tests_env
+    type: object
+    # Extra environment variables for the step running the tests. Secrets
+    # must be mapped here, e.g. SG_API_KEY: $(my_secret), since Azure does not
+    # expose them as environment variables on its own.
+
+  - name: pytest_extra_args
+    type: object
+    # List of extra arguments for pytest, e.g. [--reruns, '1'].
 
 jobs:
 - job:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.vm_image }}
+  variables:
+  # The OS and Python version of this job, for the steps and environment
+  # variables of the repository, e.g. $(tk_ci_os_name) gives Linux.
+  - name: tk_ci_os_name
+    value: ${{ parameters.os_name }}
+  - name: tk_ci_python_version
+    value: ${{ parameters.python_version }}
+  - ${{ if eq(parameters.use_tk_core, false) }}:
+    # Turn off the tk-toolchain pytest plugin so tk-core is not loaded, in
+    # the main test step and in post_tests_steps.
+    - name: PYTEST_ADDOPTS
+      value: -p no:pytest_tank_test
   steps:
 
   - checkout: self
@@ -123,8 +156,9 @@ jobs:
   - template: clone-repositories.yml
     parameters:
       repositories:
-      - name: tk-core
-        ref: ${{ parameters.tk_core_ref }}
+      - ${{ if eq(parameters.use_tk_core, true) }}:
+        - name: tk-core
+          ref: ${{ parameters.tk_core_ref }}
       # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
@@ -158,8 +192,12 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
 
+  # The pre_tests_steps list will be flattened into this list of steps.
+  - ${{ parameters.pre_tests_steps }}
+
   - task: Bash@3
     displayName: Create a simple coverage file if missing
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     # Run the tests. The task will create a simple coverage file if one is missing.
     # It will include all code except for the "tests" folder.
     inputs:
@@ -185,18 +223,25 @@ jobs:
   - task: Bash@3
     displayName: Run tests
     # Runs the tests and generates both test report and code coverage
+    # FIXME: pytest_extra_args is joined with spaces into the script, so an
+    # argument containing a space is split, e.g. ['-k', 'test_a or test_b']
+    # passes "or" and "test_b" as paths. Pass the list as JSON through an
+    # environment variable (convertToJson) and rebuild a bash array from it.
     inputs:
       targetType: inline
       script: |
         python -m pytest \
           tests \
-          --cov \
+          $PYTEST_COV_ARGS \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
-          --verbose
+          --verbose ${{ join(' ', parameters.pytest_extra_args) }}
     env:
       CI: 1
       # Tell Pytest that we're running in a CI environment
+
+      ${{ if eq(parameters.has_coverage, true) }}:
+        PYTEST_COV_ARGS: --cov
 
       COVERAGE_FILE: '.coverage.main'
       # Note that we're hardcoding the name of the coverage file. This is important
@@ -219,6 +264,9 @@ jobs:
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
 
+      ${{ each variable in parameters.tests_env }}:
+        ${{ variable.key }}: ${{ variable.value }}
+
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
 
@@ -226,6 +274,7 @@ jobs:
   # combine the results.
   - task: Bash@3
     displayName: Combine code coverage results
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     inputs:
       targetType: inline
       script: |
@@ -255,12 +304,14 @@ jobs:
 
   - task: PublishCodeCoverageResults@2
     displayName: Publish code coverage
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     inputs:
       summaryFileLocation: coverage.xml
       failIfCoverageEmpty: true
 
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
+    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
     # Upload the code coverage result to codecov.io using the binary uploader.
     # Use flags to identify coverage from each OS/Python combination for proper
     # merging.

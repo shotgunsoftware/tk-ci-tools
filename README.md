@@ -118,6 +118,41 @@ If you need to use an in-development version of these tools from a branch, you c
 
 The `build-pipeline.yml` template has a few parameters. You can find out more about them in [build-pipeline.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/build-pipeline.yml).
 
+### Choosing the Python versions and operating systems to test
+
+By default, tests run on Linux, macOS and Windows with the Python and Qt versions of the VFX Reference Platform. Each OS uses its `-latest` runner image, unless a Python version is not available on it. See `platform_versions` in [internal/run-tests.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/internal/run-tests.yml) for the default values.
+
+To test with other platforms, override `platform_versions`. Each platform runs on Linux, macOS and Windows with their `-latest` image. List an OS in `os_versions` only to use another image for it, or `skip` to not test on it. For example, to test Python 3.12 and Python 3.9, skipping macOS for 3.12:
+
+```yaml
+jobs:
+- template: build-pipeline.yml@templates
+  parameters:
+    run_tests_extra_parameters:
+      platform_versions:
+      - name: Python 3.9
+        python_version: '3.9'
+        qt_wrapper: PySide2==5.15.2.1
+        os_versions:
+          Linux: ubuntu-24.04
+      - name: Python 3.12
+        python_version: '3.12'
+        qt_wrapper: PySide6~=6.8.3
+        os_versions:
+          macOS: skip
+```
+
+Repositories that are not Toolkit components can also set `use_tk_core: false` in `run_tests_extra_parameters`. tk-core is then not cloned, and the tk-toolchain pytest plugin is turned off, so the tests don't load tk-core or the packages it bundles, like `shotgun_api3`.
+
+Repositories whose tests don't exercise their own code, like tk-ci-tools itself, can set `has_coverage: false` in `run_tests_extra_parameters`. The tests then run without measuring the code coverage, and the steps that combine, publish and upload it to Codecov are skipped.
+
+Repositories whose tests need more setup can also use these keys of `run_tests_extra_parameters`:
+
+- `pre_tests_steps`: steps run right before the tests, in every test job, e.g. to create a configuration file.
+- `tests_env`: extra environment variables for the tests. Secret variables are not exposed to the tests on their own, map them here, e.g. `MY_PASSWORD: $(my_password)`. The values can use `$(tk_ci_os_name)` and `$(tk_ci_python_version)`, the OS and Python version of the job, e.g. to use a different test user per job.
+- `extra_test_dependencies`: Python packages to pip install for testing. They are added to the top-level `extra_test_dependencies` parameter, which most repositories use.
+- `pytest_extra_args`: extra arguments for pytest, e.g. `[--reruns, '1', --reruns-delay, '2']`.
+
 ### Create a build in Azure Pipelines
 
 Once you've added your `azure-pipelines.yml` file to your repository, it's time to add the repository to the Azure Pipelines web service.
