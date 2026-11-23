@@ -223,6 +223,10 @@ jobs:
   - task: Bash@3
     displayName: Run tests
     # Runs the tests and generates both test report and code coverage
+    # FIXME: pytest_extra_args is joined with spaces into the script, so an
+    # argument containing a space is split, e.g. ['-k', 'test_a or test_b']
+    # passes "or" and "test_b" as paths. Pass the list as JSON through an
+    # environment variable (convertToJson) and rebuild a bash array from it.
     inputs:
       targetType: inline
       script: |
