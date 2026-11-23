@@ -36,7 +36,7 @@ parameters:
     type: boolean
     default: true
   # Optional overrides of the default test behavior defined in
-  # internal/run-tests.yml. Supported keys:
+  # internal/run-tests.yml. Any other key fails the pipeline. Supported keys:
   # - platform_versions: the platforms to test with, replacing the default
   #   VFX Reference Platform list. Each platform runs on Linux, macOS and
   #   Windows with their -latest image. List an OS in os_versions only to use
@@ -116,9 +116,14 @@ jobs:
       post_tests_steps: ${{ parameters.post_tests_steps }}
       has_unit_tests: ${{ parameters.has_unit_tests }}
       # Only pass the supported overrides, run-tests.yml has the defaults.
+      # An unsupported key (for example a typo) is passed under a name that
+      # run-tests.yml does not declare, so the pipeline fails with an
+      # "Unexpected parameter" error naming it instead of ignoring it.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
         ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
+        ${{ else }}:
+          ${{ format('unsupported_run_tests_extra_parameter_{0}', parameter.key) }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
