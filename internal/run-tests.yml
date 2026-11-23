@@ -44,6 +44,17 @@ parameters:
   # the repository itself.
   has_coverage: true
 
+  # Steps run right before the tests, in every test job.
+  pre_tests_steps: []
+
+  # Extra environment variables for the tests. Map secrets here, e.g.
+  # SG_API_KEY: $(my_secret). The job variables $(tk_ci_os_name) and
+  # $(tk_ci_python_version) can be used in the values.
+  tests_env: {}
+
+  # Extra arguments for pytest, e.g. [--reruns, '1'].
+  pytest_extra_args: []
+
   # Platforms to test with: a Python version and the Qt wrapper to install.
   # Each platform is tested on every OS of os_versions, with the OS default
   # image. To use another image for an OS, or not test on it, list only that
@@ -116,3 +127,6 @@ jobs:
               post_tests_steps: ${{ parameters.post_tests_steps }}
               use_tk_core: ${{ parameters.use_tk_core }}
               has_coverage: ${{ parameters.has_coverage }}
+              pre_tests_steps: ${{ parameters.pre_tests_steps }}
+              tests_env: ${{ parameters.tests_env }}
+              pytest_extra_args: ${{ parameters.pytest_extra_args }}

@@ -56,6 +56,17 @@ parameters:
   #   for repositories whose tests don't exercise their own code. For example:
   #   run_tests_extra_parameters:
   #     has_coverage: false
+  # - pre_tests_steps: steps run right before the tests, in every test job.
+  # - tests_env: extra environment variables for the tests, including
+  #   secrets, which must be mapped explicitly. The values can use the job
+  #   variables $(tk_ci_os_name) and $(tk_ci_python_version). For example:
+  #   run_tests_extra_parameters:
+  #     tests_env:
+  #       MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
+  #       MY_PASSWORD: $(my_password)
+  # - pytest_extra_args: extra arguments for pytest. For example:
+  #   run_tests_extra_parameters:
+  #     pytest_extra_args: [--reruns, '1', --reruns-delay, '2']
   - name: run_tests_extra_parameters
     type: object
     default: {}
@@ -120,7 +131,7 @@ jobs:
       # run-tests.yml does not declare, so the pipeline fails with an
       # "Unexpected parameter" error naming it instead of ignoring it.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage') }}:
+        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage', 'pre_tests_steps', 'tests_env', 'pytest_extra_args') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
         ${{ else }}:
           ${{ format('unsupported_run_tests_extra_parameter_{0}', parameter.key) }}: ${{ parameter.value }}

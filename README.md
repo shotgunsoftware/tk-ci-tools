@@ -146,6 +146,12 @@ Repositories that are not Toolkit components can also set `use_tk_core: false` i
 
 Repositories whose tests don't exercise their own code, like tk-ci-tools itself, can set `has_coverage: false` in `run_tests_extra_parameters`. The tests then run without measuring the code coverage, and the steps that combine, publish and upload it to Codecov are skipped.
 
+Repositories whose tests need more setup can also use these keys of `run_tests_extra_parameters`:
+
+- `pre_tests_steps`: steps run right before the tests, in every test job, e.g. to create a configuration file.
+- `tests_env`: extra environment variables for the tests. Secret variables are not exposed to the tests on their own, map them here, e.g. `MY_PASSWORD: $(my_password)`. The values can use `$(tk_ci_os_name)` and `$(tk_ci_python_version)`, the OS and Python version of the job, e.g. to use a different test user per job.
+- `pytest_extra_args`: extra arguments for pytest, e.g. `[--reruns, '1', --reruns-delay, '2']`.
+
 ### Create a build in Azure Pipelines
 
 Once you've added your `azure-pipelines.yml` file to your repository, it's time to add the repository to the Azure Pipelines web service.

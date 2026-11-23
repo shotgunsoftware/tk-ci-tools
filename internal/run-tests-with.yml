@@ -81,16 +81,37 @@ parameters:
     # Codecov. Turn it off for repositories whose tests don't exercise the
     # code of the repository itself.
 
+  - name: pre_tests_steps
+    type: object
+    # List of Azure Pipeline steps inserted right before the tests are run.
+
+  - name: tests_env
+    type: object
+    # Extra environment variables for the step running the tests. Secrets
+    # must be mapped here, e.g. SG_API_KEY: $(my_secret), since Azure does not
+    # expose them as environment variables on its own.
+
+  - name: pytest_extra_args
+    type: object
+    # List of extra arguments for pytest, e.g. [--reruns, '1'].
+
 jobs:
 - job:
   displayName: ${{ parameters.os_name }} - Python ${{ parameters.python_version }}
   pool:
     vmImage: ${{ parameters.vm_image }}
-  ${{ if eq(parameters.use_tk_core, false) }}:
-    variables:
-      # Turn off the tk-toolchain pytest plugin so tk-core is not loaded, in
-      # the main test step and in post_tests_steps.
-      PYTEST_ADDOPTS: -p no:pytest_tank_test
+  variables:
+  # The OS and Python version of this job, for the steps and environment
+  # variables of the repository, e.g. $(tk_ci_os_name) gives Linux.
+  - name: tk_ci_os_name
+    value: ${{ parameters.os_name }}
+  - name: tk_ci_python_version
+    value: ${{ parameters.python_version }}
+  - ${{ if eq(parameters.use_tk_core, false) }}:
+    # Turn off the tk-toolchain pytest plugin so tk-core is not loaded, in
+    # the main test step and in post_tests_steps.
+    - name: PYTEST_ADDOPTS
+      value: -p no:pytest_tank_test
   steps:
 
   - checkout: self
@@ -171,6 +192,9 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
 
+  # The pre_tests_steps list will be flattened into this list of steps.
+  - ${{ parameters.pre_tests_steps }}
+
   - task: Bash@3
     displayName: Create a simple coverage file if missing
     condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
@@ -207,7 +231,7 @@ jobs:
           $PYTEST_COV_ARGS \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
-          --verbose
+          --verbose ${{ join(' ', parameters.pytest_extra_args) }}
     env:
       CI: 1
       # Tell Pytest that we're running in a CI environment
@@ -235,6 +259,9 @@ jobs:
       TK_TOOLCHAIN_USER_LOGIN: $(sg.ci.human.login)
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
+
+      ${{ each variable in parameters.tests_env }}:
+        ${{ variable.key }}: ${{ variable.value }}
 
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
