@@ -150,6 +150,7 @@ Repositories whose tests need more setup can also use these keys of `run_tests_e
 
 - `pre_tests_steps`: steps run right before the tests, in every test job, e.g. to create a configuration file.
 - `tests_env`: extra environment variables for the tests. Secret variables are not exposed to the tests on their own, map them here, e.g. `MY_PASSWORD: $(my_password)`. The values can use `$(tk_ci_os_name)` and `$(tk_ci_python_version)`, the OS and Python version of the job, e.g. to use a different test user per job.
+- `extra_test_dependencies`: Python packages to pip install for testing. They are added to the top-level `extra_test_dependencies` parameter, which most repositories use.
 - `pytest_extra_args`: extra arguments for pytest, e.g. `[--reruns, '1', --reruns-delay, '2']`.
 
 ### Create a build in Azure Pipelines

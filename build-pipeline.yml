@@ -9,7 +9,8 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # List of Python packages that need to be pip installed for testing.
+  # List of Python packages that need to be pip installed for testing. It can
+  # also be set in run_tests_extra_parameters, and both lists are installed.
   - name: extra_test_dependencies
     type: object
     default: []
@@ -64,6 +65,11 @@ parameters:
   #     tests_env:
   #       MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
   #       MY_PASSWORD: $(my_password)
+  # - extra_test_dependencies: Python packages to pip install for testing,
+  #   added to the top-level extra_test_dependencies. For example:
+  #   run_tests_extra_parameters:
+  #     extra_test_dependencies:
+  #     - -r tests/requirements.txt
   # - pytest_extra_args: extra arguments for pytest. For example:
   #   run_tests_extra_parameters:
   #     pytest_extra_args: [--reruns, '1', --reruns-delay, '2']
@@ -120,7 +126,14 @@ jobs:
   - template: "internal/run-tests.yml"
     parameters:
       # pass through all parameters
-      extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+      # Both lists are installed: the top-level parameter, used by most
+      # repositories, and the one of run_tests_extra_parameters. Inserting a
+      # list into a list flattens it.
+      extra_test_dependencies:
+      - ${{ parameters.extra_test_dependencies }}
+      - ${{ each parameter in parameters.run_tests_extra_parameters }}:
+        - ${{ if eq(parameter.key, 'extra_test_dependencies') }}:
+          - ${{ parameter.value }}
       tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
       additional_repositories: ${{ parameters.additional_repositories }}
       tk_core_ref: ${{ parameters.tk_core_ref }}
@@ -133,7 +146,8 @@ jobs:
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
         ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage', 'pre_tests_steps', 'tests_env', 'pytest_extra_args') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
-        ${{ else }}:
+        # extra_test_dependencies is merged into the list above.
+        ${{ elseif ne(parameter.key, 'extra_test_dependencies') }}:
           ${{ format('unsupported_run_tests_extra_parameter_{0}', parameter.key) }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
