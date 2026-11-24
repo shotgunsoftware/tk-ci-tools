@@ -9,11 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # List of Python packages that need to be pip installed for testing. It can
-  # also be set in run_tests_extra_parameters, and both lists are installed.
-  - name: extra_test_dependencies
-    type: object
-    default: []
   # Version of tk-toolchain to use.
   - name: tk_toolchain_ref
     type: string
@@ -33,6 +28,9 @@ parameters:
     type: string
     default: master
   # Tells the build pipeline that the repository has unit tests to execute
+  # FIXME: rename to run_tests. It decides whether the build pipeline runs the
+  # tests of the repository, whatever they are, not whether it has unit tests.
+  # Many repositories set it, so the rename needs to update all of them.
   - name: has_unit_tests
     type: boolean
     default: true
@@ -63,8 +61,7 @@ parameters:
   #     env:
   #       MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
   #       MY_PASSWORD: $(my_password)
-  # - dependencies: Python packages to pip install for testing, added to the
-  #   top-level extra_test_dependencies. For example:
+  # - dependencies: Python packages to pip install for testing. For example:
   #   run_tests_extra_parameters:
   #     dependencies:
   #     - -r tests/requirements.txt
@@ -124,14 +121,6 @@ jobs:
   - template: "internal/run-tests.yml"
     parameters:
       # pass through all parameters
-      # Both lists of test dependencies are installed: the top-level parameter, used by most
-      # repositories, and the one of run_tests_extra_parameters. Inserting a
-      # list into a list flattens it.
-      extra_test_dependencies:
-      - ${{ parameters.extra_test_dependencies }}
-      - ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        - ${{ if eq(parameter.key, 'dependencies') }}:
-          - ${{ parameter.value }}
       tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
       additional_repositories: ${{ parameters.additional_repositories }}
       tk_core_ref: ${{ parameters.tk_core_ref }}
@@ -140,10 +129,8 @@ jobs:
       # Pass the overrides as they are, run-tests.yml has the defaults. It
       # declares all its parameters, so an unknown key (for example a typo)
       # fails the pipeline with an "Unexpected parameter" error.
-      # dependencies is merged into extra_test_dependencies above.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        ${{ if ne(parameter.key, 'dependencies') }}:
-          ${{ parameter.key }}: ${{ parameter.value }}
+        ${{ parameter.key }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.

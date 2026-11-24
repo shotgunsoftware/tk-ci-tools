@@ -45,7 +45,7 @@ parameters:
     # - name: tk-framework-qtwidgets
     #   ref: <branch-or-tag>
 
-  - name: extra_test_dependencies
+  - name: dependencies
     type: object
     # List of Python packages that need to be pip installed for testing.
 
@@ -132,14 +132,14 @@ jobs:
       - pytest-nunit
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
-      # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
+      # E.g. given a dependencies parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
       # - PySide2
       # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
       # - pytest-azurepipelines
       # - Qt.py
       # - numpy
-      - ${{ parameters.extra_test_dependencies }}
+      - ${{ parameters.dependencies }}
 
   - task: Bash@3
     displayName: Check installed packages

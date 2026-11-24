@@ -9,10 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 parameters:
-  # List of Python packages that need to be pip installed for testing.
-  - name: extra_test_dependencies
-    type: object
-    default: []
   # Git ref of tk-toolchain to use.
   - name: tk_toolchain_ref
     type: string
@@ -72,6 +68,11 @@ parameters:
   - name: env
     type: object
     default: {}
+
+  # Python packages to pip install for testing, e.g. [-r tests/requirements.txt].
+  - name: dependencies
+    type: object
+    default: []
 
   # Extra arguments for pytest, e.g. [--reruns, '1'].
   - name: pytest_args
@@ -148,7 +149,7 @@ jobs:
               vm_image: ${{ coalesce(platform.os_versions[os_version.name], os_version.image) }}
 
               # pass through all parameters
-              extra_test_dependencies: ${{ parameters.extra_test_dependencies }}
+              dependencies: ${{ parameters.dependencies }}
               tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
               additional_repositories: ${{ parameters.additional_repositories }}
               tk_core_ref: ${{ parameters.tk_core_ref }}

@@ -77,6 +77,13 @@ def test_parameters_are_typed() -> None:
 
 def test_overrides_exist(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
     """The run_tests_extra_parameters keys documented in build-pipeline.yml exist."""
-    # dependencies is merged into extra_test_dependencies by build-pipeline.yml.
-    documented = {"platforms", "toolkit", "coverage", "pre_steps", "env", "pytest_args"}
+    documented = {
+        "platforms",
+        "toolkit",
+        "coverage",
+        "pre_steps",
+        "env",
+        "dependencies",
+        "pytest_args",
+    }
     assert documented <= set(run_tests_parameters)
