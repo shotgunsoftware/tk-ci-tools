@@ -32,12 +32,12 @@ def run_tests_parameters() -> typing.Dict[str, typing.Any]:
         return yaml.safe_load(f)["parameters"]
 
 
-def test_platform_versions(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
+def test_platforms(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
     """Every platform has a quoted Python version, a Qt wrapper and valid overrides."""
     os_names = {
         os_version["name"] for os_version in run_tests_parameters["os_versions"]
     }
-    for platform in run_tests_parameters["platform_versions"]:
+    for platform in run_tests_parameters["platforms"]:
         # An unquoted 3.10 would be loaded as the number 3.1.
         assert isinstance(platform["python_version"], str), platform["name"]
         assert platform["qt_wrapper"], platform["name"]
@@ -59,4 +59,4 @@ def test_os_versions(run_tests_parameters: typing.Dict[str, typing.Any]) -> None
 
 def test_coverage_is_on_by_default(run_tests_parameters) -> None:
     """Toolkit repositories keep measuring and uploading their coverage."""
-    assert run_tests_parameters["has_coverage"] is True
+    assert run_tests_parameters["coverage"] is True

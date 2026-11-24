@@ -34,7 +34,7 @@ jobs:
     run_tests_extra_parameters:
       # The tests of this repository check the templates, not its own code,
       # so there is no code coverage to measure.
-      has_coverage: false
+      coverage: false
     # This will ensure we can clone other repositories on a branch
     # or directly on master.
     additional_repositories:

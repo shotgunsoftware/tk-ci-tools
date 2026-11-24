@@ -35,34 +35,36 @@ parameters:
   # If set to true, the build agent will run unit tests.
   has_unit_tests: true
 
-  # Clone tk-core and load it in the tests, so they can import sgtk. Turn it
+  # The repository is a Toolkit component: install the Qt wrapper and
+  # tk-toolchain, clone tk-core and set up a display for Qt on Linux. Turn it
   # off for repositories that are not Toolkit components.
-  use_tk_core: true
+  toolkit: true
 
   # Measure the code coverage, publish it to Azure Pipelines and upload it to
   # Codecov. Turn it off for repositories whose tests don't exercise the code of
   # the repository itself.
-  has_coverage: true
+  coverage: true
 
   # Steps run right before the tests, in every test job.
-  pre_tests_steps: []
+  pre_steps: []
 
   # Extra environment variables for the tests. Map secrets here, e.g.
   # SG_API_KEY: $(my_secret). The job variables $(tk_ci_os_name) and
   # $(tk_ci_python_version) can be used in the values.
-  tests_env: {}
+  env: {}
 
   # Extra arguments for pytest, e.g. [--reruns, '1'].
-  pytest_extra_args: []
+  pytest_args: []
 
   # Platforms to test with: a Python version and the Qt wrapper to install.
+  # The Qt wrapper is ignored when toolkit is false.
   # Each platform is tested on every OS of os_versions, with the OS default
   # image. To use another image for an OS, or not test on it, list only that
   # OS in the platform's os_versions:
   #   os_versions:
   #     Linux: ubuntu-24.04
   #     macOS: skip
-  platform_versions:
+  platforms:
     - name: VFX CY2022
       python_version: '3.9'
       qt_wrapper: PySide2==5.15.2.1
@@ -107,7 +109,7 @@ parameters:
 
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:
-    - ${{ each platform in parameters.platform_versions }}:
+    - ${{ each platform in parameters.platforms }}:
       - ${{ each os_version in parameters.os_versions }}:
         # Use the platform's image for this OS if it has one, else the OS default.
         - ${{ if ne(coalesce(platform.os_versions[os_version.name], os_version.image), 'skip') }}:
@@ -125,8 +127,8 @@ jobs:
               additional_repositories: ${{ parameters.additional_repositories }}
               tk_core_ref: ${{ parameters.tk_core_ref }}
               post_tests_steps: ${{ parameters.post_tests_steps }}
-              use_tk_core: ${{ parameters.use_tk_core }}
-              has_coverage: ${{ parameters.has_coverage }}
-              pre_tests_steps: ${{ parameters.pre_tests_steps }}
-              tests_env: ${{ parameters.tests_env }}
-              pytest_extra_args: ${{ parameters.pytest_extra_args }}
+              toolkit: ${{ parameters.toolkit }}
+              coverage: ${{ parameters.coverage }}
+              pre_steps: ${{ parameters.pre_steps }}
+              env: ${{ parameters.env }}
+              pytest_args: ${{ parameters.pytest_args }}

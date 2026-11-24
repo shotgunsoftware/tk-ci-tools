@@ -38,41 +38,39 @@ parameters:
     default: true
   # Optional overrides of the default test behavior defined in
   # internal/run-tests.yml. Any other key fails the pipeline. Supported keys:
-  # - platform_versions: the platforms to test with, replacing the default
-  #   VFX Reference Platform list. Each platform runs on Linux, macOS and
-  #   Windows with their -latest image. List an OS in os_versions only to use
-  #   another image or to skip it. For example:
+  # - platforms: the platforms to test with, replacing the default VFX
+  #   Reference Platform list. Each platform runs on Linux, macOS and Windows
+  #   with their -latest image. List an OS in os_versions only to use another
+  #   image or to skip it. qt_wrapper is ignored when toolkit is false. For
+  #   example:
   #   run_tests_extra_parameters:
-  #     platform_versions:
+  #     platforms:
   #     - name: Python 3.12
   #       python_version: '3.12'
   #       qt_wrapper: PySide6~=6.8.3
   #       os_versions:
   #         macOS: skip
-  # - use_tk_core: false to not clone and load tk-core in the tests, for
-  #   repositories that are not Toolkit components. For example:
+  # - toolkit: false for repositories that are not Toolkit components. The Qt
+  #   wrapper and tk-toolchain are not installed, tk-core is not cloned and
+  #   there is no display setup for Qt on Linux.
+  # - coverage: false to not measure, publish or upload the code coverage, for
+  #   repositories whose tests don't exercise their own code.
+  # - pre_steps: steps run right before the tests, in every test job.
+  # - env: extra environment variables for the tests, including secrets,
+  #   which must be mapped explicitly. The values can use the job variables
+  #   $(tk_ci_os_name) and $(tk_ci_python_version). For example:
   #   run_tests_extra_parameters:
-  #     use_tk_core: false
-  # - has_coverage: false to not measure, publish or upload the code coverage,
-  #   for repositories whose tests don't exercise their own code. For example:
-  #   run_tests_extra_parameters:
-  #     has_coverage: false
-  # - pre_tests_steps: steps run right before the tests, in every test job.
-  # - tests_env: extra environment variables for the tests, including
-  #   secrets, which must be mapped explicitly. The values can use the job
-  #   variables $(tk_ci_os_name) and $(tk_ci_python_version). For example:
-  #   run_tests_extra_parameters:
-  #     tests_env:
+  #     env:
   #       MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
   #       MY_PASSWORD: $(my_password)
-  # - extra_test_dependencies: Python packages to pip install for testing,
-  #   added to the top-level extra_test_dependencies. For example:
+  # - dependencies: Python packages to pip install for testing, added to the
+  #   top-level extra_test_dependencies. For example:
   #   run_tests_extra_parameters:
-  #     extra_test_dependencies:
+  #     dependencies:
   #     - -r tests/requirements.txt
-  # - pytest_extra_args: extra arguments for pytest. For example:
+  # - pytest_args: extra arguments for pytest. For example:
   #   run_tests_extra_parameters:
-  #     pytest_extra_args: [--reruns, '1', --reruns-delay, '2']
+  #     pytest_args: [--reruns, '1', --reruns-delay, '2']
   - name: run_tests_extra_parameters
     type: object
     default: {}
@@ -132,7 +130,7 @@ jobs:
       extra_test_dependencies:
       - ${{ parameters.extra_test_dependencies }}
       - ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        - ${{ if eq(parameter.key, 'extra_test_dependencies') }}:
+        - ${{ if eq(parameter.key, 'dependencies') }}:
           - ${{ parameter.value }}
       tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
       additional_repositories: ${{ parameters.additional_repositories }}
@@ -144,10 +142,10 @@ jobs:
       # run-tests.yml does not declare, so the pipeline fails with an
       # "Unexpected parameter" error naming it instead of ignoring it.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        ${{ if in(parameter.key, 'platform_versions', 'use_tk_core', 'has_coverage', 'pre_tests_steps', 'tests_env', 'pytest_extra_args') }}:
+        ${{ if in(parameter.key, 'platforms', 'toolkit', 'coverage', 'pre_steps', 'env', 'pytest_args') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
-        # extra_test_dependencies is merged into the list above.
-        ${{ elseif ne(parameter.key, 'extra_test_dependencies') }}:
+        # dependencies is merged into extra_test_dependencies above.
+        ${{ elseif ne(parameter.key, 'dependencies') }}:
           ${{ format('unsupported_run_tests_extra_parameter_{0}', parameter.key) }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
