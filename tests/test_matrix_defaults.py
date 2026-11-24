@@ -76,7 +76,7 @@ def test_parameters_are_typed() -> None:
 
 
 def test_overrides_exist(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
-    """The run_tests_extra_parameters keys documented in build-pipeline.yml exist."""
+    """The run_tests_parameters keys documented in build-pipeline.yml exist."""
     documented = {
         "platforms",
         "toolkit",

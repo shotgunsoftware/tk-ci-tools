@@ -122,13 +122,13 @@ The `build-pipeline.yml` template has a few parameters. You can find out more ab
 
 By default, tests run on Linux, macOS and Windows with the Python and Qt versions of the VFX Reference Platform. Each OS uses its `-latest` runner image, unless a Python version is not available on it. See `platforms` in [internal/run-tests.yml](https://github.com/shotgunsoftware/tk-ci-tools/blob/master/internal/run-tests.yml) for the default values.
 
-To test with other platforms, override `platforms` in `run_tests_extra_parameters`. Each platform runs on Linux, macOS and Windows with their `-latest` image. List an OS in `os_versions` only to use another image for it, or `skip` to not test on it. For example, to test Python 3.12 and Python 3.9, skipping macOS for 3.12:
+To test with other platforms, override `platforms` in `run_tests_parameters`. Each platform runs on Linux, macOS and Windows with their `-latest` image. List an OS in `os_versions` only to use another image for it, or `skip` to not test on it. For example, to test Python 3.12 and Python 3.9, skipping macOS for 3.12:
 
 ```yaml
 jobs:
 - template: build-pipeline.yml@templates
   parameters:
-    run_tests_extra_parameters:
+    run_tests_parameters:
       platforms:
       - name: Python 3.9
         python_version: '3.9'
@@ -142,7 +142,7 @@ jobs:
           macOS: skip
 ```
 
-The other keys of `run_tests_extra_parameters` are:
+The other keys of `run_tests_parameters` are:
 
 - `toolkit`: `false` for repositories that are not Toolkit components. The Qt wrapper and tk-toolchain are not installed, tk-core is not cloned, and there is no display setup for Qt on Linux. `qt_wrapper` in `platforms` is then ignored.
 - `coverage`: `false` for repositories whose tests don't exercise their own code, like tk-ci-tools itself. The coverage is not measured, and the steps that combine, publish and upload it to Codecov are skipped.

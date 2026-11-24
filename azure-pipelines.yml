@@ -31,7 +31,7 @@ variables:
 jobs:
 - template: build-pipeline.yml
   parameters:
-    run_tests_extra_parameters:
+    run_tests_parameters:
       # The tests of this repository check the templates, not its own code,
       # so there is no code coverage to measure.
       coverage: false

@@ -124,22 +124,24 @@ jobs:
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - ${{ if eq(parameters.toolkit, true) }}:
-        - ${{ parameters.qt_wrapper }}
-        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - pytest
       - pytest-cov
       - pytest-nunit
+      - ${{ if eq(parameters.toolkit, true) }}:
+        - ${{ parameters.qt_wrapper }}
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a dependencies parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
+      # - pytest, pytest-cov, pytest-nunit
       # - PySide2
-      # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
-      # - pytest-azurepipelines
       # - Qt.py
       # - numpy
+      # - tk-toolchain
       - ${{ parameters.dependencies }}
+      # Last, since the URL is long.
+      - ${{ if eq(parameters.toolkit, true) }}:
+        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
   - task: Bash@3
     displayName: Check installed packages
@@ -152,27 +154,30 @@ jobs:
   - template: clone-repositories.yml
     parameters:
       repositories:
-      - ${{ if eq(parameters.toolkit, true) }}:
-        - name: tk-core
-          ref: ${{ parameters.tk_core_ref }}
+      # Always listed, so the clone shows as skipped for other repositories.
+      - name: tk-core
+        ref: ${{ parameters.tk_core_ref }}
+        condition: eq('${{ parameters.toolkit }}', 'true')
       # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
-  # We can't use eq(Agent.OS, 'linux') here because template expansion is done
-  # before the job is assigned to an agent.
-  - ${{ if and(eq(parameters.toolkit, true), contains(parameters.os_name, 'Linux')) }}:
-    # Start xvfb on Linux so we can test with a GUI.
-    - bash: |
-        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        echo ">>> Started Xvfb"
-      displayName: Start Xvfb
+  # Qt display setup, only for Toolkit repositories on Linux. The steps are
+  # shown as skipped otherwise.
+  # Start xvfb on Linux so we can test with a GUI.
+  - bash: |
+      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      echo ">>> Started Xvfb"
+    displayName: Start Xvfb
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
-    - bash: sudo apt update
-      displayName: APT Update
+  - bash: sudo apt update
+    displayName: APT Update
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
-    # Install libegl1 required for PySide6
-    - bash: sudo apt install libegl1
-      displayName: Install libegl1
+  # Install libegl1 required for PySide6
+  - bash: sudo apt install libegl1
+    displayName: Install libegl1
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
   # Repositories using our build pipeline outside of the
   # shotgunsoftware organization should not be able to run our UI automation
