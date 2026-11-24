@@ -21,7 +21,6 @@ import typing
 import pytest
 import yaml
 
-
 RUN_TESTS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
 )
