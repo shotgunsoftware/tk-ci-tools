@@ -22,15 +22,21 @@ import pytest
 import yaml
 
 
+RUN_TESTS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
+)
+
+
+def _load_parameters() -> typing.List[typing.Dict[str, typing.Any]]:
+    """Parameters of internal/run-tests.yml, as declared."""
+    with open(RUN_TESTS_PATH, "r") as f:
+        return yaml.safe_load(f)["parameters"]
+
+
 @pytest.fixture(scope="module")
 def run_tests_parameters() -> typing.Dict[str, typing.Any]:
-    """Default parameters of internal/run-tests.yml."""
-    path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
-    )
-    with open(path, "r") as f:
-        parameters = yaml.safe_load(f)["parameters"]
-    return {parameter["name"]: parameter["default"] for parameter in parameters}
+    """Default values of the internal/run-tests.yml parameters, by name."""
+    return {parameter["name"]: parameter["default"] for parameter in _load_parameters()}
 
 
 def test_platforms(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
@@ -64,11 +70,13 @@ def test_coverage_is_on_by_default(run_tests_parameters) -> None:
 
 
 def test_parameters_are_typed() -> None:
-    """Every parameter uses the full form, with a name, a type and a default."""
-    path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
-    )
-    with open(path, "r") as f:
-        parameters = yaml.safe_load(f)["parameters"]
-    for parameter in parameters:
+    """Every parameter uses the full form, so Azure rejects unknown keys and wrong types."""
+    for parameter in _load_parameters():
         assert set(parameter) == {"name", "type", "default"}, parameter
+
+
+def test_overrides_exist(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
+    """The run_tests_extra_parameters keys documented in build-pipeline.yml exist."""
+    # dependencies is merged into extra_test_dependencies by build-pipeline.yml.
+    documented = {"platforms", "toolkit", "coverage", "pre_steps", "env", "pytest_args"}
+    assert documented <= set(run_tests_parameters)

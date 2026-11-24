@@ -124,7 +124,7 @@ jobs:
   - template: "internal/run-tests.yml"
     parameters:
       # pass through all parameters
-      # Both lists are installed: the top-level parameter, used by most
+      # Both lists of test dependencies are installed: the top-level parameter, used by most
       # repositories, and the one of run_tests_extra_parameters. Inserting a
       # list into a list flattens it.
       extra_test_dependencies:
@@ -137,16 +137,13 @@ jobs:
       tk_core_ref: ${{ parameters.tk_core_ref }}
       post_tests_steps: ${{ parameters.post_tests_steps }}
       has_unit_tests: ${{ parameters.has_unit_tests }}
-      # Only pass the supported overrides, run-tests.yml has the defaults.
-      # An unsupported key (for example a typo) is passed under a name that
-      # run-tests.yml does not declare, so the pipeline fails with an
-      # "Unexpected parameter" error naming it instead of ignoring it.
+      # Pass the overrides as they are, run-tests.yml has the defaults. It
+      # declares all its parameters, so an unknown key (for example a typo)
+      # fails the pipeline with an "Unexpected parameter" error.
+      # dependencies is merged into extra_test_dependencies above.
       ${{ each parameter in parameters.run_tests_extra_parameters }}:
-        ${{ if in(parameter.key, 'platforms', 'toolkit', 'coverage', 'pre_steps', 'env', 'pytest_args') }}:
+        ${{ if ne(parameter.key, 'dependencies') }}:
           ${{ parameter.key }}: ${{ parameter.value }}
-        # dependencies is merged into extra_test_dependencies above.
-        ${{ elseif ne(parameter.key, 'dependencies') }}:
-          ${{ format('unsupported_run_tests_extra_parameter_{0}', parameter.key) }}: ${{ parameter.value }}
 
 # If the build was launched because a tag was created, we'll want to deploy
 # this to the AppStore.
