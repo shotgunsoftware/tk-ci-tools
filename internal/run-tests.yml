@@ -10,9 +10,13 @@
 
 parameters:
   # List of Python packages that need to be pip installed for testing.
-  extra_test_dependencies: []
+  - name: extra_test_dependencies
+    type: object
+    default: []
   # Git ref of tk-toolchain to use.
-  tk_toolchain_ref: master
+  - name: tk_toolchain_ref
+    type: string
+    default: master
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
@@ -20,9 +24,13 @@ parameters:
   # - name: tk-framework-shotgunutils
   # - name: tk-framework-qtwidgets
   #   ref: <branch-or-tag>
-  additional_repositories: []
+  - name: additional_repositories
+    type: object
+    default: []
   # Git ref of tk-core to use.
-  tk_core_ref: master
+  - name: tk_core_ref
+    type: string
+    default: master
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -31,30 +39,44 @@ parameters:
   # post_tests_steps:
   # - bash: do_something
   # - bash: do_something_else
-  post_tests_steps: []
+  - name: post_tests_steps
+    type: object
+    default: []
   # If set to true, the build agent will run unit tests.
-  has_unit_tests: true
+  - name: has_unit_tests
+    type: boolean
+    default: true
 
   # The repository is a Toolkit component: install the Qt wrapper and
   # tk-toolchain, clone tk-core and set up a display for Qt on Linux. Turn it
   # off for repositories that are not Toolkit components.
-  toolkit: true
+  - name: toolkit
+    type: boolean
+    default: true
 
   # Measure the code coverage, publish it to Azure Pipelines and upload it to
   # Codecov. Turn it off for repositories whose tests don't exercise the code of
   # the repository itself.
-  coverage: true
+  - name: coverage
+    type: boolean
+    default: true
 
   # Steps run right before the tests, in every test job.
-  pre_steps: []
+  - name: pre_steps
+    type: object
+    default: []
 
   # Extra environment variables for the tests. Map secrets here, e.g.
   # SG_API_KEY: $(my_secret). The job variables $(tk_ci_os_name) and
   # $(tk_ci_python_version) can be used in the values.
-  env: {}
+  - name: env
+    type: object
+    default: {}
 
   # Extra arguments for pytest, e.g. [--reruns, '1'].
-  pytest_args: []
+  - name: pytest_args
+    type: object
+    default: []
 
   # Platforms to test with: a Python version and the Qt wrapper to install.
   # The Qt wrapper is ignored when toolkit is false.
@@ -64,48 +86,52 @@ parameters:
   #   os_versions:
   #     Linux: ubuntu-24.04
   #     macOS: skip
-  platforms:
-    - name: VFX CY2022
-      python_version: '3.9'
-      qt_wrapper: PySide2==5.15.2.1
-      os_versions:
-        # ubuntu-latest (Ubuntu 26.04) does not provide Python 3.9
-        Linux: ubuntu-24.04
+  - name: platforms
+    type: object
+    default:
+      - name: VFX CY2022
+        python_version: '3.9'
+        qt_wrapper: PySide2==5.15.2.1
+        os_versions:
+          # ubuntu-latest (Ubuntu 26.04) does not provide Python 3.9
+          Linux: ubuntu-24.04
 
-    - name: VFX CY2023
-      python_version: '3.10'
-      qt_wrapper: PySide2==5.15.2.1
+      - name: VFX CY2023
+        python_version: '3.10'
+        qt_wrapper: PySide2==5.15.2.1
 
-    - name: VFX CY2024
-      python_version: '3.11'
-      qt_wrapper: PySide6~=6.6.3
-      # Not using the real VFX Qt version: 6.5.
-      # Because ~6.5.2 has problem with core ci
-      # Also 6.6.1 has a random bug (SG-38086).
+      - name: VFX CY2024
+        python_version: '3.11'
+        qt_wrapper: PySide6~=6.6.3
+        # Not using the real VFX Qt version: 6.5.
+        # Because ~6.5.2 has problem with core ci
+        # Also 6.6.1 has a random bug (SG-38086).
 
-    - name: VFX CY2026
-      python_version: '3.13'
-      qt_wrapper: PySide6~=6.8.3
+      - name: VFX CY2026
+        python_version: '3.13'
+        qt_wrapper: PySide6~=6.8.3
 
   # Operating systems to test on, with their default runner image.
-  os_versions:
-    - name: Linux
-      image: ubuntu-latest
-      codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
+  - name: os_versions
+    type: object
+    default:
+      - name: Linux
+        image: ubuntu-latest
+        codecov_download_url: https://uploader.codecov.io/latest/linux/codecov
 
-    - name: macOS
-      image: macOS-latest
-      codecov_download_url: https://uploader.codecov.io/v0.7.3/macos/codecov
-      # macOS & codecov note:
-      # In Nov 2024 (SG-36700), we pinned macOS to codecov v0.7.3 because the
-      # macOS-14 Azure Pipelines agent is Intel (x86_64), but Codecov started
-      # shipping arm64-only binaries.
-      # When we will change the macOs image to a arm64 arch, we can use the
-      # "latest" version again.
+      - name: macOS
+        image: macOS-latest
+        codecov_download_url: https://uploader.codecov.io/v0.7.3/macos/codecov
+        # macOS & codecov note:
+        # In Nov 2024 (SG-36700), we pinned macOS to codecov v0.7.3 because the
+        # macOS-14 Azure Pipelines agent is Intel (x86_64), but Codecov started
+        # shipping arm64-only binaries.
+        # When we will change the macOs image to a arm64 arch, we can use the
+        # "latest" version again.
 
-    - name: Windows
-      image: windows-latest
-      codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
+      - name: Windows
+        image: windows-latest
+        codecov_download_url: https://uploader.codecov.io/latest/windows/codecov.exe
 
 jobs:
   - ${{ if eq( parameters.has_unit_tests, true ) }}:

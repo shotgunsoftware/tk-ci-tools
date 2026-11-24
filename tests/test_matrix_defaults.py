@@ -29,7 +29,8 @@ def run_tests_parameters() -> typing.Dict[str, typing.Any]:
         os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
     )
     with open(path, "r") as f:
-        return yaml.safe_load(f)["parameters"]
+        parameters = yaml.safe_load(f)["parameters"]
+    return {parameter["name"]: parameter["default"] for parameter in parameters}
 
 
 def test_platforms(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
@@ -60,3 +61,14 @@ def test_os_versions(run_tests_parameters: typing.Dict[str, typing.Any]) -> None
 def test_coverage_is_on_by_default(run_tests_parameters) -> None:
     """Toolkit repositories keep measuring and uploading their coverage."""
     assert run_tests_parameters["coverage"] is True
+
+
+def test_parameters_are_typed() -> None:
+    """Every parameter uses the full form, with a name, a type and a default."""
+    path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "internal", "run-tests.yml"
+    )
+    with open(path, "r") as f:
+        parameters = yaml.safe_load(f)["parameters"]
+    for parameter in parameters:
+        assert set(parameter) == {"name", "type", "default"}, parameter
