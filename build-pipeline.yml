@@ -39,42 +39,51 @@ parameters:
     default: true
 
   # Optional overrides of the default test behavior defined in
-  # internal/run-tests.yml. Any other key fails the pipeline. Supported keys:
-  # - platforms: the platforms to test with, replacing the default VFX
-  #   Reference Platform list. Each platform runs on Linux, macOS and Windows
-  #   with their -latest image. List an OS in os_versions only to use another
-  #   image or to skip it. qt_wrapper is ignored when toolkit is false. For
-  #   example:
+  # internal/run-tests.yml. Its supported keys are listed below. Any other key
+  # fails the pipeline. For example:
   #   run_tests_parameters:
-  #     platforms:
-  #     - name: Python 3.12
-  #       python_version: '3.12'
-  #       qt_wrapper: PySide6~=6.8.3
-  #       os_versions:
-  #         macOS: skip
-  # - toolkit: false for repositories that are not Toolkit components. The Qt
-  #   wrapper and tk-toolchain are not installed, tk-core is not cloned and
-  #   there is no display setup for Qt on Linux.
-  # - coverage: false to not measure, publish or upload the code coverage, for
-  #   repositories whose tests don't exercise their own code.
-  # - pre_steps: steps run right before the tests, in every test job.
-  # - env: extra environment variables for the tests, including secrets,
-  #   which must be mapped explicitly. The values can use the job variables
-  #   $(tk_ci_os_name) and $(tk_ci_python_version). For example:
-  #   run_tests_parameters:
-  #     env:
-  #       MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
-  #       MY_PASSWORD: $(my_password)
-  # - dependencies: Python packages to pip install for testing. For example:
-  #   run_tests_parameters:
+  #     toolkit: false
   #     dependencies:
   #     - --requirement=tests/requirements.txt
-  # - pytest_args: extra arguments for pytest. For example:
-  #   run_tests_parameters:
-  #     pytest_args: [--reruns, '1', --reruns-delay, '2']
   - name: run_tests_parameters
     type: object
     default: {}
+    # Supported keys:
+    #
+    # platforms: the platforms to test with, replacing the default VFX
+    # Reference Platform list. Each platform runs on Linux, macOS and Windows
+    # with their -latest image. List an OS in os_versions only to use another
+    # image or to skip it. qt_wrapper is ignored when toolkit is false. For
+    # example:
+    #   platforms:
+    #   - name: Python 3.12
+    #     python_version: '3.12'
+    #     qt_wrapper: PySide6~=6.8.3
+    #     os_versions:
+    #       macOS: skip
+    #
+    # toolkit: false for repositories that are not Toolkit components. The Qt
+    # wrapper and tk-toolchain are not installed, tk-core is not cloned and
+    # there is no display setup for Qt on Linux.
+    #
+    # coverage: false to not measure, publish or upload the code coverage, for
+    # repositories whose tests don't exercise their own code.
+    #
+    # pre_steps: steps run right before the tests, in every test job.
+    #
+    # env: extra environment variables for the tests, including secrets, which
+    # must be mapped explicitly. The values can use the job variables
+    # $(tk_ci_os_name) and $(tk_ci_python_version). For example:
+    #   env:
+    #     MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
+    #     MY_PASSWORD: $(my_password)
+    #
+    # dependencies: Python packages to pip install for testing. For example:
+    #   dependencies:
+    #   - --requirement=tests/requirements.txt
+    #
+    # pytest_args: extra arguments for pytest. For example:
+    #   pytest_args: [--reruns, '1', --reruns-delay, '2']
 
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
