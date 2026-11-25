@@ -69,7 +69,8 @@ parameters:
     type: object
     default: {}
 
-  # Python packages to pip install for testing, e.g. [-r tests/requirements.txt].
+  # Python packages to pip install for testing, e.g.
+  # [--requirement=tests/requirements.txt].
   - name: dependencies
     type: object
     default: []

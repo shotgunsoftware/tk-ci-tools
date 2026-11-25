@@ -64,7 +64,7 @@ parameters:
   # - dependencies: Python packages to pip install for testing. For example:
   #   run_tests_parameters:
   #     dependencies:
-  #     - -r tests/requirements.txt
+  #     - --requirement=tests/requirements.txt
   # - pytest_args: extra arguments for pytest. For example:
   #   run_tests_parameters:
   #     pytest_args: [--reruns, '1', --reruns-delay, '2']
