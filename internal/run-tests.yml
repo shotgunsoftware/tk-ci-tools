@@ -13,6 +13,7 @@ parameters:
   - name: tk_toolchain_ref
     type: string
     default: master
+
   # List of repositories to clone alongside this repository.
   # To clone the tk-framework-shotgunutils's master branch
   # and a specific tk-framework-qtwidget ref, you would
@@ -23,10 +24,12 @@ parameters:
   - name: additional_repositories
     type: object
     default: []
+
   # Git ref of tk-core to use.
   - name: tk_core_ref
     type: string
     default: master
+
   # Post test steps
   # This is a list of Azure Pipeline steps that will be inserted
   # right after the tests were run.
@@ -38,6 +41,7 @@ parameters:
   - name: post_tests_steps
     type: object
     default: []
+
   # If set to true, the build agent will run unit tests.
   - name: has_unit_tests
     type: boolean
