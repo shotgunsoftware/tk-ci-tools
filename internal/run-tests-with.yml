@@ -151,13 +151,16 @@ jobs:
         pip --version
         pip list
 
+  # Same as clone-repositories.yml, but with a runtime condition so the clone
+  # shows as skipped for repositories that are not Toolkit components.
+  - bash: git clone --depth 1 --branch ${{ parameters.tk_core_ref }} https://github.com/shotgunsoftware/tk-core ../tk-core
+    displayName: Clone tk-core(${{ parameters.tk_core_ref }})
+    # Skipped in the tk-core repository itself.
+    condition: and(ne(variables['Build.DefinitionName'], 'tk-core'), eq('${{ parameters.toolkit }}', 'true'))
+
   - template: clone-repositories.yml
     parameters:
       repositories:
-      # Always listed, so the clone shows as skipped for other repositories.
-      - name: tk-core
-        ref: ${{ parameters.tk_core_ref }}
-        condition: eq('${{ parameters.toolkit }}', 'true')
       # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
