@@ -276,8 +276,8 @@ jobs:
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
 
-  # Combine test results from main pytest and any post_tests_steps (e.g., integration tests).
-  # This merges multiple JUnit XML files into a single file for uploading to Codecov.
+  # Combine test results from main pytest and post_tests_steps (e.g. integration)
+  # Merges multiple JUnit XML files into single file for Codecov upload
   - task: Bash@3
     displayName: Combine test results
     condition: succeededOrFailed()
@@ -309,7 +309,6 @@ jobs:
         # Multiple test result files: merge them using Python
         python3 << 'PYTHON_SCRIPT'
         import xml.etree.ElementTree as ET
-        from pathlib import Path
         import glob
 
         # Find all test result files
@@ -372,8 +371,11 @@ jobs:
 
         # Write combined XML to standard location
         combined_tree = ET.ElementTree(combined_root)
-        ET.indent(combined_tree, space="  ")
-        combined_tree.write('test-results-main.xml', encoding='utf-8', xml_declaration=True)
+        # Note: ET.indent() is only available in Python 3.9+, so use tostring
+        xml_str = ET.tostring(combined_root, encoding='unicode')
+        with open('test-results-main.xml', 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+            f.write(xml_str)
         print(f"Combined {len(all_testsuites)} test suites into test-results-main.xml")
         PYTHON_SCRIPT
 
