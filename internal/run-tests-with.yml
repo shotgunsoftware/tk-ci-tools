@@ -276,6 +276,107 @@ jobs:
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
 
+  # Combine test results from main pytest and any post_tests_steps (e.g., integration tests).
+  # This merges multiple JUnit XML files into a single file for uploading to Codecov.
+  - task: Bash@3
+    displayName: Combine test results
+    condition: succeededOrFailed()
+    inputs:
+      targetType: inline
+      script: |
+        set -e
+
+        # Find all test result files
+        test_files=$(find . -maxdepth 1 -name "test-results-*.xml" -type f 2>/dev/null)
+        
+        if [ -z "$test_files" ]; then
+          echo "No test result files to combine"
+          exit 0
+        fi
+
+        # If only one file exists, rename it to the standard location
+        file_count=$(echo "$test_files" | wc -w)
+        if [ "$file_count" -eq 1 ]; then
+          if [ -f test-results-main.xml ]; then
+            echo "Single test results file already in place"
+            exit 0
+          fi
+          # Move the single file to standard location
+          mv $(echo $test_files | awk '{print $1}') test-results-main.xml
+          exit 0
+        fi
+
+        # Multiple test result files: merge them using Python
+        python3 << 'PYTHON_SCRIPT'
+        import xml.etree.ElementTree as ET
+        from pathlib import Path
+        import glob
+
+        # Find all test result files
+        test_files = sorted(glob.glob('test-results-*.xml'))
+        
+        if not test_files:
+            print("No test result files found")
+            exit(0)
+
+        # Parse all XML files
+        all_testsuites = []
+        total_tests = 0
+        total_failures = 0
+        total_errors = 0
+        total_skipped = 0
+        total_time = 0.0
+
+        for test_file in test_files:
+            try:
+                tree = ET.parse(test_file)
+                root = tree.getroot()
+                
+                # Handle both testsuites (root) and testsuite elements
+                if root.tag == 'testsuites':
+                    # Root is already testsuites container
+                    for suite in root.findall('testsuite'):
+                        all_testsuites.append(suite)
+                        # Aggregate statistics
+                        total_tests += int(suite.get('tests', 0))
+                        total_failures += int(suite.get('failures', 0))
+                        total_errors += int(suite.get('errors', 0))
+                        total_skipped += int(suite.get('skipped', 0))
+                        total_time += float(suite.get('time', 0))
+                elif root.tag == 'testsuite':
+                    # Root is a single testsuite
+                    all_testsuites.append(root)
+                    total_tests += int(root.get('tests', 0))
+                    total_failures += int(root.get('failures', 0))
+                    total_errors += int(root.get('errors', 0))
+                    total_skipped += int(root.get('skipped', 0))
+                    total_time += float(root.get('time', 0))
+            except Exception as e:
+                print(f"Warning: Failed to parse {test_file}: {e}")
+                continue
+
+        if not all_testsuites:
+            print("No test suites found in any XML files")
+            exit(0)
+
+        # Create combined testsuites element
+        combined_root = ET.Element('testsuites')
+        combined_root.set('tests', str(total_tests))
+        combined_root.set('failures', str(total_failures))
+        combined_root.set('errors', str(total_errors))
+        combined_root.set('skipped', str(total_skipped))
+        combined_root.set('time', str(total_time))
+
+        for suite in all_testsuites:
+            combined_root.append(suite)
+
+        # Write combined XML to standard location
+        combined_tree = ET.ElementTree(combined_root)
+        ET.indent(combined_tree, space="  ")
+        combined_tree.write('test-results-main.xml', encoding='utf-8', xml_declaration=True)
+        print(f"Combined {len(all_testsuites)} test suites into test-results-main.xml")
+        PYTHON_SCRIPT
+
   # We're done testing.. Before we can upload code coverage, we'll have to
   # combine the results.
   - task: Bash@3
