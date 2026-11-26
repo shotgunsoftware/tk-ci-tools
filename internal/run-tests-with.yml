@@ -135,7 +135,7 @@ jobs:
       # the result instead of nesting it.
       # E.g. given a pip_requirements parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
-      # - pytest, pytest-cov, pytest-nunit
+      # - pytest, pytest-cov, pytest-nunit, codecov-cli
       # - PySide2
       # - Qt.py
       # - numpy

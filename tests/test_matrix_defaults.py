@@ -54,13 +54,12 @@ def test_platforms(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
 
 
 def test_os_versions(run_tests_parameters: typing.Dict[str, typing.Any]) -> None:
-    """Every OS defaults to its -latest image and has a Codecov uploader."""
+    """Every OS defaults to its -latest image."""
     assert [
         os_version["name"] for os_version in run_tests_parameters["os_versions"]
     ] == ["Linux", "macOS", "Windows"]
     for os_version in run_tests_parameters["os_versions"]:
         assert os_version["image"].endswith("-latest"), os_version["name"]
-        assert os_version["codecov_download_url"].startswith("https://")
 
 
 def test_coverage_is_on_by_default(run_tests_parameters) -> None:
