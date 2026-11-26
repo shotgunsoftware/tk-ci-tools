@@ -18,9 +18,13 @@ parameters:
   #   ref: <branch-or-tag>
   repositories: []
 
+  # Runtime condition for all the clones of this call. When false, they are
+  # shown as skipped.
+  condition: 'true'
+
 steps:
 - ${{ each repo in parameters.repositories }}:
    - bash: git clone --depth 1 --branch ${{ coalesce(repo.ref, 'master') }} https://github.com/shotgunsoftware/${{ repo.name }} ../${{ repo.name }}
      displayName: Clone ${{ repo.name }}(${{ coalesce(repo.ref, 'master') }})
      # Allows us to easily skip when cloning tk-core inside the tk-core repo.
-     condition: ne(variables['Build.DefinitionName'], '${{ repo.name }}')
+     condition: and(ne(variables['Build.DefinitionName'], '${{ repo.name }}'), ${{ parameters.condition }})

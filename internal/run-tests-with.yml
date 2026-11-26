@@ -151,12 +151,13 @@ jobs:
         pip --version
         pip list
 
-  # Same as clone-repositories.yml, but with a runtime condition so the clone
-  # shows as skipped for repositories that are not Toolkit components.
-  - bash: git clone --depth 1 --branch ${{ parameters.tk_core_ref }} https://github.com/shotgunsoftware/tk-core ../tk-core
-    displayName: Clone tk-core(${{ parameters.tk_core_ref }})
-    # Skipped in the tk-core repository itself.
-    condition: and(ne(variables['Build.DefinitionName'], 'tk-core'), eq('${{ parameters.toolkit }}', 'true'))
+  - template: clone-repositories.yml
+    parameters:
+      repositories:
+      - name: tk-core
+        ref: ${{ parameters.tk_core_ref }}
+      # Shown as skipped for repositories that are not Toolkit components.
+      condition: eq('${{ parameters.toolkit }}', 'true')
 
   - template: clone-repositories.yml
     parameters:
