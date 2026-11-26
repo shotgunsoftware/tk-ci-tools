@@ -125,7 +125,6 @@ jobs:
       packages:
       - pytest
       - pytest-cov
-      - pytest-nunit
       # Uploads the coverage to codecov.io. pip picks the last release that
       # supports the Python version, e.g. 11.3.1 for Python 3.9.
       - codecov-cli
@@ -135,7 +134,7 @@ jobs:
       # the result instead of nesting it.
       # E.g. given a pip_requirements parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
-      # - pytest, pytest-cov, pytest-nunit, codecov-cli
+      # - pytest, pytest-cov, codecov-cli
       # - PySide2
       # - Qt.py
       # - numpy
@@ -241,8 +240,7 @@ jobs:
           tests \
           $PYTEST_COV_ARGS \
           --durations=0 \
-          --nunit-xml=test-results-main.xml \
-          --junitxml=test-results-main.junit.xml \
+          --junitxml=test-results-main.xml \
           --verbose ${{ join(' ', parameters.pytest_args) }}
     env:
       CI: 1
@@ -306,7 +304,7 @@ jobs:
       failTaskOnFailureToPublishResults: true
       failTaskOnMissingResultsFile: true
       testResultsFiles: test-results*.xml
-      testResultsFormat: NUnit
+      testResultsFormat: JUnit
       testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
     condition: succeededOrFailed()
 
@@ -368,13 +366,13 @@ jobs:
       script: |
         set -e
 
-        if [ ! -f test-results-main.junit.xml ]; then
+        if [ ! -f test-results-main.xml ]; then
           echo "No test results file found, skipping upload"
           exit 0
         fi
 
         codecovcli do-upload \
           --report-type test_results \
-          --file test-results-main.junit.xml
+          --file test-results-main.xml
     env:
       CODECOV_TOKEN: $(CODECOV_TOKEN)
