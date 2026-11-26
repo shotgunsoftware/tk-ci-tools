@@ -42,9 +42,9 @@ parameters:
     # - name: tk-framework-qtwidgets
     #   ref: <branch-or-tag>
 
-  - name: extra_test_dependencies
+  - name: pip_requirements
     type: object
-    # List of Python packages that need to be pip installed for testing.
+    # What to pip install for testing, one pip argument per item.
 
   - name: post_tests_steps
     type: object
@@ -65,30 +65,30 @@ parameters:
     type: string
     # Git ref of tk-toolchain to use.
 
-  - name: use_tk_core
+  - name: toolkit
     type: boolean
-    # Clone tk-core and let the tk-toolchain pytest plugin load it, so tests
-    # can import sgtk. Turn it off for repositories that are not Toolkit
-    # components, since tk-core also puts its own bundled packages, like
-    # shotgun_api3, first on sys.path.
+    # The repository is a Toolkit component: install the Qt wrapper and
+    # tk-toolchain, clone tk-core, and set up a display for Qt on Linux. Turn
+    # it off for other repositories, which don't need any of it. tk-core also
+    # puts its own bundled packages, like shotgun_api3, first on sys.path.
 
-  - name: has_coverage
+  - name: coverage
     type: boolean
     # Measure the code coverage, publish it to Azure Pipelines and upload it to
     # Codecov. Turn it off for repositories whose tests don't exercise the
     # code of the repository itself.
 
-  - name: pre_tests_steps
+  - name: pre_steps
     type: object
     # List of Azure Pipeline steps inserted right before the tests are run.
 
-  - name: tests_env
+  - name: env
     type: object
     # Extra environment variables for the step running the tests. Secrets
     # must be mapped here, e.g. SG_API_KEY: $(my_secret), since Azure does not
     # expose them as environment variables on its own.
 
-  - name: pytest_extra_args
+  - name: pytest_args
     type: object
     # List of extra arguments for pytest, e.g. [--reruns, '1'].
 
@@ -106,11 +106,6 @@ jobs:
     value: ${{ parameters.os_name }}
   - name: tk_ci_python_version
     value: ${{ parameters.python_version }}
-  - ${{ if eq(parameters.use_tk_core, false) }}:
-    # Turn off the tk-toolchain pytest plugin so tk-core is not loaded, in
-    # the main test step and in post_tests_steps.
-    - name: PYTEST_ADDOPTS
-      value: -p no:pytest_tank_test
   steps:
 
   - checkout: self
@@ -128,24 +123,27 @@ jobs:
   - template: pip-install-packages.yml
     parameters:
       packages:
-      - ${{ parameters.qt_wrapper }}
-      - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
       - pytest
       - pytest-cov
       - pytest-nunit
       # Uploads the coverage to codecov.io. pip picks the last release that
       # supports the Python version, e.g. 11.3.1 for Python 3.9.
       - codecov-cli
+      - ${{ if eq(parameters.toolkit, true) }}:
+        - ${{ parameters.qt_wrapper }}
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
-      # E.g. given a extra_test_dependencies parameter set to [Qt.py, numpy], the packages
+      # E.g. given a pip_requirements parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
+      # - pytest, pytest-cov, pytest-nunit
       # - PySide2
-      # - git+https://github.com/shotgunsoftware/tk-toolchain.git@${{ parameters.tk_toolchain_ref }}#egg=tk-toolchain
-      # - pytest-azurepipelines
       # - Qt.py
       # - numpy
-      - ${{ parameters.extra_test_dependencies }}
+      # - tk-toolchain
+      - ${{ parameters.pip_requirements }}
+      # Last, since the URL is long.
+      - ${{ if eq(parameters.toolkit, true) }}:
+        - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip
 
   - task: Bash@3
     displayName: Check installed packages
@@ -158,27 +156,34 @@ jobs:
   - template: clone-repositories.yml
     parameters:
       repositories:
-      - ${{ if eq(parameters.use_tk_core, true) }}:
-        - name: tk-core
-          ref: ${{ parameters.tk_core_ref }}
+      - name: tk-core
+        ref: ${{ parameters.tk_core_ref }}
+      # Shown as skipped for repositories that are not Toolkit components.
+      condition: eq('${{ parameters.toolkit }}', 'true')
+
+  - template: clone-repositories.yml
+    parameters:
+      repositories:
       # Nested lists are flattened, as explained above in pip-install-packages.yml.
       - ${{ parameters.additional_repositories }}
 
-  # We can't use eq(Agent.OS, 'linux') here because template expansion is done
-  # before the job is assigned to an agent.
-  - ${{ if contains(parameters.os_name, 'Linux') }}:
-    # Start xvfb on Linux so we can test with a GUI.
-    - bash: |
-        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        echo ">>> Started Xvfb"
-      displayName: Start Xvfb
+  # Qt display setup, only for Toolkit repositories on Linux. The steps are
+  # shown as skipped otherwise.
+  # Start xvfb on Linux so we can test with a GUI.
+  - bash: |
+      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      echo ">>> Started Xvfb"
+    displayName: Start Xvfb
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
-    - bash: sudo apt update
-      displayName: APT Update
+  - bash: sudo apt update
+    displayName: APT Update
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
-    # Install libegl1 required for PySide6
-    - bash: sudo apt install libegl1
-      displayName: Install libegl1
+  # Install libegl1 required for PySide6
+  - bash: sudo apt install libegl1
+    displayName: Install libegl1
+    condition: and(succeeded(), eq('${{ parameters.toolkit }}', 'true'), eq(variables['Agent.OS'], 'Linux'))
 
   # Repositories using our build pipeline outside of the
   # shotgunsoftware organization should not be able to run our UI automation
@@ -194,12 +199,12 @@ jobs:
   # all tests tasks require access to our secrets so they can't be used and the build will
   # fail.
 
-  # The pre_tests_steps list will be flattened into this list of steps.
-  - ${{ parameters.pre_tests_steps }}
+  # The pre_steps list will be flattened into this list of steps.
+  - ${{ parameters.pre_steps }}
 
   - task: Bash@3
     displayName: Create a simple coverage file if missing
-    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
     # Run the tests. The task will create a simple coverage file if one is missing.
     # It will include all code except for the "tests" folder.
     inputs:
@@ -225,7 +230,7 @@ jobs:
   - task: Bash@3
     displayName: Run tests
     # Runs the tests and generates both test report and code coverage
-    # FIXME: pytest_extra_args is joined with spaces into the script, so an
+    # FIXME: pytest_args is joined with spaces into the script, so an
     # argument containing a space is split, e.g. ['-k', 'test_a or test_b']
     # passes "or" and "test_b" as paths. Pass the list as JSON through an
     # environment variable (convertToJson) and rebuild a bash array from it.
@@ -237,12 +242,12 @@ jobs:
           $PYTEST_COV_ARGS \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
-          --verbose ${{ join(' ', parameters.pytest_extra_args) }}
+          --verbose ${{ join(' ', parameters.pytest_args) }}
     env:
       CI: 1
       # Tell Pytest that we're running in a CI environment
 
-      ${{ if eq(parameters.has_coverage, true) }}:
+      ${{ if eq(parameters.coverage, true) }}:
         PYTEST_COV_ARGS: --cov
 
       COVERAGE_FILE: '.coverage.main'
@@ -250,7 +255,7 @@ jobs:
       # as "coverage combine" will combine all coverage files that match .coverage.*.
       # The parameters.post_tests_steps might also produce coeverage files
 
-      ${{ if eq(parameters.os_name, 'Linux') }}:
+      ${{ if and(eq(parameters.toolkit, true), eq(parameters.os_name, 'Linux')) }}:
         # These environment variables need to be set so Linux runs can connect
         # to xvfb and to have complete logging. Each test logging output will
         # be captured by pytest and displayed on failure.
@@ -266,7 +271,7 @@ jobs:
       TK_TOOLCHAIN_USER_PASSWORD: $(sg.ci.human.password)
       SHOTGUN_TEST_ENTITY_SUFFIX: '$(Agent.Name)'
 
-      ${{ each variable in parameters.tests_env }}:
+      ${{ each variable in parameters.env }}:
         ${{ variable.key }}: ${{ variable.value }}
 
   # The post_test_steps list will be flattened into this list of steps.
@@ -276,7 +281,7 @@ jobs:
   # combine the results.
   - task: Bash@3
     displayName: Combine code coverage results
-    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
     inputs:
       targetType: inline
       script: |
@@ -306,14 +311,14 @@ jobs:
 
   - task: PublishCodeCoverageResults@2
     displayName: Publish code coverage
-    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
     inputs:
       summaryFileLocation: coverage.xml
       failIfCoverageEmpty: true
 
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
-    condition: and(succeeded(), eq('${{ parameters.has_coverage }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
     # Upload the code coverage result to codecov.io using the Codecov CLI.
     # Use flags to identify coverage from each OS/Python combination for proper
     # merging.
