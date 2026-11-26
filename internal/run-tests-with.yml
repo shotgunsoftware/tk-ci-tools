@@ -320,8 +320,7 @@ jobs:
     displayName: Uploading coverage to Codecov.io
     condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
     # Upload the code coverage result to codecov.io using the Codecov CLI.
-    # Use flags to identify coverage from each OS/Python combination for proper
-    # merging.
+    # One flag per upload identifies the OS/Python combination for proper merging.
     inputs:
       targetType: inline
       script: |
@@ -348,8 +347,7 @@ jobs:
         codecovcli upload-process \
           --disable-search \
           --file coverage.xml \
-          --flag "${{ parameters.os_name }}" \
-          --flag "Python-${{ parameters.python_version }}" \
+          --flag "${{ parameters.os_name }}-Python-${{ parameters.python_version }}" \
           --name "Tested on ${{ parameters.os_name }} with Python ${{ parameters.python_version }}" \
           "${branch_args[@]}"
     env:
