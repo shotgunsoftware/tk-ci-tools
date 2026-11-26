@@ -82,7 +82,7 @@ def test_overrides_exist(run_tests_parameters: typing.Dict[str, typing.Any]) -> 
         "coverage",
         "pre_steps",
         "env",
-        "dependencies",
+        "pip_requirements",
         "pytest_args",
     }
     assert documented <= set(run_tests_parameters)

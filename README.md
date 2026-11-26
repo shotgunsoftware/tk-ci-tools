@@ -148,7 +148,13 @@ The other keys of `run_tests_parameters` are:
 - `coverage`: `false` for repositories whose tests don't exercise their own code, like tk-ci-tools itself. The coverage is not measured, and the steps that combine, publish and upload it to Codecov are skipped.
 - `pre_steps`: steps run right before the tests, in every test job, e.g. to create a configuration file.
 - `env`: extra environment variables for the tests. Secret variables are not exposed to the tests on their own, map them here, e.g. `MY_PASSWORD: $(my_password)`. The values can use `$(tk_ci_os_name)` and `$(tk_ci_python_version)`, the OS and Python version of the job, e.g. to use a different test user per job.
-- `dependencies`: Python packages to pip install for testing, e.g. `[--requirement=tests/requirements.txt]`.
+- `pip_requirements`: what to pip install for testing, one pip argument per item. For example:
+  - `--requirement=tests/requirements.txt`: a requirements file
+  - `pytest==8.3.5`: a package, with its version
+  - `urllib3@https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip`: a package from a URL
+  - `https://example.com/wheels/my_package-1.0-py3-none-any.whl`: a wheel from a URL
+
+  The items are passed to pip unquoted, so an item can't contain spaces, `<`, `>` or `;`. Put such requirements, like `urllib3 @ <url>` or `pytest>=8`, in a requirements file.
 - `pytest_args`: extra arguments for pytest, e.g. `[--reruns, '1', --reruns-delay, '2']`.
 
 ### Create a build in Azure Pipelines

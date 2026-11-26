@@ -45,9 +45,9 @@ parameters:
     # - name: tk-framework-qtwidgets
     #   ref: <branch-or-tag>
 
-  - name: dependencies
+  - name: pip_requirements
     type: object
-    # List of Python packages that need to be pip installed for testing.
+    # What to pip install for testing, one pip argument per item.
 
   - name: post_tests_steps
     type: object
@@ -131,14 +131,14 @@ jobs:
         - ${{ parameters.qt_wrapper }}
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
-      # E.g. given a dependencies parameter set to [Qt.py, numpy], the packages
+      # E.g. given a pip_requirements parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
       # - pytest, pytest-cov, pytest-nunit
       # - PySide2
       # - Qt.py
       # - numpy
       # - tk-toolchain
-      - ${{ parameters.dependencies }}
+      - ${{ parameters.pip_requirements }}
       # Last, since the URL is long.
       - ${{ if eq(parameters.toolkit, true) }}:
         - https://github.com/shotgunsoftware/tk-toolchain/archive/${{ parameters.tk_toolchain_ref }}.zip

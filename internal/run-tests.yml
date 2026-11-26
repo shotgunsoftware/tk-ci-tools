@@ -73,9 +73,9 @@ parameters:
     type: object
     default: {}
 
-  # Python packages to pip install for testing, e.g.
-  # [--requirement=tests/requirements.txt].
-  - name: dependencies
+  # What to pip install for testing, one pip argument per item, passed
+  # unquoted, e.g. [--requirement=tests/requirements.txt, pytest==8.3.5].
+  - name: pip_requirements
     type: object
     default: []
 
@@ -154,7 +154,7 @@ jobs:
               vm_image: ${{ coalesce(platform.os_versions[os_version.name], os_version.image) }}
 
               # pass through all parameters
-              dependencies: ${{ parameters.dependencies }}
+              pip_requirements: ${{ parameters.pip_requirements }}
               tk_toolchain_ref: ${{ parameters.tk_toolchain_ref }}
               additional_repositories: ${{ parameters.additional_repositories }}
               tk_core_ref: ${{ parameters.tk_core_ref }}

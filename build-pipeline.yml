@@ -43,7 +43,7 @@ parameters:
   # fails the pipeline. For example:
   #   run_tests_parameters:
   #     toolkit: false
-  #     dependencies:
+  #     pip_requirements:
   #     - --requirement=tests/requirements.txt
   - name: run_tests_parameters
     type: object
@@ -78,9 +78,13 @@ parameters:
     #     MY_LOGIN: $(my_login)-$(tk_ci_os_name)-$(tk_ci_python_version)
     #     MY_PASSWORD: $(my_password)
     #
-    # dependencies: Python packages to pip install for testing. For example:
-    #   dependencies:
+    # pip_requirements: what to pip install for testing, one pip argument per
+    # item. The items are passed to pip unquoted: no spaces, <, > or ; in an
+    # item, use a requirements file for those. For example:
+    #   pip_requirements:
     #   - --requirement=tests/requirements.txt
+    #   - pytest==8.3.5
+    #   - urllib3@https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip
     #
     # pytest_args: extra arguments for pytest. For example:
     #   pytest_args: [--reruns, '1', --reruns-delay, '2']
