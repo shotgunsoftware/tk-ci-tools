@@ -98,8 +98,10 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
   variables:
-  - ${{ if eq(parameters.coverage, true) }}:
-    - group: codecov.io
+  # Provides CODECOV_TOKEN for both coverage uploads (codecovcli upload-process)
+  # and test results uploads (codecovcli do-upload --report-type test_results).
+  # Both are now core features of the pipeline.
+  - group: codecov.io
   # The OS and Python version of this job, for the steps and environment
   # variables of the repository, e.g. $(tk_ci_os_name) gives Linux.
   - name: tk_ci_os_name
