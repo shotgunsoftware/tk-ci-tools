@@ -98,8 +98,8 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
   variables:
-  # Provides CODECOV_TOKEN, the Codecov global upload token.
-  - group: codecov.io
+  - ${{ if eq(parameters.coverage, true) }}:
+    - group: codecov.io
   # The OS and Python version of this job, for the steps and environment
   # variables of the repository, e.g. $(tk_ci_os_name) gives Linux.
   - name: tk_ci_os_name
@@ -287,22 +287,12 @@ jobs:
         set -e
 
         # Find all test result files
-        test_files=$(find . -maxdepth 1 -name "test-results-*.xml" -type f 2>/dev/null)
-        
-        if [ -z "$test_files" ]; then
-          echo "No test result files to combine"
-          exit 0
-        fi
-
-        # If only one file exists, rename it to the standard location
+        test_files=$(find . -maxdepth 1 -name "test-results-*.xml" -type f 2>/dev/null | sort)
         file_count=$(echo "$test_files" | wc -w)
-        if [ "$file_count" -eq 1 ]; then
-          if [ -f test-results-main.xml ]; then
-            echo "Single test results file already in place"
-            exit 0
-          fi
-          # Move the single file to standard location
-          mv $(echo $test_files | awk '{print $1}') test-results-main.xml
+
+        # If single file or no files, nothing to combine
+        if [ "$file_count" -le 1 ]; then
+          echo "Found $file_count test result file(s), no combination needed"
           exit 0
         fi
 
@@ -314,8 +304,8 @@ jobs:
         # Find all test result files
         test_files = sorted(glob.glob('test-results-*.xml'))
         
-        if not test_files:
-            print("No test result files found")
+        if len(test_files) <= 1:
+            print(f"Found {len(test_files)} test result file(s), skipping combination")
             exit(0)
 
         # Parse all XML files
@@ -370,8 +360,6 @@ jobs:
             combined_root.append(suite)
 
         # Write combined XML to standard location
-        combined_tree = ET.ElementTree(combined_root)
-        # Note: ET.indent() is only available in Python 3.9+, so use tostring
         xml_str = ET.tostring(combined_root, encoding='unicode')
         with open('test-results-main.xml', 'w', encoding='utf-8') as f:
             f.write('<?xml version="1.0" encoding="utf-8"?>\n')
