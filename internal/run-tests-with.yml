@@ -305,7 +305,7 @@ jobs:
 
         # Find all test result files
         test_files = sorted(glob.glob('test-results-*.xml'))
-        
+
         if len(test_files) <= 1:
             print(f"Found {len(test_files)} test result file(s), skipping combination")
             exit(0)
@@ -322,7 +322,7 @@ jobs:
             try:
                 tree = ET.parse(test_file)
                 root = tree.getroot()
-                
+
                 # Handle both testsuites (root) and testsuite elements
                 if root.tag == 'testsuites':
                     # Root is already testsuites container
