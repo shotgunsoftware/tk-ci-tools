@@ -242,6 +242,7 @@ jobs:
           $PYTEST_COV_ARGS \
           --durations=0 \
           --nunit-xml=test-results-main.xml \
+          --junitxml=test-results-main.junit.xml \
           --verbose ${{ join(' ', parameters.pytest_args) }}
     env:
       CI: 1
@@ -354,4 +355,26 @@ jobs:
       # Secret variables must be mapped explicitly. In fork builds, the
       # secret is not set and this is the literal "$(CODECOV_TOKEN)" string,
       # hence the unset above.
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+  - task: Bash@3
+    displayName: Uploading test results to Codecov.io
+    condition: succeededOrFailed()
+    # Upload the test results to codecov.io using the Codecov CLI.
+    # This enables test analytics, failed test visibility in PR comments,
+    # and flaky test detection.
+    inputs:
+      targetType: inline
+      script: |
+        set -e
+
+        if [ ! -f test-results-main.junit.xml ]; then
+          echo "No test results file found, skipping upload"
+          exit 0
+        fi
+
+        codecovcli do-upload \
+          --report-type test_results \
+          --file test-results-main.junit.xml
+    env:
       CODECOV_TOKEN: $(CODECOV_TOKEN)
