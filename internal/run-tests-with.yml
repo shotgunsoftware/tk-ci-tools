@@ -16,9 +16,6 @@ parameters:
   # All parameters are mandatory: run-tests.yml provides them all, including
   # the default values.
 
-  - name: codecov_download_url
-    type: string
-
   - name: os_name
     type: string
     # Pretty name for the OS.
@@ -101,6 +98,10 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
   variables:
+  # Provides CODECOV_TOKEN for both coverage uploads (codecovcli upload-process)
+  # and test results uploads (codecovcli do-upload --report-type test_results).
+  # Both are now core features of the pipeline.
+  - group: codecov.io
   # The OS and Python version of this job, for the steps and environment
   # variables of the repository, e.g. $(tk_ci_os_name) gives Linux.
   - name: tk_ci_os_name
@@ -126,14 +127,16 @@ jobs:
       packages:
       - pytest
       - pytest-cov
-      - pytest-nunit
+      # Uploads the coverage to codecov.io. pip picks the last release that
+      # supports the Python version, e.g. 11.3.1 for Python 3.9.
+      - codecov-cli
       - ${{ if eq(parameters.toolkit, true) }}:
         - ${{ parameters.qt_wrapper }}
       # Inserting a parameter that is a list into another list flattens
       # the result instead of nesting it.
       # E.g. given a pip_requirements parameter set to [Qt.py, numpy], the packages
       # parameter will end up as
-      # - pytest, pytest-cov, pytest-nunit
+      # - pytest, pytest-cov, codecov-cli
       # - PySide2
       # - Qt.py
       # - numpy
@@ -239,7 +242,7 @@ jobs:
           tests \
           $PYTEST_COV_ARGS \
           --durations=0 \
-          --nunit-xml=test-results-main.xml \
+          --nunitxml=test-results-main.xml \
           --verbose ${{ join(' ', parameters.pytest_args) }}
     env:
       CI: 1
@@ -274,6 +277,83 @@ jobs:
 
   # The post_test_steps list will be flattened into this list of steps.
   - ${{ parameters.post_tests_steps }}
+
+  # Combine test results from main pytest and post_tests_steps (e.g. integration)
+  # Merges multiple NUnit XML files into single file for Codecov upload
+  - task: PythonScript@0
+    displayName: Combine test results
+    condition: succeededOrFailed()
+    inputs:
+      scriptSource: inline
+      script: |
+        import xml.etree.ElementTree as ET
+        import glob
+        import os
+
+        # Find all test result files
+        test_files = sorted(glob.glob('test-results-*.xml'))
+
+        if len(test_files) <= 1:
+            print(f"Found {len(test_files)} test result file(s), skipping combination")
+            exit(0)
+
+        # Parse all XML files
+        all_testsuites = []
+        total_tests = 0
+        total_failures = 0
+        total_errors = 0
+        total_skipped = 0
+        total_time = 0.0
+
+        for test_file in test_files:
+            try:
+                tree = ET.parse(test_file)
+                root = tree.getroot()
+
+                # Handle both testsuites (root) and testsuite elements
+                if root.tag == 'testsuites':
+                    # Root is already testsuites container
+                    for suite in root.findall('testsuite'):
+                        all_testsuites.append(suite)
+                        # Aggregate statistics
+                        total_tests += int(suite.get('tests', 0))
+                        total_failures += int(suite.get('failures', 0))
+                        total_errors += int(suite.get('errors', 0))
+                        total_skipped += int(suite.get('skipped', 0))
+                        total_time += float(suite.get('time', 0))
+                elif root.tag == 'testsuite':
+                    # Root is a single testsuite
+                    all_testsuites.append(root)
+                    total_tests += int(root.get('tests', 0))
+                    total_failures += int(root.get('failures', 0))
+                    total_errors += int(root.get('errors', 0))
+                    total_skipped += int(root.get('skipped', 0))
+                    total_time += float(root.get('time', 0))
+            except Exception as e:
+                print(f"Warning: Failed to parse {test_file}: {e}")
+                continue
+
+        if not all_testsuites:
+            print("No test suites found in any XML files")
+            exit(0)
+
+        # Create combined testsuites element
+        combined_root = ET.Element('testsuites')
+        combined_root.set('tests', str(total_tests))
+        combined_root.set('failures', str(total_failures))
+        combined_root.set('errors', str(total_errors))
+        combined_root.set('skipped', str(total_skipped))
+        combined_root.set('time', str(total_time))
+
+        for suite in all_testsuites:
+            combined_root.append(suite)
+
+        # Write combined XML to standard location
+        xml_str = ET.tostring(combined_root, encoding='unicode')
+        with open('test-results-main.xml', 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+            f.write(xml_str)
+        print(f"Combined {len(all_testsuites)} test suites into test-results-main.xml")
 
   # We're done testing.. Before we can upload code coverage, we'll have to
   # combine the results.
@@ -317,17 +397,61 @@ jobs:
   - task: Bash@3
     displayName: Uploading coverage to Codecov.io
     condition: and(succeeded(), eq('${{ parameters.coverage }}', 'true'))
-    # Upload the code coverage result to codecov.io using the binary uploader.
-    # Use flags to identify coverage from each OS/Python combination for proper
-    # merging.
+    # Upload the code coverage result to codecov.io using the Codecov CLI.
+    # One flag per upload identifies the OS/Python combination for proper merging.
     inputs:
       targetType: inline
       script: |
         set -e
-        curl --remote-name --silent "${{ parameters.codecov_download_url }}"
-        chmod +x codecov
-        ./codecov  \
+
+        branch_args=()
+        if [ -n "${SYSTEM_PULLREQUEST_SOURCEBRANCH}" ]; then
+          # Pull request builds check out refs/pull/<number>/merge, so give
+          # Codecov the name of the pull request branch.
+          branch="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
+
+          if [ "${SYSTEM_PULLREQUEST_ISFORK}" = "True" ]; then
+            # Azure does not give secrets to builds of pull requests from
+            # forks. Codecov accepts uploads without a token for branches
+            # named <fork-owner>:<branch>.
+            fork_owner=$(echo "${SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI}" | sed -E 's#^https://github.com/([^/]+)/.*$#\1#')
+            branch="${fork_owner:-fork}:${branch}"
+            unset CODECOV_TOKEN
+          fi
+
+          branch_args=(--branch "${branch}")
+        fi
+
+        codecovcli upload-process \
+          --disable-search \
           --file coverage.xml \
-          --flags ${{ parameters.os_name }} \
-          --flags "Python-${{ parameters.python_version }}" \
+          --flag "${{ parameters.os_name }}-Python-${{ parameters.python_version }}" \
           --name "Tested on ${{ parameters.os_name }} with Python ${{ parameters.python_version }}" \
+          "${branch_args[@]}"
+    env:
+      # Secret variables must be mapped explicitly. In fork builds, the
+      # secret is not set and this is the literal "$(CODECOV_TOKEN)" string,
+      # hence the unset above.
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+  - task: Bash@3
+    displayName: Uploading test results to Codecov.io
+    condition: succeededOrFailed()
+    # Upload the test results to codecov.io using the Codecov CLI.
+    # This enables test analytics, failed test visibility in PR comments,
+    # and flaky test detection.
+    inputs:
+      targetType: inline
+      script: |
+        set -e
+
+        if [ ! -f test-results-main.xml ]; then
+          echo "No test results file found, skipping upload"
+          exit 0
+        fi
+
+        codecovcli do-upload \
+          --report-type test_results \
+          --file test-results-main.xml
+    env:
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
