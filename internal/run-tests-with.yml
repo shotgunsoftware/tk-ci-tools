@@ -242,7 +242,7 @@ jobs:
           tests \
           $PYTEST_COV_ARGS \
           --durations=0 \
-          --junitxml=test-results-main.xml \
+          --nunitxml=test-results-main.xml \
           --verbose ${{ join(' ', parameters.pytest_args) }}
     env:
       CI: 1
@@ -279,29 +279,16 @@ jobs:
   - ${{ parameters.post_tests_steps }}
 
   # Combine test results from main pytest and post_tests_steps (e.g. integration)
-  # Merges multiple JUnit XML files into single file for Codecov upload
-  - task: Bash@3
+  # Merges multiple NUnit XML files into single file for Codecov upload
+  - task: PythonScript@0
     displayName: Combine test results
     condition: succeededOrFailed()
     inputs:
-      targetType: inline
+      scriptSource: inline
       script: |
-        set -e
-
-        # Find all test result files
-        test_files=$(find . -maxdepth 1 -name "test-results-*.xml" -type f 2>/dev/null | sort)
-        file_count=$(echo "$test_files" | wc -w)
-
-        # If single file or no files, nothing to combine
-        if [ "$file_count" -le 1 ]; then
-          echo "Found $file_count test result file(s), no combination needed"
-          exit 0
-        fi
-
-        # Multiple test result files: merge them using Python
-        python3 << 'PYTHON_SCRIPT'
         import xml.etree.ElementTree as ET
         import glob
+        import os
 
         # Find all test result files
         test_files = sorted(glob.glob('test-results-*.xml'))
@@ -367,7 +354,6 @@ jobs:
             f.write('<?xml version="1.0" encoding="utf-8"?>\n')
             f.write(xml_str)
         print(f"Combined {len(all_testsuites)} test suites into test-results-main.xml")
-        PYTHON_SCRIPT
 
   # We're done testing.. Before we can upload code coverage, we'll have to
   # combine the results.
@@ -397,7 +383,7 @@ jobs:
       failTaskOnFailureToPublishResults: true
       failTaskOnMissingResultsFile: true
       testResultsFiles: test-results*.xml
-      testResultsFormat: JUnit
+      testResultsFormat: NUnit
       testRunTitle: "${{ parameters.os_name }} - Python ${{ parameters.python_version }}"
     condition: succeededOrFailed()
 
